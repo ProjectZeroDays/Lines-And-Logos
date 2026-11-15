@@ -1,0 +1,518 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+// ========== CRM & Leads ==========
+model Lead {
+  id          String   @id @default(cuid())
+  name        String
+  company     String
+  email       String?
+  phone       String?
+  source      String
+  type        String
+  score       Int      @default(0)
+  tier        String   @default("warm")
+  stage       String   @default("new")
+  owner       String?
+  nextStep    String?
+  lastTouch   DateTime?
+  notes       String?
+  aiSummary   String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  activities  Activity[]
+  deals       Deal[]
+  account     Account? @relation(fields: [accountId], references: [id])
+  accountId   String?
+  notifications Notification[]
+}
+
+model Account {
+  id          String   @id @default(cuid())
+  name        String
+  type        String
+  segment     String?
+  seats       Int?
+  health      String   @default("green")
+  risks       String?
+  goals       String?
+  renewalDate DateTime?
+  owner       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  contacts    Contact[]
+  opportunities Opportunity[]
+  leads       Lead[]
+  notes       Note[]
+  tasks       Task[]
+  jobs        Job[]
+  invoices    Invoice[]
+  employees   Employee[]
+}
+
+model Contact {
+  id        String   @id @default(cuid())
+  name      String
+  role      String?
+  email     String?
+  phone     String?
+  account   Account  @relation(fields: [accountId], references: [id])
+  accountId String
+  lastTouch DateTime?
+  createdAt DateTime @default(now())
+}
+
+model Opportunity {
+  id        String   @id @default(cuid())
+  type      String
+  value     Float
+  stage     String   @default("prospect")
+  account   Account  @relation(fields: [accountId], references: [id])
+  accountId String
+  closeDate DateTime?
+  notes     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Deal {
+  id        String   @id @default(cuid())
+  title     String
+  value     Float
+  stage     String   @default("prospect")
+  lead      Lead?    @relation(fields: [leadId], references: [id])
+  leadId    String?
+  closeDate DateTime?
+  notes     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Activity {
+  id        String   @id @default(cuid())
+  type      String
+  date      DateTime @default(now())
+  who       String?
+  outcome   String?
+  notes     String?
+  lead      Lead?    @relation(fields: [leadId], references: [id])
+  leadId    String?
+  dealId    String?
+  createdAt DateTime @default(now())
+}
+
+model Note {
+  id        String   @id @default(cuid())
+  content   String
+  account   Account  @relation(fields: [accountId], references: [id])
+  accountId String
+  createdAt DateTime @default(now())
+}
+
+model Task {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  owner       String?
+  dueDate     DateTime?
+  status      String   @default("pending")
+  priority    String   @default("medium")
+  account     Account? @relation(fields: [accountId], references: [id])
+  accountId   String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// ========== Jobs & Operations ==========
+model Job {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  type        String
+  status      String   @default("quoted")
+  account     Account? @relation(fields: [accountId], references: [id])
+  accountId   String?
+  assignedTo  String?
+  crewDays    Int?
+  startDate   DateTime?
+  endDate     DateTime?
+  value       Float?
+  notes       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  invoices    Invoice[]
+  timeEntries TimeEntry[]
+  checklists  ChecklistRun[]
+  notifications Notification[]
+}
+
+model TimeEntry {
+  id        String   @id @default(cuid())
+  job       Job      @relation(fields: [jobId], references: [id])
+  jobId     String
+  worker    String
+  hours     Float
+  date      DateTime
+  billable  Boolean  @default(true)
+  notes     String?
+  createdAt DateTime @default(now())
+}
+
+model Checklist {
+  id          String   @id @default(cuid())
+  name        String
+  type        String
+  items       String
+  createdAt   DateTime @default(now())
+  runs        ChecklistRun[]
+}
+
+model ChecklistRun {
+  id          String   @id @default(cuid())
+  checklist   Checklist @relation(fields: [checklistId], references: [id])
+  checklistId String
+  job         Job?     @relation(fields: [jobId], references: [id])
+  jobId       String?
+  completedBy String?
+  completedAt DateTime?
+  results     String
+  issues      String?
+  createdAt   DateTime @default(now())
+}
+
+// ========== Finance ==========
+model Invoice {
+  id          String   @id @default(cuid())
+  number      String   @unique
+  account     Account? @relation(fields: [accountId], references: [id])
+  accountId   String?
+  job         Job?     @relation(fields: [jobId], references: [id])
+  jobId       String?
+  amount      Float
+  status      String   @default("draft")
+  dueDate     DateTime?
+  paidDate    DateTime?
+  sentAt      DateTime?
+  notes       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  payments    Payment[]
+  reminders   Reminder[]
+}
+
+model Payment {
+  id        String   @id @default(cuid())
+  invoice   Invoice  @relation(fields: [invoiceId], references: [id])
+  invoiceId String
+  amount    Float
+  method    String
+  date      DateTime @default(now())
+  notes     String?
+}
+
+model Reminder {
+  id        String   @id @default(cuid())
+  invoice   Invoice  @relation(fields: [invoiceId], references: [id])
+  invoiceId String
+  type      String
+  sentAt    DateTime @default(now())
+  channel   String
+}
+
+model Expense {
+  id          String   @id @default(cuid())
+  category    String
+  amount      Float
+  description String?
+  vendor      String?
+  date        DateTime @default(now())
+  createdAt   DateTime @default(now())
+}
+
+model Revenue {
+  id        String   @id @default(cuid())
+  source    String
+  amount    Float
+  date      DateTime @default(now())
+  jobId     String?
+  accountId String?
+  createdAt DateTime @default(now())
+}
+
+// ========== Marketing & Content ==========
+model ContentPost {
+  id          String   @id @default(cuid())
+  platform    String
+  content     String
+  status      String   @default("draft")
+  scheduledAt DateTime?
+  publishedAt DateTime?
+  impressions Int      @default(0)
+  clicks      Int      @default(0)
+  source      String?
+  createdAt   DateTime @default(now())
+}
+
+model Campaign {
+  id          String   @id @default(cuid())
+  name        String
+  type        String
+  status      String   @default("draft")
+  spend       Float    @default(0)
+  leads       Int      @default(0)
+  conversions Int      @default(0)
+  startDate   DateTime?
+  endDate     DateTime?
+  createdAt   DateTime @default(now())
+}
+
+// ========== Operations & Inventory ==========
+model Equipment {
+  id             String   @id @default(cuid())
+  name           String
+  type           String
+  status         String   @default("available")
+  assignedTo     String?
+  jobId          String?
+  purchaseDate   DateTime?
+  value          Float?
+  maintenanceDue DateTime?
+  notes          String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model Vendor {
+  id          String   @id @default(cuid())
+  name        String
+  category    String
+  contact     String?
+  email       String?
+  phone       String?
+  rating      Float?
+  contractEnd DateTime?
+  status      String   @default("active")
+  notes       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  purchaseOrders PurchaseOrder[]
+  evaluations VendorEvaluation[]
+}
+
+model PurchaseOrder {
+  id        String   @id @default(cuid())
+  vendor    Vendor   @relation(fields: [vendorId], references: [id])
+  vendorId  String
+  item      String
+  amount    Float
+  status    String   @default("pending")
+  approver  String?
+  date      DateTime @default(now())
+  createdAt DateTime @default(now())
+}
+
+model VendorEvaluation {
+  id        String   @id @default(cuid())
+  vendor    Vendor   @relation(fields: [vendorId], references: [id])
+  vendorId  String
+  criteria  String
+  score     Float
+  notes     String?
+  date      DateTime @default(now())
+}
+
+// ========== HR & Recruiting ==========
+model Candidate {
+  id            String   @id @default(cuid())
+  name          String
+  email         String
+  phone         String?
+  role          String
+  stage         String   @default("applied")
+  source        String?
+  score         Float?
+  owner         String?
+  nextInterview DateTime?
+  notes         String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  scorecards    Scorecard[]
+}
+
+model Scorecard {
+  id          String   @id @default(cuid())
+  candidate   Candidate @relation(fields: [candidateId], references: [id])
+  candidateId String
+  criteria    String
+  score       Float
+  evidence    String?
+  reviewer    String?
+  date        DateTime @default(now())
+}
+
+model Employee {
+  id              String   @id @default(cuid())
+  applicantId     String?  @unique
+  applicant       Applicant? @relation(fields: [applicantId], references: [id])
+  name            String
+  email           String   @unique
+  phone           String?
+  role            String
+  team            String?
+  timezone        String?
+  status          String   @default("active")
+  // 1099 onboarding fields
+  w9Signed        Boolean  @default(false)
+  w9SignedAt      DateTime?
+  ack1099Signed   Boolean  @default(false)
+  ack1099SignedAt DateTime?
+  jobDescSigned   Boolean  @default(false)
+  jobDescSignedAt DateTime?
+  safetySigned    Boolean  @default(false)
+  safetySignedAt  DateTime?
+  allDocsSigned   Boolean  @default(false)
+  allDocsSignedAt DateTime?
+  startDate       DateTime?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  documents       Document[]
+}
+
+// ========== 1099 Onboarding ==========
+model Applicant {
+  id               String   @id @default(cuid())
+  firstName        String
+  lastName         String
+  email            String   @unique
+  phone            String
+  address          String?
+  city             String?
+  state            String?
+  zip              String?
+  position         String
+  experience       String?
+  skills           String?
+  availability     String?
+  hasTransport     Boolean  @default(false)
+  hasInsurance     Boolean  @default(false)
+  references       String?
+  resumeUrl        String?
+  coverLetter      String?
+  aiScore          Int      @default(0)
+  aiSummary        String?
+  aiRecommendation String?
+  status           String   @default("pending")
+  appliedAt        DateTime @default(now())
+  screenedAt       DateTime?
+  approvedAt       DateTime?
+  approvedBy       String?
+  rejectedAt       DateTime?
+  rejectedReason   String?
+  documents        Document[]
+  employee         Employee?
+  notifications    Notification[]
+}
+
+model Document {
+  id          String   @id @default(cuid())
+  type        String
+  title       String
+  content     String
+  applicantId String?
+  applicant   Applicant? @relation(fields: [applicantId], references: [id])
+  employeeId  String?
+  employee    Employee? @relation(fields: [employeeId], references: [id])
+  token       String   @unique
+  signed      Boolean  @default(false)
+  signedAt    DateTime?
+  signature   String?
+  ipAddress   String?
+  userAgent   String?
+  createdAt   DateTime @default(now())
+  expiresAt   DateTime?
+}
+
+model JobPosting {
+  id           String   @id @default(cuid())
+  title        String
+  description  String
+  requirements String
+  payRate      String
+  location     String
+  active       Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  applicants   Applicant[]
+}
+
+model AdminUser {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String
+  role      String   @default("admin")
+  createdAt DateTime @default(now())
+}
+
+// ========== Notifications & Logs ==========
+model Notification {
+  id          String   @id @default(cuid())
+  type        String
+  recipient   String
+  subject     String?
+  body        String
+  status      String   @default("pending")
+  sentAt      DateTime?
+  leadId      String?
+  lead        Lead?    @relation(fields: [leadId], references: [id])
+  jobId       String?
+  job         Job?     @relation(fields: [jobId], references: [id])
+  applicantId String?
+  applicant   Applicant? @relation(fields: [applicantId], references: [id])
+  createdAt   DateTime @default(now())
+}
+
+model ActivityLog {
+  id        String   @id @default(cuid())
+  action    String
+  entity    String
+  entityId  String?
+  details   String?
+  user      String?
+  createdAt DateTime @default(now())
+}
+
+// ========== Content & Knowledge ==========
+model WikiDoc {
+  id        String   @id @default(cuid())
+  title     String
+  content   String
+  category  String
+  status    String   @default("draft")
+  author    String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Policy {
+  id        String   @id @default(cuid())
+  title     String
+  content   String
+  category  String
+  version   Int      @default(1)
+  status    String   @default("draft")
+  author    String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// ========== Settings ==========
+model Setting {
+  id    String @id @default(cuid())
+  key   String @unique
+  value String
+}

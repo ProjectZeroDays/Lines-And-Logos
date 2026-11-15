@@ -1,0 +1,120 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model Applicant {
+  id              String   @id @default(cuid())
+  firstName       String
+  lastName        String
+  email           String   @unique
+  phone           String
+  address         String?
+  city            String?
+  state           String?
+  zip             String?
+  position        String   // job title applied for
+  experience      String?  // years of experience
+  skills          String?  // comma-separated skills
+  availability    String?  // full-time / part-time / weekends
+  hasTransport    Boolean  @default(false)
+  hasInsurance    Boolean  @default(false)
+  references      String?  // JSON string of references
+  resumeUrl       String?
+  coverLetter     String?
+  aiScore         Int      @default(0) // 0-100
+  aiSummary       String?
+  aiRecommendation String? // "strong" | "moderate" | "weak"
+  status          String   @default("pending") // pending | screening | approved | rejected | onboarded
+  appliedAt       DateTime @default(now())
+  screenedAt      DateTime?
+  approvedAt      DateTime?
+  approvedBy      String?
+  rejectedAt      DateTime?
+  rejectedReason  String?
+  notifications   Notification[]
+  documents       Document[]
+  employee        Employee?
+}
+
+model Employee {
+  id              String   @id @default(cuid())
+  applicantId     String   @unique
+  applicant       Applicant @relation(fields: [applicantId], references: [id])
+  firstName       String
+  lastName        String
+  email           String   @unique
+  phone           String
+  position        String
+  startDate       DateTime?
+  status          String   @default("active") // active | inactive | terminated
+  w9Signed        Boolean  @default(false)
+  w9SignedAt      DateTime?
+  ack1099Signed   Boolean  @default(false)
+  ack1099SignedAt DateTime?
+  jobDescSigned   Boolean  @default(false)
+  jobDescSignedAt DateTime?
+  safetySigned    Boolean  @default(false)
+  safetySignedAt  DateTime?
+  allDocsSigned   Boolean  @default(false)
+  allDocsSignedAt DateTime?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  documents       Document[]
+}
+
+model Document {
+  id          String   @id @default(cuid())
+  type        String   // "w9" | "ack1099" | "jobdesc" | "safety" | "application" | "offer"
+  title       String
+  content     String   // HTML or markdown content
+  applicantId String?
+  applicant   Applicant? @relation(fields: [applicantId], references: [id])
+  employeeId  String?
+  employee    Employee? @relation(fields: [employeeId], references: [id])
+  token       String   @unique // secure link token
+  signed      Boolean  @default(false)
+  signedAt    DateTime?
+  signature   String?  // base64 or typed name
+  ipAddress   String?
+  userAgent   String?
+  createdAt   DateTime @default(now())
+  expiresAt   DateTime?
+}
+
+model Notification {
+  id          String   @id @default(cuid())
+  type        String   // "email" | "sms" | "app"
+  recipient   String   // email or phone
+  subject     String?
+  body        String
+  status      String   @default("pending") // pending | sent | failed
+  sentAt      DateTime?
+  applicantId String?
+  applicant   Applicant? @relation(fields: [applicantId], references: [id])
+  createdAt   DateTime @default(now())
+}
+
+model JobPosting {
+  id          String   @id @default(cuid())
+  title       String
+  description String
+  requirements String
+  payRate     String
+  location    String
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  applicants  Applicant[]
+}
+
+model AdminUser {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String
+  role      String   @default("admin") // admin | reviewer
+  createdAt DateTime @default(now())
+}

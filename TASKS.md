@@ -1,0 +1,8 @@
+Build the Tier 1 spreadsheet — Start with your 22 verified-tier targets. Research each for: website, main phone, Facilities/Athletic Director name, Superintendent/ED, public email, distance, facility count, and your service-fit score. Aim for 25-30 fully researched accounts first, not 200.
+Map the bundled offer — Define exact service packages (e.g., "Gym Refresh: refinish + restripe + center court logo," "Campus Branding: wall wraps + window graphics + donor wall," "Full Facility: gym + parking lot + playground + exterior signage"). Bundle pricing makes the one-stop value proposition concrete.
+Competitive intel on the 5 local rivals — Check Sports Floors Inc., Conrad, Martin, Finchum, and GameDay websites/social to confirm which don't offer wall wraps, window graphics, or donor walls. That gap is your sales collateral.
+Develop the outreach sequence — School districts buy on budget cycles (bond funds, capital budgets, summer maintenance windows). Churches/YMCAs buy on stewardship campaigns and facility anniversary cycles. Timing matters more than script.                                                                    The 25-50 account research spreadsheet with column headers and scoring formulas (you'd still need to fill in live research)
+Service-fit scoring calculator (weighted 0-100 with budget-capacity gating)
+Outreach email sequence for school districts vs. churches vs. parks departments
+Competitive battle card comparing your bundled model vs. Sports Floors Inc., Conrad, Martin, Finchum, GameDay
+Business plan outline specific to the Memphis athletic flooring + graphics market
