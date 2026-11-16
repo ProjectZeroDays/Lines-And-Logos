@@ -65,6 +65,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <a href="/approvals">Approvals</a>
               <a href="/reports">Reports</a>
               <a href="/settings">Settings</a>
+
+              <div className="sidebar-section">Dropshipping Bridge</div>
+              <a href="/dropshipping">Bridge Overview</a>
+              <a href="/bridge" target="_blank" rel="noopener noreferrer">Open Bridge UI ↗</a>
             </nav>
           </aside>
           <main className="main-content">{children}</main>
