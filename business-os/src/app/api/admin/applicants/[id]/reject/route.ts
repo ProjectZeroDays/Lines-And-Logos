@@ -2,9 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { sendEmail } from "@/lib/email";
 
-export async function POST(req: NextRequest, { params }: { params: { id: string } }) {
+export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const applicant = await db.applicant.findUnique({ where: { id: params.id } });
+    const { id } = await params;
+    const applicant = await db.applicant.findUnique({ where: { id } });
     if (!applicant) return NextResponse.json({ error: "Applicant not found" }, { status: 404 });
 
     const { reason } = await req.json().catch(() => ({}));

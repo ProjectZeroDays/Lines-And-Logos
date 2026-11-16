@@ -2,8 +2,9 @@ import Link from "next/link";
 import { db } from "@/lib/db";
 import ApplicantActions from "@/components/ApplicantActions";
 
-export default async function ApplicantDetailPage({ params }: { params: { id: string } }) {
-  const a = await db.applicant.findUnique({ where: { id: params.id }, include: { documents: true, employee: true, notifications: true } });
+export default async function ApplicantDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const a = await db.applicant.findUnique({ where: { id }, include: { documents: true, employee: true, notifications: true } });
   if (!a) return <div className="section container"><p>Applicant not found.</p></div>;
 
   const badgeClass = a.aiRecommendation === "strong" ? "badge-strong" : a.aiRecommendation === "moderate" ? "badge-moderate" : "badge-weak";

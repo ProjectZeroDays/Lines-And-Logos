@@ -2,12 +2,13 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { sendEmail } from "@/lib/email";
 
-export async function POST(req: NextRequest, { params }: { params: { token: string } }) {
+export async function POST(req: NextRequest, { params }: { params: Promise<{ token: string }> }) {
   try {
+    const { token } = await params;
     const { signature } = await req.json();
     if (!signature || typeof signature !== "string" || signature.trim().length < 2) return NextResponse.json({ error: "Signature required" }, { status: 400 });
 
-    const doc = await db.document.findUnique({ where: { token: params.token }, include: { employee: { include: { documents: true } } } });
+    const doc = await db.document.findUnique({ where: { token }, include: { employee: { include: { documents: true } } } });
     if (!doc) return NextResponse.json({ error: "Invalid link" }, { status: 404 });
     if (doc.signed) return NextResponse.json({ error: "Already signed" }, { status: 400 });
     if (doc.expiresAt && new Date() > doc.expiresAt) return NextResponse.json({ error: "Link expired" }, { status: 410 });
@@ -32,9 +33,12 @@ export async function POST(req: NextRequest, { params }: { params: { token: stri
         await db.employee.update({ where: { id: emp.id }, data: { allDocsSigned: true, allDocsSignedAt: new Date() } });
         if (emp.applicantId) await db.applicant.update({ where: { id: emp.applicantId }, data: { status: "onboarded" } });
 
+        const empNameParts = emp.name.split(" ");
+        const empFirstName = empNameParts[0] || "";
+        const empLastName = empNameParts.slice(1).join(" ") || "";
         const adminEmail = process.env.ADMIN_EMAIL || "admin@linesandlogos.com";
-        await sendEmail({ to: adminEmail, subject: `Onboarding Complete: ${emp.firstName} ${emp.lastName}`, body: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:20px;"><h2 style="color:#2e7d32;">Onboarding Complete</h2><p><strong>${emp.firstName} ${emp.lastName}</strong> has signed all onboarding documents.</p><p>Position: ${emp.position}</p><p>Email: ${emp.email} | Phone: ${emp.phone || "N/A"}</p><p>All documents signed and stored.</p><p>— Lines & Logos Business OS</p></div>` });
-        await sendEmail({ to: emp.email, subject: "Your Signed Onboarding Documents — Lines & Logos", body: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:20px;"><h2 style="color:#1F3864;">Onboarding Complete!</h2><p>Hi ${emp.firstName},</p><p>You've successfully signed all your onboarding documents. Copies are stored in our system.</p><p><strong>Documents completed:</strong></p><ul><li>W-9 (Tax Form)</li><li>1099 Acknowledgment</li><li>Job Description & Scope of Work</li><li>Safety & Compliance Agreement</li></ul><p>Welcome to the team!</p><p>— Lines & Logos Team</p></div>` });
+        await sendEmail({ to: adminEmail, subject: `Onboarding Complete: ${emp.name}`, body: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:20px;"><h2 style="color:#2e7d32;">Onboarding Complete</h2><p><strong>${emp.name}</strong> has signed all onboarding documents.</p><p>Position: ${emp.role}</p><p>Email: ${emp.email} | Phone: ${emp.phone || "N/A"}</p><p>All documents signed and stored.</p><p>— Lines & Logos Business OS</p></div>` });
+        await sendEmail({ to: emp.email, subject: "Your Signed Onboarding Documents — Lines & Logos", body: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:20px;"><h2 style="color:#1F3864;">Onboarding Complete!</h2><p>Hi ${empFirstName},</p><p>You've successfully signed all your onboarding documents. Copies are stored in our system.</p><p><strong>Documents completed:</strong></p><ul><li>W-9 (Tax Form)</li><li>1099 Acknowledgment</li><li>Job Description & Scope of Work</li><li>Safety & Compliance Agreement</li></ul><p>Welcome to the team!</p><p>— Lines & Logos Team</p></div>` });
       }
     }
 

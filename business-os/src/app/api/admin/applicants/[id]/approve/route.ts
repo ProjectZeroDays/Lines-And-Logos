@@ -5,9 +5,10 @@ import { sendSms, welcomeSms } from "@/lib/sms";
 import { getDocTemplate, getAllDocTypes } from "@/lib/documents";
 import { randomBytes } from "crypto";
 
-export async function POST(req: NextRequest, { params }: { params: { id: string } }) {
+export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const applicant = await db.applicant.findUnique({ where: { id: params.id } });
+    const { id } = await params;
+    const applicant = await db.applicant.findUnique({ where: { id } });
     if (!applicant) return NextResponse.json({ error: "Applicant not found" }, { status: 404 });
     if (applicant.status === "approved" || applicant.status === "onboarded") return NextResponse.json({ error: "Already approved" }, { status: 400 });
 

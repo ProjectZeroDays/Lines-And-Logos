@@ -1,8 +1,9 @@
 "use client";
+import { Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 
-export default function SuccessPage() {
+function SuccessContent() {
   const params = useSearchParams();
   const score = params.get("score") || "0";
   const rec = params.get("rec") || "pending";
@@ -19,5 +20,13 @@ export default function SuccessPage() {
         <Link href="/" className="btn btn-primary">Back to Home</Link>
       </div>
     </div>
+  );
+}
+
+export default function SuccessPage() {
+  return (
+    <Suspense fallback={<div className="section" style={{ maxWidth: 600, textAlign: "center" }}><div className="card"><h2 style={{ color: "#2e7d32" }}>Loading…</h2></div></div>}>
+      <SuccessContent />
+    </Suspense>
   );
 }

@@ -2,11 +2,11 @@
 
 import { db } from "./db";
 
-export interface SmsPayload { to: string; body: string; leadId?: string; jobId?: string; }
+export interface SmsPayload { to: string; body: string; leadId?: string; jobId?: string; applicantId?: string; }
 
 export async function sendSms(payload: SmsPayload): Promise<{ ok: boolean; id: string }> {
   const record = await db.notification.create({
-    data: { type: "sms", recipient: payload.to, body: payload.body, status: "pending", leadId: payload.leadId, jobId: payload.jobId },
+    data: { type: "sms", recipient: payload.to, body: payload.body, status: "pending", leadId: payload.leadId, jobId: payload.jobId, applicantId: payload.applicantId },
   });
 
   let sent = false;

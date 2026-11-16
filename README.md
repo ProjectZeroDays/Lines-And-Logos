@@ -13,7 +13,7 @@
 **Facility branding & athletic surfaces, automated end-to-end.** One platform to run sales, operations, finance, team, and compliance for a Memphis-based facility branding and athletic surface company — plus a complete go-to-market deliverable kit (prospecting databases, proposals, outreach sequences, and launch plans).
 
 [![version](https://img.shields.io/badge/version-1.0.0-1F3864?style=for-the-badge&logo=next.js&logoColor=white)](https://github.com/ProjectZeroDays/Lines-And-Logos/releases/tag/v1.0.0)
-[![Next.js](https://img.shields.io/badge/Next.js-14.2.35-black?style=for-the-badge&logo=next.js&logoColor=white)](https://nextjs.org)
+[![Next.js](https://img.shields.io/badge/Next.js-15.5.29-black?style=for-the-badge&logo=next.js&logoColor=white)](https://nextjs.org)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org)
 [![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge&logo=opensourceinitiative&logoColor=white)](#license)
 [![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20macOS%20%7C%20Linux-8A2BE2?style=for-the-badge)](#installation)
@@ -161,7 +161,7 @@ All agents run **without any API key** using deterministic heuristics, and switc
 ```text
 ┌──────────────────────────────────────────────────────────────────────┐
 │                        PRESENTATION LAYER                             │
-│   Next.js 14 · App Router · React Server Components                   │
+│   Next.js 15 · App Router · React Server Components                   │
 │   59 pages (dashboard, sales, ops, finance, HR, marketing, admin)     │
 └───────────────────────────────┬───────────────────────────────────────┘
                                  │ RSC / fetch
@@ -295,10 +295,9 @@ curl -X POST http://localhost:3001/api/apply \
 ### Runtime
 | Package | Version | Purpose |
 |---|---|---|
-| `next` | 14.2.35 | App framework (App Router, RSC, route handlers) |
-| `react` / `react-dom` | 18.3.1 | UI |
+| `next` | 15.5.29 | App framework (App Router, RSC, route handlers) |
+| `react` / `react-dom` | 19.3.1 | UI |
 | `@prisma/client` | 5.22.0 | Type-safe DB client |
-| `zod` | 3.23.x | Input validation on write paths |
 
 ### Development
 | Package | Version | Purpose |
@@ -532,7 +531,7 @@ jobs:
 | **PII** | Applicant/contractor W-9s, SSNs via form | Encrypt SSN column; retention policy; DPA |
 | **E-sign** | Drawn signature stored as string, not PKI-backed | DocuSign/HelloSign or eIDAS/ESIGN-grade flow |
 | **Webhooks** | Stripe scaffold only | Verify `STRIPE_WEBHOOK_SECRET` signatures |
-| **Dependencies** | **82 open Dependabot alerts** (9 critical, 32 high, 35 moderate) | Scheduled `pnpm audit fix`; pin and review |
+| **Dependencies** | Upgraded to Next 15.5.29 / React 19.3.1 / postcss 8.5.33 (was: 82 open Dependabot alerts — 9 critical, 32 high) | GitHub re-scan after push; `pnpm audit` in CI |
 | **Launcher** | `LinesAndLogos-Launcher.exe` is **unsigned** | Code-sign with an OV/EV cert; or distribute source only |
 | **Transport** | HTTP localhost only | TLS everywhere; HSTS; secure cookies |
 
@@ -663,7 +662,7 @@ GitHub Issues: [ProjectZeroDays/Lines-And-Logos/issues](https://github.com/Proje
 | Cron endpoints | **2** |
 | Source code (TS/TSX, src + prisma) | **~3,067 lines** |
 | Business deliverables (XLSX/CSV/MD) | **40+** |
-| Open Dependabot alerts | **82** (9 critical) |
+| Open Dependabot alerts | **~0 expected** (migrated to Next 15.5.29; was 82) |
 | Releases | **1** — [v1.0.0](https://github.com/ProjectZeroDays/Lines-And-Logos/releases/tag/v1.0.0) |
 | License | MIT (designated; `LICENSE` file pending) |
 | Default branch | `master` |
@@ -690,7 +689,7 @@ GitHub Issues: [ProjectZeroDays/Lines-And-Logos/issues](https://github.com/Proje
 - [ ] GitHub Actions CI: install → `prisma generate` → `next build` → type-check on every PR
 - [ ] Cron workflow committed (`.github/workflows/cron.yml`) with `CRON_SECRET` wired
 - [ ] Dependabot auto-merge for patch/minor dev-deps after CI green
-- [ ] Structured startup log (`Next 14.2.35 · Prisma 5.22.0 · DB ok · agents ok`)
+- [ ] Structured startup log (`Next 15.5.29 · Prisma 5.22.0 · DB ok · agents ok`)
 </details>
 
 <details>
@@ -782,7 +781,7 @@ You are free to use, copy, modify, merge, publish, and distribute copies of this
 1. **Not legal, financial, or tax advice.** The 1099 onboarding flow, W-9 collection, and invoice reminders are operational tooling, not compliance guarantees. Consult counsel and your CPA before engaging contractors or dunning customers.
 2. **Sample data is fictitious.** Seeded leads/accounts (MSCS contacts included) are demonstrative; do not market to them without independent verification of their public channels.
 3. **Unsigned binary.** `LinesAndLogos-Launcher.exe` is distributed as-is; Windows SmartScreen may warn. You may always run the two shell commands instead of the .exe.
-4. **Security posture.** 82 Dependabot alerts remain open at time of writing; auth is not enforced; SQLite is unencrypted. Do not expose publicly until you complete [Security Considerations](#security-considerations).
+4. **Security posture.** Dependencies were upgraded to Next 15.5.29 and React 19 to close 82 open Dependabot alerts (GitHub re-scan pending at time of writing); auth is not enforced; SQLite is unencrypted. Do not expose publicly until you complete [Security Considerations](#security-considerations).
 5. **AI outputs** (scores, drafted emails, dispatch suggestions) are decision support, not decisions. A human approves approvals, sends, and assignments.
 6. **Affiliation.** Lines & Logos and Authenticated, Inc. are not affiliated with Memphis-Shelby County Schools, DeSoto County Schools, or Bellevue Baptist Church; those organizations appear solely as sample/prospect context.
 
