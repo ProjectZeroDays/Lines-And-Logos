@@ -360,6 +360,8 @@ model Employee {
   id              String   @id @default(cuid())
   applicantId     String?  @unique
   applicant       Applicant? @relation(fields: [applicantId], references: [id])
+  accountId       String?
+  account         Account? @relation(fields: [accountId], references: [id])
   name            String
   email           String   @unique
   phone           String?
@@ -390,6 +392,8 @@ model Applicant {
   firstName        String
   lastName         String
   email            String   @unique
+  jobPostingId     String?
+  jobPosting       JobPosting? @relation(fields: [jobPostingId], references: [id])
   phone            String
   address          String?
   city             String?

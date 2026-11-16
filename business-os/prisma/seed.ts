@@ -1,7 +1,31 @@
 import { PrismaClient } from "@prisma/client";
 const db = new PrismaClient();
 
+// This seed is intentionally idempotent: it removes the sample records it
+// creates (in dependency-safe order) before recreating them, so `npm run
+// db:seed` can be run repeatedly without unique-constraint failures.
+// Any data created outside this script is left untouched unless it depends on
+// the sample accounts (jobs/invoices/etc. reference account ids).
+
+async function wipe() {
+  await db.notification.deleteMany();
+  await db.contentPost.deleteMany();
+  await db.policy.deleteMany();
+  await db.wikiDoc.deleteMany();
+  await db.task.deleteMany();
+  await db.expense.deleteMany();
+  await db.revenue.deleteMany();
+  await db.invoice.deleteMany();
+  await db.job.deleteMany();
+  await db.checklist.deleteMany();
+  await db.lead.deleteMany();
+  // Accounts cascade-free: children above are removed first.
+  await db.account.deleteMany();
+}
+
 async function main() {
+  await wipe();
+
   // Sample accounts
   const mscs = await db.account.create({ data: { name: "Memphis-Shelby County Schools", type: "school-district", segment: "enterprise", seats: 213, owner: "admin", goals: "Gym refresh + campus branding", health: "green" } });
   const desoto = await db.account.create({ data: { name: "DeSoto County School District", type: "school-district", segment: "enterprise", seats: 42, owner: "admin", goals: "Gym refresh (pilot)", health: "green" } });
