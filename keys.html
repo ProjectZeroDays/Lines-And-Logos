@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Keys &amp; Integrations — Lines &amp; Logos</title>
+<link rel="icon" type="image/png" href="icons/favicon-32.png?v=2">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;700;800&family=Archivo+Black&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/os.css?v=9">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#04060d">
+<style>
+.keys-hero{background:radial-gradient(120% 140% at 20% 0%,rgba(77,125,255,.16),transparent 55%),var(--panel,#0d1526);border:1px solid var(--line,#1c2946);border-radius:18px;padding:26px 28px;margin-bottom:20px}
+.keys-hero h2{margin:0 0 8px;font-size:23px}
+.keys-hero p{margin:0;color:var(--mut,#8b95b3);font-size:13.5px;max-width:760px;line-height:1.7}
+.group-title{font-size:12px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--mut,#8b95b3);margin:26px 0 10px}
+.kcard{background:var(--panel,#0d1526);border:1px solid var(--line,#1c2946);border-radius:14px;margin-bottom:12px;overflow:hidden}
+.kcard>header{display:flex;align-items:center;gap:12px;padding:15px 18px;flex-wrap:wrap}
+.kcard h3{margin:0;font-size:15px}
+.kbadge{font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;padding:4px 11px;border-radius:99px;flex:none}
+.kbadge.set{background:#0f2b1c;color:#43d17c;border:1px solid #1c4430}
+.kbadge.unset{background:#241a08;color:#f5b942;border:1px solid #4a3a10}
+.kbadge.auto{background:#101d38;color:#5bb8ff;border:1px solid #1c3355}
+.kmasked{font-family:ui-monospace,Menlo,monospace;font-size:12.5px;color:var(--mut,#8b95b3);margin-left:auto}
+.kbody{padding:0 18px 16px;border-top:1px dashed var(--line,#1c2946)}
+.khow{font-size:12.5px;color:var(--mut,#8b95b3);line-height:1.7;margin:12px 0}
+.khow a{color:#5bb8ff}
+.krow{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.krow input{flex:1;min-width:220px;padding:11px 13px;border-radius:10px;border:1px solid var(--line,#1c2946);background:#0a1122;color:var(--tx,#e8ecf6);font-family:ui-monospace,Menlo,monospace;font-size:13px;outline:none}
+.krow input:focus{border-color:#4d7dff;box-shadow:0 0 0 3px rgba(45,91,255,.18)}
+.klinks{display:flex;gap:14px;margin-top:10px;font-size:12.5px;flex-wrap:wrap}
+.kmsg{font-size:12.5px;margin-top:10px;display:none}
+.kmsg.ok{display:block;color:#43d17c}
+.kmsg.err{display:block;color:#ff8a8a}
+.kai-note{background:#101d38;border:1px solid #1c3355;border-radius:12px;padding:14px 18px;margin:22px 0 10px;font-size:13px;color:var(--mut,#8b95b3);line-height:1.7}
+.kai-note b{color:#5bb8ff}
+</style>
+</head>
+<body data-perms="notifications">
+<main>
+  <div class="topbar">
+    <div><div class="crumb">Business Suite / Keys &amp; Integrations</div><h1 class="chrome">Keys &amp; Integrations</h1></div>
+    <div class="topbar-right"><span class="pill" id="countPill">—</span></div>
+  </div>
+  <div class="keys-hero">
+    <h2>Every API key, one page</h2>
+    <p>Keys are stored in the server's <b>.env</b> file (chmod 600, git-ignored) — never in the database, never in page responses. Values are shown masked; updates apply immediately and survive restarts. Changes are logged to the audit trail with masked values. Leave anything blank at install time and set it here later.</p>
+  </div>
+  <div id="list"><p style="color:var(--mut)">Loading…</p></div>
+  <div class="kai-note"><b>AI provider routing:</b> keys saved here automatically power the matching AI provider in <a href="settings.html" style="color:#5bb8ff">Settings → AI Providers</a> (per-agent routing, rate limits, provider tests). The OpenRouter key is the free default for the website chat assistant.</div>
+</main>
+<script src="assets/os.js?v=9"></script>
+<script>
+const { boot, raw, esc, toast, $ } = OS;
+
+async function load(){
+  try {
+    const d = await raw('/api/keys');
+    render(d.keys || []);
+  } catch (e) {
+    $('#list').innerHTML = '<p style="color:#ff8a8a">Could not load keys — ' + esc(e.message || e) + '</p>';
+  }
+}
+
+function render(keys){
+  const set = keys.filter(k => k.set).length;
+  $('#countPill').textContent = set + ' / ' + keys.length + ' set';
+  const groups = {};
+  keys.forEach(k => { (groups[k.group] ||= []).push(k); });
+  $('#list').innerHTML = Object.entries(groups).map(([g, ks]) => `
+    <div class="group-title">${esc(g)}</div>
+    ${ks.map(k => `
+    <div class="kcard" id="card-${k.env}">
+      <header>
+        <h3>${esc(k.label)}</h3>
+        ${k.auto ? '<span class="kbadge auto">auto</span>'
+                : k.set ? '<span class="kbadge set">set</span>' : '<span class="kbadge unset">not set</span>'}
+        <span class="kmasked">${k.set ? esc(k.masked) : (k.auto ? 'generated at install' : '—')}</span>
+      </header>
+      <div class="kbody">
+        <p class="khow">${esc(k.how)}${k.where ? ` <a href="${esc(k.where)}" target="_blank" rel="noopener">Open the provider page ↗</a>` : ''}${k.signup ? ` · <a href="${esc(k.signup)}" target="_blank" rel="noopener">Sign up ↗</a>` : ''}</p>
+        ${k.auto ? '' : `
+        <div class="krow">
+          <input id="in-${k.env}" type="password" placeholder="${k.set ? 'Paste a new key to replace the saved one' : 'Paste the key'}" autocomplete="off" spellcheck="false">
+          <button class="btn btn-sm" onclick="saveKey('${k.env}')">Save</button>
+          ${k.set ? `<button class="btn btn-ghost btn-sm" onclick="clearKey('${k.env}')">Clear</button>` : ''}
+        </div>
+        <div class="kmsg" id="msg-${k.env}"></div>`}
+      </div>
+    </div>`).join('')}`).join('');
+}
+
+function flash(env, ok, text){
+  const el = $('#msg-' + env);
+  el.className = 'kmsg ' + (ok ? 'ok' : 'err');
+  el.textContent = text;
+}
+
+async function saveKey(env){
+  const input = $('#in-' + env);
+  const value = input.value.trim();
+  if (!value) return flash(env, false, 'Paste the key first.');
+  try {
+    const r = await fetch(OS.BASE + '/api/keys', { method:'POST', headers:{ 'Content-Type':'application/json', Authorization:'Bearer ' + OS.TOKEN },
+      body: JSON.stringify({ env, value }) });
+    const d = await r.json();
+    if (!r.ok) return flash(env, false, d.error || 'Save failed.');
+    const msg = d.persisted ? 'Saved to .env and applied.' : 'Applied for this session. ' + (d.warning || '');
+    toast('Key updated');
+    setTimeout(async () => { await load(); flash(env, true, msg); }, 500);
+  } catch (e) { flash(env, false, 'Network error — try again.'); }
+}
+
+async function clearKey(env){
+  if (!confirm('Remove this key? The integration will go offline until a new key is set.')) return;
+  try {
+    const r = await fetch(OS.BASE + '/api/keys', { method:'POST', headers:{ 'Content-Type':'application/json', Authorization:'Bearer ' + OS.TOKEN },
+      body: JSON.stringify({ env, clear:true }) });
+    const d = await r.json();
+    if (!r.ok) return flash(env, false, d.error || 'Clear failed.');
+    toast('Key cleared');
+    setTimeout(async () => { await load(); flash(env, true, 'Key cleared from .env.'); }, 500);
+  } catch (e) { flash(env, false, 'Network error — try again.'); }
+}
+
+boot('keys', 'Keys & Integrations', load);
+</script>
+</body>
+</html>

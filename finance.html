@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Finance — Lines &amp; Logos Business OS</title>
+<link rel="icon" type="image/png" href="icons/favicon-32.png?v=2">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;700;800&family=Archivo+Black&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/os.css?v=9">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#04060d">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Lines & Logos">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+</head>
+<body data-perms="notifications">
+<main>
+  <div class="topbar">
+    <div><div class="crumb">Business OS / Finance</div><h1 class="chrome">Finance</h1></div>
+    <div class="topbar-right">
+      <input class="search" id="q" placeholder="Search…" oninput="render()">
+      <button class="btn btn-sm" id="addBtn" onclick="addItem()">+ New Invoice</button>
+    </div>
+  </div>
+  <div class="tabs2" id="tabs"></div>
+  <div id="view"></div>
+</main>
+<script src="assets/os.js?v=9"></script>
+<script>
+const {fmt,esc,INV,GEN}=OS;
+let view='invoices';
+const TABS=[['invoices','Invoices'],['apar','AP / AR Agent'],['expenses','Expenses'],['revenue','Revenue'],['payouts','Contractor Pay'],['watchdog','Watchdog'],['pnl','P&L'],['stripe','Stripe Monitor']];
+const ADD={invoices:'+ New Invoice',expenses:'+ New Expense',revenue:'+ Revenue Entry'};
+function renderTabs(){const openAlerts=(OS.cur('financialAlerts')||[]).filter(a=>a.status==='open').length;
+  OS.$('#tabs').innerHTML=TABS.map(([k,l])=>`<button class="${view===k?'active':''}" onclick="go('${k}')">${l}${k==='watchdog'&&openAlerts?`<span class="cnt">${openAlerts}</span>`:''}</button>`).join('');
+  const b=OS.$('#addBtn');b.textContent=ADD[view]||'';b.style.display=ADD[view]?'inline-block':'none';}
+function go(v){view=v;renderTabs();render();}
+const q=()=>OS.$('#q').value.toLowerCase();
+const match=(...xs)=>xs.join(' ').toLowerCase().includes(q());
+
+async function render(){
+  await ({invoices:vInvoices,apar:vApAr,expenses:vExpenses,revenue:vRevenue,payouts:vPayouts,watchdog:vWatchdog,pnl:vPnl,stripe:vStripe})[view]();
+  renderTabs();
+}
+async function vApAr(){
+  OS.$('#view').innerHTML='<div class="panel"><h3>AP / AR Agent</h3><p class="sub">Working both sides of the ledger…</p></div>';
+  const r=await OS.runAgent('ap-ar',{});
+  const {ar,ap,totals,notes}=r.result||r;
+  const TONE={current:'t-blue',friendly:'t-yellow',firm:'t-orange',final:'t-red'};
+  OS.$('#view').innerHTML=`
+  <div class="kpis">
+    <div class="kpi" style="--accent:var(--green)"><div class="lbl">Open Receivables</div><div class="val">${fmt(totals.receivable)}</div><div class="delta" style="--c:#7ad892">${ar.length} open invoice(s)</div></div>
+    <div class="kpi" style="--accent:#ff5a5a"><div class="lbl">Past Due AR</div><div class="val">${fmt(totals.overdueAR)}</div><div class="delta" style="--c:${totals.overdueAR?'#ff9d9d':'#7ad892'}">${totals.overdueAR?'collections running':'nothing past due'}</div></div>
+    <div class="kpi" style="--accent:var(--orange)"><div class="lbl">Open Payables</div><div class="val">${fmt(totals.payable)}</div><div class="delta" style="--c:#ffb066">${ap.length} open PO(s)</div></div>
+    <div class="kpi" style="--accent:var(--yellow)"><div class="lbl">Payables ≤ 30d</div><div class="val">${fmt(totals.payableNext30)}</div><div class="delta" style="--c:var(--yellow)">${totals.payableNext30>totals.receivable?'pinch — collect first':'covered by receivables'}</div></div>
+  </div>
+  <div class="panel" style="--accent:var(--blue)"><h3>Agent Notes</h3>${notes.map(n=>`<p style="font-size:13.5px;line-height:1.55;color:var(--chrome-1);margin:0 0 10px">• ${esc(n)}</p>`).join('')}</div>
+  <div class="panel flush" style="--accent:var(--green)"><h3 style="padding:24px 24px 0">Receivables — Collections Queue <span class="right">worst first</span></h3><div class="table-wrap"><table>
+    <tr><th>Invoice</th><th>Account</th><th>Due</th><th>Amount</th><th>Cadence</th><th>Next Action</th></tr>
+    ${ar.length?ar.map(i=>`<tr>
+      <td><b>${esc(i.number)}</b></td><td>${esc(i.account)}</td><td>${i.dueDate||'—'}${i.daysOverdue?`<div class="sub" style="color:#ff9d9d">${i.daysOverdue}d overdue</div>`:''}</td>
+      <td><b>${fmt(i.amount)}</b></td><td><span class="tag ${TONE[i.tone]||'t-grey'}">${i.tone}</span></td>
+      <td style="font-size:12.5px">${esc(i.nextAction)}</td></tr>`).join(''):'<tr><td colspan="6" class="sub" style="padding:18px">No open receivables — everything is collected.</td></tr>'}
+  </table></div></div>
+  <div class="panel flush" style="--accent:var(--orange)"><h3 style="padding:24px 24px 0">Payables — Vendor Payment Schedule <span class="right">net-30 from PO date</span></h3><div class="table-wrap"><table>
+    <tr><th>PO</th><th>Vendor</th><th>Item</th><th>Amount</th><th>Status</th><th>Assumed Due</th><th>Next Action</th></tr>
+    ${ap.length?ap.map(p=>`<tr>
+      <td><b>${esc(p.number)}</b></td><td>${esc(p.vendor)}</td><td style="font-size:12.5px">${esc(p.item||'—')}</td>
+      <td><b>${fmt(p.amount)}</b></td><td><span class="tag ${GEN(p.status)}">${p.status}</span></td>
+      <td>${p.assumedDue}${p.daysLeft<0?'<div class="sub" style="color:#ff9d9d">past due</div>':''}</td>
+      <td style="font-size:12.5px">${esc(p.nextAction)}</td></tr>`).join(''):'<tr><td colspan="7" class="sub" style="padding:18px">No open payables.</td></tr>'}
+  </table></div></div>`;
+}
+async function vInvoices(){
+  const rows=await OS.list('invoices');
+  OS.$('#view').innerHTML=`<div class="panel flush" style="--accent:var(--yellow)"><h3 style="padding:24px 24px 0">Invoices — lifecycle &amp; dunning <span class="right">Invoice Reminder Agent · escalating tone</span></h3><div class="table-wrap"><table>
+    <tr><th>Number</th><th>Account</th><th>Issued</th><th>Due</th><th>Amount</th><th>Status</th><th>Reminders</th><th>Actions</th></tr>
+    ${rows.filter(i=>match(i.number,i.account)).map(i=>`<tr>
+      <td><b>${esc(i.number)}</b></td><td>${esc(i.account)}</td><td>${i.issued}</td><td>${i.dueDate||'—'}</td>
+      <td><b>${fmt(i.amount)}</b></td>
+      <td><span class="tag ${INV(i.status)}">${i.status}</span>${i.status==='overdue'?`<span class="sub" style="color:#ff9d9d">${OS.daysOverdue(i)} days overdue</span>`:''}</td>
+      <td>${i.reminders?`<span class="tag ${i.lastReminderTone==='final'?'t-red':i.lastReminderTone==='firm'?'t-yellow':'t-blue'}">${i.lastReminderTone||''} ×${i.reminders}</span>`:'<span class="sub">none</span>'}</td>
+      <td style="white-space:nowrap">
+        ${i.status!=='paid'?`<button class="btn btn-sm btn-ghost" onclick="remind('${i.id}')">Send Reminder</button>
+        ${i.hostedInvoiceUrl?`<a class="btn btn-sm" href="${esc(i.hostedInvoiceUrl)}" target="_blank" rel="noopener">Hosted Page</a>`:`<button class="btn btn-sm" onclick="stripeInvoice('${i.id}')" title="Create a Stripe-hosted invoice (cards + ACH + tax)">Send via Stripe</button>`}
+        <button class="btn btn-sm btn-green" onclick="markPaid('${i.id}')">Mark Paid</button>`:'<span class="sub">settled</span>'}
+      </td>
+    </tr>`).join('')}
+  </table></div></div>`;
+}
+async function stripeInvoice(id, email){
+  OS.toast('Creating Stripe invoice…');
+  const r=await fetch('/api/stripe/invoice',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+OS.TOKEN},body:JSON.stringify({invoiceId:id,...(email?{email}:{})})}).then(r=>r.json()).catch(()=>null);
+  if(!r) return OS.toast('Request failed');
+  if(r.simulated) return OS.toast(r.reason||'Stripe not configured',7000);
+  if(r.needEmail){
+    const em=prompt('Customer email for '+r.customer+' — Stripe emails them the payment link:','');
+    if(em) return stripeInvoice(id, em.trim());
+    return OS.toast('Cancelled — email required');
+  }
+  if(r.error) return OS.toast('Stripe error: '+r.error,7000);
+  if(r.url){
+    const copied=await navigator.clipboard?.writeText(r.url).then(()=>true).catch(()=>false);
+    OS.openModal('Stripe Invoice Sent'+(r.number?' — '+r.number:''),
+      `<label>Hosted payment page (cards + ACH bank transfer + tax)</label>
+       <input value="${esc(r.url)}" readonly style="width:100%" onclick="this.select()">
+       ${r.pdf?`<label style="margin-top:10px">PDF</label><a href="${esc(r.pdf)}" target="_blank" rel="noopener">${esc(r.pdf)}</a>`:''}
+       <p class="sub" style="margin-top:10px">${copied?'Link copied to clipboard. ':''}Stripe emailed the customer${r.alreadySent?' (already sent — existing link)':''}. Status updates flow back via webhook.</p>`);
+    OS.$('#modalSave').textContent='Done';
+    OS.onModalSave(()=>{OS.closeModal();render();});
+  }
+}
+async function remind(id){
+  const r=await OS.remindInvoice(id);
+  OS.openModal('Reminder Sent — Invoice Reminder Agent',
+    `<label>Tone</label><input value="${r.tone} (${r.days} days overdue)" readonly>
+     <label>Subject</label><input value="${esc(r.subject)}" readonly>
+     <label>Body</label><textarea readonly style="min-height:140px">${esc(r.body)}</textarea>`);
+  OS.$('#modalSave').textContent='Done';
+  OS.onModalSave(()=>{OS.closeModal();render();});
+}
+async function markPaid(id){
+  await OS.patch('invoices',id,{status:'paid',paidDate:OS.today()});
+  const inv=OS.cur('invoices').find(i=>i.id===id);
+  if(inv&&!OS.isLive()){OS.cur('revenue').push({id:OS.uid('r'),date:OS.today(),source:inv.number+' — payment',amount:inv.amount,note:'Marked paid'});OS.persistDemo();}
+  OS.toast('Invoice marked paid → revenue posted');render();
+}
+async function vExpenses(){
+  const rows=await OS.list('expenses');
+  const byCat={};rows.forEach(x=>byCat[x.category]=(byCat[x.category]||0)+x.amount);
+  const max=Math.max(...Object.values(byCat),1);
+  OS.$('#view').innerHTML=`<div class="grid-2">
+    <div class="panel" style="--accent:var(--red)"><h3>By Category</h3>
+      ${Object.entries(byCat).map(([c,a])=>`<div class="bar-row"><span class="n">${esc(c)}</span><div class="bar-track"><div class="bar-fill" style="width:${a/max*100}%;background:linear-gradient(90deg,#ff7a1a,#ff5a5a)"></div></div><span class="amt">${fmt(a)}</span></div>`).join('')}
+    </div>
+    <div class="panel flush" style="--accent:var(--red)"><h3 style="padding:24px 24px 0">Expense Ledger</h3><div class="table-wrap"><table>
+      <tr><th>Date</th><th>Category</th><th>Vendor</th><th>Amount</th><th>Note</th></tr>
+      ${rows.filter(x=>match(x.category,x.vendor,x.note)).map(x=>`<tr><td>${x.date}</td><td><span class="tag t-red">${esc(x.category)}</span></td><td>${esc(x.vendor||'—')}</td><td><b>${fmt(x.amount)}</b></td><td>${esc(x.note||'')}</td></tr>`).join('')}
+    </table></div></div>
+  </div>`;
+}
+async function vRevenue(){
+  const rows=await OS.list('revenue');
+  OS.$('#view').innerHTML=`<div class="panel flush" style="--accent:var(--green)"><h3 style="padding:24px 24px 0">Revenue Entries</h3><div class="table-wrap"><table>
+    <tr><th>Date</th><th>Source</th><th>Amount</th><th>Note</th></tr>
+    ${rows.filter(r=>match(r.source,r.note)).map(r=>`<tr><td>${r.date}</td><td><b>${esc(r.source)}</b></td><td><b style="color:#7ad892">${fmt(r.amount)}</b></td><td>${esc(r.note||'')}</td></tr>`).join('')}
+  </table></div></div>`;
+}
+async function vPayouts(){
+  const payouts=await OS.list('payouts');
+  const pend=payouts.filter(p=>p.status==='pending');
+  OS.$('#view').innerHTML=`
+  <div class="banner info" style="display:block">Payroll aggregates the last 14 days of time entries per contractor at the standard hourly rate. Paying out sends a Stripe transfer (simulated until <b>STRIPE_SECRET_KEY</b> is set) and posts the expense automatically.
+    <button class="btn btn-sm" style="margin-left:12px" onclick="runPayroll()">▶ Run Payroll</button></div>
+  <div class="kpis">
+    <div class="kpi" style="--accent:var(--orange)"><div class="lbl">Pending payouts</div><div class="val">${fmt(pend.reduce((s,p)=>s+p.amount,0))}</div><div class="delta" style="--c:var(--orange)">${pend.length} awaiting payment</div></div>
+    <div class="kpi" style="--accent:var(--green)"><div class="lbl">Paid out</div><div class="val">${fmt(payouts.filter(p=>p.status==='paid').reduce((s,p)=>s+p.amount,0))}</div><div class="delta" style="--c:var(--green)">all time</div></div>
+  </div>
+  <div class="panel flush" style="--accent:var(--orange)"><h3 style="padding:24px 24px 0">Contractor Payouts</h3><div class="table-wrap"><table>
+    <tr><th>Contractor</th><th>Period</th><th>Hours</th><th>Rate</th><th>Amount</th><th>Status</th><th>Transfer Ref</th><th></th></tr>
+    ${payouts.map(p=>`<tr>
+      <td><b>${esc(p.employee)}</b></td><td>${p.periodStart} → ${p.periodEnd}</td><td>${p.hours}h</td><td>$${p.rate}/h</td>
+      <td><b>${fmt(p.amount)}</b></td><td><span class="tag ${p.status==='paid'?'t-green':'t-yellow'}">${p.status}</span></td>
+      <td><span class="sub">${esc(p.transferRef||'—')}</span></td>
+      <td>${p.status==='pending'?`<button class="btn btn-sm btn-green" onclick="payOut('${p.id}')">Pay Now</button>`:''}</td></tr>`).join('')||'<tr><td colspan="8" class="empty">No payouts yet — run payroll to aggregate this period’s time entries</td></tr>'}
+  </table></div></div>`;
+}
+async function runPayroll(){const r=await OS.runPayrollNow();OS.toast(r.created?`Payroll run: ${r.created} payout(s) created`:'No unpaid time entries this period');render();}
+async function payOut(id){const r=await OS.payPayoutNow(id);if(r.error){OS.toast(r.error);return}OS.toast(`Paid ${r.employee} ${fmt(r.amount)}`);render();}
+
+async function vWatchdog(){
+  const alerts=await OS.list('financialAlerts');
+  const open=alerts.filter(a=>a.status==='open');
+  OS.$('#view').innerHTML=`
+  <div class="banner info" style="display:block">The <b>Financial Watchdog Agent</b> scans payments, expenses, and contractor payouts for odd behavior: unusually large charges, possible duplicates, expense spikes, stalled payouts, and collections risk.
+    <button class="btn btn-sm" style="margin-left:12px" onclick="runScan()">▶ Scan Now</button></div>
+  <div class="panel flush" style="--accent:var(--red)"><h3 style="padding:24px 24px 0">Alerts — ${open.length} open</h3><div class="table-wrap"><table>
+    <tr><th>Raised</th><th>Severity</th><th>Kind</th><th>Alert</th><th>Detail</th><th>Status</th><th></th></tr>
+    ${alerts.map(a=>`<tr>
+      <td>${OS.ago(a.at)}</td><td><span class="tag ${GEN(a.severity)}">${a.severity}</span></td><td><span class="tag t-blue">${esc(a.kind)}</span></td>
+      <td><b>${esc(a.title)}</b></td><td>${esc(a.detail)}</td>
+      <td><span class="tag ${GEN(a.status)}">${a.status}</span></td>
+      <td>${a.status==='open'?`<button class="btn btn-sm btn-ghost" onclick="dismissAlert('${a.id}')">Dismiss</button>`:''}</td></tr>`).join('')||'<tr><td colspan="7" class="empty">No alerts — run a scan to sweep the books</td></tr>'}
+  </table></div></div>`;
+}
+async function runScan(){const r=await OS.financeScanNow();OS.toast(`Scan complete — ${r.newAlerts} new alert(s), ${r.openTotal} open`);render();}
+async function dismissAlert(id){await OS.patch('financialAlerts',id,{status:'dismissed'});OS.toast('Alert dismissed');render();}
+
+async function vStripe(){
+  const o=await OS.stripeOverview();
+  const ch=(o.charges||[]).map(c=>({...c,amt:(c.amount||0)/(o.source==='stripe-live'?100:1),at:c.created?((typeof c.created==='number'?new Date(c.created*1000):new Date(c.created)).toISOString().slice(0,10)):'—'}));
+  const bal=o.balance||{};
+  const avail=o.source==='stripe-live'?((bal.available||[])[0]||{}).amount/100:bal.available;
+  const pend=o.source==='stripe-live'?((bal.pending||[])[0]||{}).amount/100:bal.pending;
+  OS.$('#view').innerHTML=`
+  <div class="banner ${o.source==='stripe-live'?'good':'info'}" style="display:block">${o.source==='stripe-live'
+    ?'Live feed from the Stripe account API.'
+    :esc(o.note||'Simulated from local books — set STRIPE_SECRET_KEY to switch to the live Stripe account feed.')}</div>
+  <div class="kpis">
+    <div class="kpi" style="--accent:var(--green)"><div class="lbl">Available balance</div><div class="val">${fmt(Math.round(avail||0))}</div><div class="delta" style="--c:var(--green)">${esc(o.source)}</div></div>
+    <div class="kpi" style="--accent:var(--yellow)"><div class="lbl">Pending</div><div class="val">${fmt(Math.round(pend||0))}</div><div class="delta">in transit / open invoices</div></div>
+    <div class="kpi" style="--accent:var(--red)"><div class="lbl">Disputes</div><div class="val">${(o.disputes||[]).length}</div><div class="delta" style="--c:var(--red)">chargebacks</div></div>
+  </div>
+  <div class="grid-2 eq">
+  <div class="panel flush" style="--accent:var(--volley)"><h3 style="padding:24px 24px 0">Recent Charges</h3><div class="table-wrap"><table>
+    <tr><th>Date</th><th>Ref</th><th>Invoice</th><th>Method</th><th>Amount</th><th>Status</th></tr>
+    ${ch.map(c=>`<tr><td>${c.at}</td><td><span class="sub">${esc(c.id)}</span></td><td>${esc(c.invoice||'—')}</td><td>${esc(c.method||c.payment_method||'—')}</td><td><b>${fmt(Math.round(c.amt))}</b></td><td><span class="tag t-green">${esc(c.status||'succeeded')}</span></td></tr>`).join('')||'<tr><td colspan="6" class="empty">No charges yet</td></tr>'}
+  </table></div></div>
+  <div class="panel flush" style="--accent:var(--cyan)"><h3 style="padding:24px 24px 0">Payouts to Contractors</h3><div class="table-wrap"><table>
+    <tr><th>Contractor / Ref</th><th>Amount</th><th>Status</th></tr>
+    ${(o.payouts||[]).map(p=>`<tr><td><b>${esc(p.employee||p.id)}</b><span class="sub">${esc(p.transferRef||p.method||'')}</span></td><td><b>${fmt(p.amount)}</b></td><td><span class="tag ${p.status==='paid'?'t-green':'t-yellow'}">${p.status}</span></td></tr>`).join('')||'<tr><td colspan="3" class="empty">No payouts yet</td></tr>'}
+  </table></div></div>
+  </div>`;
+}
+
+async function vPnl(){
+  const p=await OS.getPnl();
+  const maxM=Math.max(...p.months.map(m=>Math.max(m.revenue,m.expenses)),1);
+  OS.$('#view').innerHTML=`
+  <div class="kpis">
+    <div class="kpi" style="--accent:var(--green)"><div class="lbl">Revenue</div><div class="val">${fmt(p.revenueTotal)}</div><div class="delta" style="--c:var(--green)">collected</div></div>
+    <div class="kpi" style="--accent:var(--red)"><div class="lbl">Expenses</div><div class="val">${fmt(p.expensesTotal)}</div><div class="delta" style="--c:var(--red)">incl. contractor labor ${fmt(p.contractorLabor)}</div></div>
+    <div class="kpi" style="--accent:${p.netProfit>=0?'var(--lime)':'var(--red)'}"><div class="lbl">Net profit</div><div class="val">${fmt(p.netProfit)}</div><div class="delta" style="--c:${p.netProfit>=0?'var(--green)':'var(--red)'}">${p.marginPct}% net · ${p.grossMarginPct}% gross</div></div>
+    <div class="kpi" style="--accent:var(--yellow)"><div class="lbl">Open A/R</div><div class="val">${fmt(p.openAR)}</div><div class="delta" style="--c:var(--yellow)">+ ${fmt(p.openPayouts)} open payouts</div></div>
+  </div>
+  <div class="grid-2 eq">
+  <div class="panel" style="--accent:var(--lime)"><h3>Last 6 Months</h3>
+    ${p.months.map(m=>`<div class="bar-row"><span class="n">${m.month}</span>
+      <div class="bar-track" style="position:relative"><div class="bar-fill" style="position:absolute;left:0;top:0;width:${m.revenue/maxM*100}%;background:linear-gradient(90deg,#3fae5a,#c6e02c)"></div><div class="bar-fill" style="position:absolute;left:0;top:0;width:${m.expenses/maxM*100}%;background:linear-gradient(90deg,rgba(255,122,26,.85),rgba(255,90,90,.85))"></div></div>
+      <span class="amt" style="color:${m.net>=0?'#7ad892':'#ff9d9d'}">${fmt(m.net)}</span></div>`).join('')}
+    <p style="font-size:12px;color:var(--text-dim);margin-top:12px">Green = revenue · red overlay = expenses · right column = monthly net</p>
+  </div>
+  <div class="panel flush" style="--accent:var(--cyan)"><h3 style="padding:24px 24px 0">Profit &amp; Loss Detail</h3><div class="table-wrap"><table>
+    <tr><th>Line</th><th>Amount</th></tr>
+    <tr><td><b>Revenue (collected)</b></td><td><b style="color:#7ad892">${fmt(p.revenueTotal)}</b></td></tr>
+    ${Object.entries(p.byCategory).map(([c,a])=>`<tr><td style="padding-left:28px">${esc(c)}</td><td style="color:#ff9d9d">(${fmt(a)})</td></tr>`).join('')}
+    <tr><td><b>Total expenses</b></td><td><b style="color:#ff9d9d">(${fmt(p.expensesTotal)})</b></td></tr>
+    <tr><td><b>Gross profit</b> <span class="sub">after materials, equipment &amp; contractor labor</span></td><td><b style="color:${p.grossProfit>=0?'#7ad892':'#ff9d9d'}">${fmt(p.grossProfit)}</b></td></tr>
+    <tr><td><b>Net income</b></td><td><b style="color:${p.netProfit>=0?'#7ad892':'#ff9d9d'}">${fmt(p.netProfit)}</b></td></tr>
+    <tr><td style="color:var(--text-dim)">Open receivables (not yet in revenue)</td><td style="color:var(--yellow)">${fmt(p.openAR)}</td></tr>
+  </table></div></div>
+  </div>`;
+}
+function addItem(){
+  const acctOpts=OS.cur('accounts').map(a=>`<option value="${a.id}">${esc(a.name)}</option>`).join('');
+  const forms={
+    invoices:['New Invoice',`<label>Account</label><select id="f-acct">${acctOpts}</select><label>Amount ($)</label><input id="f-amount" type="number" min="0">`,
+      async()=>{const r=await OS.create('invoices',{accountId:OS.field('f-acct'),amount:+OS.field('f-amount')||0,status:'sent'});return `Invoice ${r.number} created (Net-${OS.cur('settings').invoiceTermsDays||30})`}],
+    expenses:['New Expense',`<label>Category</label><select id="f-cat"><option>Materials</option><option>Equipment</option><option>Fuel & Travel</option><option>Insurance</option><option>Marketing</option><option>Payroll</option></select><label>Vendor</label><input id="f-vendor"><label>Amount ($)</label><input id="f-amount" type="number" min="0"><label>Note</label><input id="f-note">`,
+      async()=>{await OS.create('expenses',{date:OS.today(),category:OS.field('f-cat'),vendor:OS.field('f-vendor')||null,amount:+OS.field('f-amount')||0,note:OS.field('f-note')});return 'Expense logged'}],
+    revenue:['Revenue Entry',`<label>Source</label><input id="f-source" placeholder="Client — what for"><label>Amount ($)</label><input id="f-amount" type="number" min="0"><label>Note</label><input id="f-note">`,
+      async()=>{await OS.create('revenue',{date:OS.today(),source:OS.field('f-source')||'Revenue',amount:+OS.field('f-amount')||0,note:OS.field('f-note')});return 'Revenue posted'}],
+  };
+  const f=forms[view];if(!f)return;
+  OS.openModal(f[0],f[1]);
+  OS.onModalSave(async()=>{const msg=await f[2]();OS.closeModal();OS.toast(msg);render();});
+}
+OS.boot('finance','Finance',async()=>{await Promise.all([OS.list('accounts'),OS.list('invoices'),OS.list('expenses'),OS.list('revenue'),OS.get('settings'),OS.list('financialAlerts')]);renderTabs();await render();});
+</script>
+<script src="assets/pwa.js" defer></script>
+</body>
+</html>

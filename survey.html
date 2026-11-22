@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>How did we do? — Lines &amp; Logos</title>
+<link rel="icon" type="image/png" href="icons/favicon-32.png?v=2">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;700;800&family=Archivo+Black&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#04060d;--navy:#0a1533;--blue:#2d5bff;--blue-hi:#4d7dff;--lime:#c6e02c;--yellow:#ffc21c;--line:rgba(120,145,205,.16);--text:#c6d0e6;--text-dim:#7e8cab}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--ink);color:var(--text);font-family:'Space Grotesk',system-ui,sans-serif;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 20px;overflow-x:clip}
+.chrome{background:linear-gradient(180deg,#fff 0%,#dfe7f5 26%,#8ea2c8 50%,#f4f8ff 60%,#7688ad 86%,#ccd8ee 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.card{width:100%;max-width:520px;border:1px solid var(--line);border-radius:22px;background:linear-gradient(180deg,rgba(16,31,77,.55),rgba(4,6,13,.85));padding:38px 34px;box-shadow:0 40px 100px rgba(0,0,0,.55);text-align:center}
+.card img{height:72px;margin-bottom:18px;filter:drop-shadow(0 8px 30px rgba(45,91,255,.4))}
+h1{font-family:'Archivo Black',sans-serif;font-size:26px;text-transform:uppercase;line-height:1.1;margin-bottom:8px}
+.sub{color:var(--text-dim);font-size:14px;line-height:1.6;margin-bottom:26px}
+.stars{display:flex;justify-content:center;gap:8px;margin-bottom:22px}
+.star{font-size:38px;cursor:pointer;color:#3a4670;transition:.15s;background:none;border:none}
+.star.on{color:var(--yellow);text-shadow:0 0 18px rgba(255,194,28,.6)}
+textarea{width:100%;min-height:100px;padding:13px 15px;border-radius:11px;border:1px solid var(--line);background:rgba(4,6,13,.55);color:#fff;font-family:inherit;font-size:14px;outline:none;resize:vertical;margin-bottom:18px}
+textarea:focus{border-color:var(--blue-hi)}
+.btn{font-family:'Archivo',sans-serif;font-weight:800;font-size:15px;color:#fff;border:none;cursor:pointer;padding:15px 30px;border-radius:12px;background:linear-gradient(180deg,#4d7dff,#2d5bff 45%,#1c3fd6);box-shadow:0 0 0 1px rgba(120,160,255,.5) inset,0 10px 30px rgba(45,91,255,.35);width:100%}
+.btn:hover{transform:translateY(-1px)}
+.done .big{font-family:'Archivo Black',sans-serif;font-size:52px;color:var(--lime);margin-bottom:12px}
+.err{color:#ff9d9d;font-size:13px;margin-top:12px}
+@media(max-width:560px){body{padding:16px}.card,main{max-width:100%!important}}
+
+/* canonical footer (self-contained) */
+.wrap{max-width:1180px;margin:0 auto;padding:0 32px}
+footer{padding:60px 0 36px;border-top:1px solid var(--line,rgba(255,255,255,.08));background:linear-gradient(180deg,var(--ink,#04060d),var(--navy,#0a1226))}
+.foot-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:44px;margin-bottom:44px;text-align:left}
+.foot-grid h4{font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--chrome-1,#eef3fc);margin:0 0 14px}
+.foot-grid>div:not(.foot-brand) a{display:block;color:var(--text-dim,#8b94a7);text-decoration:none;font-size:14px;margin-bottom:9px}
+.foot-grid>div:not(.foot-brand) a:hover{color:#fff}
+.foot-brand{text-align:left}
+.foot-brand img{height:180px;width:auto;margin-bottom:16px}
+.foot-brand .foot-address{display:block;margin-top:14px;font-style:normal;text-align:left;line-height:1.6;color:var(--text-dim,#8b94a7);font-size:13.5px}
+.foot-bottom{display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;border-top:1px solid var(--line,rgba(255,255,255,.08));padding-top:24px;font-size:12.5px;color:var(--text-dim,#8b94a7)}
+@media(max-width:900px){.foot-grid{grid-template-columns:1fr 1fr;gap:28px}}
+@media(max-width:600px){.wrap{padding:0 20px}}
+@media(max-width:520px){.foot-grid{grid-template-columns:1fr}}
+</style>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#04060d">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Lines & Logos">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+</head>
+<body>
+<div class="card" id="card">
+  <img src="logo-hero.png" alt="Lines &amp; Logos">
+  <h1><span class="chrome">How did we do?</span></h1>
+  <p class="sub" id="sub">Loading your survey…</p>
+  <div id="form" style="display:none">
+    <div class="stars" id="stars"></div>
+    <textarea id="comment" placeholder="Anything the crew nailed — or could do better? (optional)"></textarea>
+    <button class="btn" onclick="submit()">Submit Feedback</button>
+    <p class="err" id="err"></p>
+  </div>
+  <div id="done" class="done" style="display:none">
+    <div class="big">✓</div>
+    <h1><span class="chrome">Thank you</span></h1>
+    <p class="sub">Your feedback went straight to the owner. It is how we keep every floor, court, and wall up to spec.</p>
+  </div>
+</div>
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <img src="logo-hero.png" alt="Lines &amp; Logos">
+        <address class="foot-address">2847 New Broadway St.<br>Memphis, TN 38109</address>
+      </div>
+      <div>
+        <h4>Partners</h4>
+        <a href="careers.html">Become a Contractor</a>
+        <a href="partners.html#apply">Become an Affiliate</a>
+        <a href="partners.html#how">Affiliate Guide</a>
+        <a href="partners.html#tiers">Earnings &amp; Payouts</a>
+      </div>
+      <div>
+        <h4>Support</h4>
+        <a href="index.html#faq">FAQ</a>
+        <a href="mailto:info@linesandlogos.team">Contact Support</a>
+        <a href="gallery.html">Photo Gallery</a>
+        <a href="legal.html#trust">Verification &amp; Trust</a>
+        <a href="legal.html#data-retention">Data Retention</a>
+      </div>
+      <div>
+        <h4>Legal</h4>
+        <a href="legal.html#terms">Terms of Service</a>
+        <a href="legal.html#privacy">Privacy Policy</a>
+        <a href="legal.html#acceptable-use">Acceptable Use Policy</a>
+        <a href="legal.html#provider-terms">Provider Terms</a>
+        <a href="legal.html#refunds">Refund Policy</a>
+        <a href="legal.html#cookies">Cookie Policy</a>
+        <a href="legal.html#legal-notice">Legal Notice</a>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>© 2026 Lines &amp; Logos. All rights reserved.</span>
+    </div>
+  </div>
+</footer>
+<script>
+const BASE=(location.protocol==='file:')?'http://localhost:3001':'';
+const token=new URLSearchParams(location.search).get('token')||'';
+let rating=0;
+const starsEl=document.getElementById('stars');
+starsEl.innerHTML=[1,2,3,4,5].map(i=>`<button class="star" data-i="${i}" aria-label="${i} star">★</button>`).join('');
+starsEl.querySelectorAll('.star').forEach(b=>b.onclick=()=>{rating=+b.dataset.i;starsEl.querySelectorAll('.star').forEach(x=>x.classList.toggle('on',+x.dataset.i<=rating));});
+async function init(){
+  if(!token){document.getElementById('sub').textContent='This survey link is missing its token. Please use the link from your email.';return}
+  try{
+    const r=await fetch(BASE+'/api/survey?token='+encodeURIComponent(token));
+    const d=await r.json();
+    if(!r.ok) throw new Error(d.error||'Survey not found');
+    if(d.status==='responded'){document.getElementById('sub').textContent='You already submitted this survey — thank you!';return}
+    document.getElementById('sub').innerHTML=`Thanks for trusting us with <b style="color:#fff">${d.job||'your project'}</b>${d.account?` at <b style="color:#fff">${d.account}</b>`:''}. Sixty seconds, five stars, done.`;
+    document.getElementById('form').style.display='block';
+  }catch(e){document.getElementById('sub').textContent=e.message+'. If this link should work, call info@linesandlogos.team.'}
+}
+async function submit(){
+  if(!rating){document.getElementById('err').textContent='Pick a star rating first.';return}
+  try{
+    const r=await fetch(BASE+'/api/survey',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token,rating,comment:document.getElementById('comment').value.trim()})});
+    const d=await r.json();
+    if(!r.ok) throw new Error(d.error||'Could not submit');
+    document.getElementById('form').style.display='none';
+    document.getElementById('done').style.display='block';
+  }catch(e){document.getElementById('err').textContent=e.message}
+}
+init();
+</script>
+<script src="assets/pwa.js" defer></script>
+</body>
+</html>

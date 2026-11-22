@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sign Contract — Lines &amp; Logos</title>
+<link rel="icon" type="image/png" href="icons/favicon-32.png?v=2">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;700;800&family=Archivo+Black&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#04060d;--navy:#0a1533;--navy-2:#132a63;--blue:#2d5bff;--blue-hi:#4d7dff;--cyan:#57c7ff;
+  --lime:#c6e02c;--yellow:#ffc21c;--green:#3fae5a;
+  --chrome-1:#eef3fc;--line:rgba(120,145,205,.16);--text:#c6d0e6;--text-dim:#7e8cab;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--ink);color:var(--text);font-family:'Space Grotesk',system-ui,sans-serif;min-height:100vh;display:flex;flex-direction:column;overflow-x:clip}
+.chrome{background:linear-gradient(180deg,#fff 0%,#dfe7f5 26%,#8ea2c8 50%,#f4f8ff 60%,#7688ad 86%,#ccd8ee 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.top-logo{position:fixed;top:22px;left:50%;transform:translateX(-50%);z-index:10}
+.top-logo img{height:64px;filter:drop-shadow(0 8px 30px rgba(45,91,255,.4))}
+main{flex:1;max-width:780px;width:100%;margin:0 auto;padding:130px 24px 70px}
+.hero-t{text-align:center;margin-bottom:36px}
+.hero-t h1{font-family:'Archivo Black',sans-serif;font-size:clamp(26px,3.6vw,38px);text-transform:uppercase}
+.hero-t p{color:var(--text-dim);margin-top:10px;font-size:15px}
+.panel{border:1px solid var(--line);border-radius:18px;background:linear-gradient(180deg,rgba(16,31,77,.35),rgba(4,6,13,.6));padding:30px 32px;margin-bottom:22px}
+.contract-title{font-family:'Archivo',sans-serif;font-weight:800;font-size:17px;color:#fff}
+.contract-amt{font-family:'Archivo Black',sans-serif;font-size:30px;margin:8px 0 18px}
+.contract-body{font-size:14px;line-height:1.75;color:var(--text);white-space:pre-wrap}
+.small-print{font-size:11.5px;color:var(--text-dim);line-height:1.65;border-top:1px dashed var(--line);margin-top:22px;padding-top:16px}
+.small-print b{color:var(--text)}
+.small-print a{color:var(--cyan)}
+.sig-wrap{border:1.5px dashed rgba(77,125,255,.5);border-radius:14px;background:rgba(4,6,13,.5);touch-action:none;cursor:crosshair;margin-top:6px}
+canvas{width:100%;height:170px;display:block;border-radius:14px}
+label{display:block;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--text-dim);margin:16px 0 7px}
+input[type=text],input[type=email]{width:100%;padding:12px 14px;border-radius:10px;border:1px solid var(--line);background:rgba(4,6,13,.6);color:#fff;font-family:inherit;font-size:14px;outline:none}
+input:focus{border-color:var(--blue-hi)}
+.chk{display:flex;gap:10px;align-items:flex-start;font-size:13px;color:var(--text-dim);margin-top:18px;line-height:1.55}
+.chk input{margin-top:3px;accent-color:var(--blue)}
+.btn{font-family:'Archivo',sans-serif;font-weight:800;font-size:14px;color:#fff;border:none;cursor:pointer;padding:13px 26px;border-radius:10px;background:linear-gradient(180deg,#4d7dff,#2d5bff 45%,#1c3fd6);box-shadow:0 0 0 1px rgba(120,160,255,.5) inset;transition:.15s;margin-top:22px}
+.btn:hover{transform:translateY(-1px)}
+.btn[disabled]{opacity:.4;cursor:not-allowed;transform:none}
+.btn-ghost{background:transparent;box-shadow:0 0 0 1px var(--line) inset;color:var(--chrome-1)}
+.done-box{text-align:center;padding:40px 20px}
+.done-box .big{font-family:'Archivo Black',sans-serif;font-size:30px;margin-bottom:12px}
+.done-box p{color:var(--text-dim);font-size:14.5px;line-height:1.7}
+.tag{display:inline-block;font-size:11px;font-weight:800;letter-spacing:.06em;border-radius:100px;padding:5px 13px;text-transform:uppercase;background:rgba(63,174,90,.14);color:#7ad892;border:1px solid rgba(63,174,90,.4)}
+footer{border-top:1px solid var(--line);padding:36px 24px;text-align:center;background:linear-gradient(180deg,var(--ink),var(--navy))}
+footer p{font-size:12px;color:var(--text-dim);letter-spacing:.06em}
+footer a{color:var(--cyan);text-decoration:none}
+.toast{position:fixed;bottom:26px;right:26px;background:linear-gradient(180deg,var(--navy-2),var(--navy));border:1px solid rgba(77,125,255,.5);color:#fff;padding:14px 22px;border-radius:13px;font-size:13.5px;font-weight:600;box-shadow:0 20px 50px rgba(0,0,0,.6);transform:translateY(120px);opacity:0;transition:.35s;z-index:300;max-width:360px}
+.toast.show{transform:none;opacity:1}
+@media(max-width:560px){.top-logo img{height:48px}main{padding-top:100px}}
+</style>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#04060d">
+<meta name="apple-mobile-web-app-title" content="Lines &amp; Logos">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+</head>
+<body>
+<a class="top-logo" href="index.html"><img src="logo-hero.png" alt="Lines &amp; Logos"></a>
+
+<main>
+  <div class="hero-t">
+    <h1 class="chrome">Contract Signature</h1>
+    <p id="heroSub">Review your fixed-price contract, then sign below.</p>
+  </div>
+
+  <div class="panel" id="contractPanel">
+    <div id="cBody" style="display:none">
+      <div class="contract-title" id="cTitle"></div>
+      <div class="contract-amt chrome" id="cAmt"></div>
+      <div class="contract-body" id="cText"></div>
+      <div class="small-print">
+        <b>Small print — please read:</b> This is a fixed-price contract; scope changes require a written change order signed by both parties. Workmanship is covered by a one-year touch-up warranty.
+        <b>Photography &amp; business reference:</b> You authorize Lines &amp; Logos to identify your organization as a business reference and to photograph and share completed work for portfolio and marketing purposes — <b>unless you opt out</b>. You can opt out below before signing, or at any time afterward via the <a href="gallery.html#optout">Photo &amp; Reference Opt-Out form</a> or by emailing <b>info@linesandlogos.team</b>. Opted-out photos are unpublished within 5 business days.
+        Full terms: <a href="legal.html#terms">Terms of Service</a> · <a href="legal.html#privacy">Privacy Policy</a> · <a href="legal.html#refunds">Refund Policy</a>.
+      </div>
+
+      <label for="typed">Type your full legal name</label>
+      <input type="text" id="typed" placeholder="Full legal name">
+      <label for="email">Your email (receipt &amp; project updates)</label>
+      <input type="email" id="email" placeholder="you@organization.org">
+      <label>…and draw your signature</label>
+      <div class="sig-wrap"><canvas id="sig"></canvas></div>
+      <div style="margin-top:8px"><button class="btn btn-ghost" style="margin-top:0;padding:8px 16px;font-size:12px" onclick="clearSig()">Clear</button></div>
+
+      <label class="chk"><input type="checkbox" id="optoutChk">
+        <span><b style="color:var(--text)">Opt out of photo &amp; reference use.</b> Check this box if you do NOT authorize us to use your organization as a business reference or share photos of the completed work. This is recorded with your signature and can also be changed later.</span></label>
+
+      <button class="btn" id="signBtn" onclick="doSign()">Sign Contract</button>
+    </div>
+    <div id="cLoading" style="text-align:center;color:var(--text-dim);padding:30px 0">Loading your contract…</div>
+    <div id="cError" style="display:none;text-align:center;color:#ff9a9a;padding:30px 0"></div>
+    <div id="cDone" class="done-box" style="display:none">
+      <div class="big chrome">Signed ✓</div>
+      <span class="tag">contract executed</span>
+      <p style="margin-top:16px" id="doneText"></p>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <p>© 2026 Lines &amp; Logos · Memphis, TN · <a href="legal.html#terms">Terms</a> · <a href="legal.html#privacy">Privacy</a> · <a href="gallery.html#optout">Photo Opt-Out</a></p>
+</footer>
+
+<div class="toast" id="toast"></div>
+<script>
+const API_BASE=(location.protocol==='file:')?'http://localhost:3001':'';
+const TOKEN=new URLSearchParams(location.search).get('token')||'demo-client-token';
+let contract=null;
+
+async function load(){
+  try{
+    const r=await fetch(API_BASE+'/api/sign/'+TOKEN);
+    const d=await r.json();
+    if(!r.ok)throw new Error(d.error||'Not found');
+    contract=d;
+    document.getElementById('cLoading').style.display='none';
+    if(d.status==='signed'){showDone(d);return}
+    document.getElementById('cBody').style.display='block';
+    document.getElementById('cTitle').textContent=d.title;
+    document.getElementById('cAmt').textContent='$'+(+d.amount).toLocaleString();
+    document.getElementById('cText').textContent=d.body;
+    document.getElementById('heroSub').textContent='For '+(d.company||'your organization')+' — review, then sign below.';
+  }catch(e){
+    document.getElementById('cLoading').style.display='none';
+    const el=document.getElementById('cError');el.style.display='block';
+    el.textContent='Contract not found or link expired — contact info@linesandlogos.team and we will resend your signing link.';
+  }
+}
+function showDone(d){
+  document.getElementById('cBody').style.display='none';
+  document.getElementById('cDone').style.display='block';
+  document.getElementById('doneText').textContent=d.signerName
+    ? `Signed by ${d.signerName}${d.signedAt?' on '+new Date(d.signedAt).toLocaleString():''}. A copy is in your client portal — we will be in touch to schedule your walkthrough.`
+    : 'This contract is already signed.';
+}
+/* signature pad */
+const cv=document.getElementById('sig'),ctx=cv.getContext('2d');
+let drawing=false,drew=false;
+function sizeCv(){const r=cv.getBoundingClientRect(),d=devicePixelRatio||1;cv.width=r.width*d;cv.height=r.height*d;ctx.setTransform(d,0,0,d,0,0);ctx.lineWidth=2.4;ctx.lineCap='round';ctx.strokeStyle='#57c7ff';}
+function pos(e){const r=cv.getBoundingClientRect();return[e.clientX-r.left,e.clientY-r.top];}
+cv.addEventListener('pointerdown',e=>{drawing=true;drew=true;ctx.beginPath();ctx.moveTo(...pos(e));cv.setPointerCapture(e.pointerId)});
+cv.addEventListener('pointermove',e=>{if(drawing){ctx.lineTo(...pos(e));ctx.stroke()}});
+cv.addEventListener('pointerup',()=>drawing=false);
+function clearSig(){ctx.clearRect(0,0,cv.width,cv.height);drew=false}
+addEventListener('resize',()=>{if(document.getElementById('cBody').style.display==='block')sizeCv()});
+
+async function doSign(){
+  const name=document.getElementById('typed').value.trim();
+  const email=document.getElementById('email').value.trim();
+  const optOut=document.getElementById('optoutChk').checked;
+  if(!name){toast('Type your full legal name');return}
+  if(!email||!email.includes('@')){toast('Enter your email for the receipt');return}
+  if(!drew){toast('Draw your signature in the box');return}
+  const btn=document.getElementById('signBtn');btn.disabled=true;btn.textContent='Signing…';
+  try{
+    const r=await fetch(API_BASE+'/api/sign/'+TOKEN,{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({signerName:name,signature:name+' (drawn)',email})});
+    const d=await r.json();
+    if(!r.ok||d.error)throw new Error(d.error||'Sign failed');
+    if(optOut){
+      try{await fetch(API_BASE+'/api/optout',{method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({business:contract.company||contract.title,email,name,signature:name})});}catch(_){}
+    }
+    showDone({signerName:name,signedAt:new Date().toISOString()});
+  }catch(e){toast(e.message||'Could not sign — try again');btn.disabled=false;btn.textContent='Sign Contract'}
+}
+function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000)}
+load();
+addEventListener('load',()=>setTimeout(sizeCv,100));
+</script>
+<script src="assets/pwa.js" defer></script>
+</body>
+</html>

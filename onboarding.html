@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Onboarding — Lines &amp; Logos Business OS</title>
+<link rel="icon" type="image/png" href="icons/favicon-32.png?v=2">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;700;800&family=Archivo+Black&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/os.css?v=9">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#04060d">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Lines & Logos">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+</head>
+<body>
+<main>
+  <div class="topbar">
+    <div><div class="crumb">Business OS / Onboarding</div><h1 class="chrome">Onboarding</h1></div>
+    <div class="topbar-right">
+      <input class="search" id="q" placeholder="Search onboardings…" oninput="render()">
+    </div>
+  </div>
+  <div class="tabs2" id="tabs"></div>
+  <div id="view"></div>
+</main>
+<script src="assets/os.js?v=9"></script>
+<script>
+const {fmt,esc,GEN}=OS;
+let view='emp';
+let wz={step:1,data:{}};      // wizard state (per current view)
+let openRow=null;             // expanded tracking row id
+
+const CFG={
+  emp:{
+    coll:'employeeOnboardings', label:'Employee', title:'Start Employee Onboarding',
+    steps:['Details','Checklist','Review'],
+    fields:[
+      {id:'name',label:'Full name *',ph:'Jordan Lee'},
+      {id:'role',label:'Role *',ph:'Floor Installer'},
+      {row:[
+        {id:'email',label:'Email',ph:'jlee@example.com',type:'email'},
+        {id:'phone',label:'Phone',ph:'901-234-5678',type:'tel'}]},
+      {row:[
+        {id:'type',label:'Worker type',type:'select',opts:['1099','W-2']},
+        {id:'availability',label:'Availability',type:'select',opts:['full-time','part-time']}]},
+      {id:'startDate',label:'Target start date',type:'date'},
+      {id:'notes',label:'Notes',type:'textarea',ph:'Referred by James Carter — hardwood experience…'},
+    ],
+    tpl:()=>OS.EMP_STEPS,
+    req:['name','role'],
+    linkLabel:'Add to Crew Roster',
+    link:async(o)=>{const e=await OS.create('employees',{name:o.name,role:o.role,type:o.type||'1099',w9Signed:(o.steps.find(s=>s.key==='w9')||{}).done||false,rating:4.0,skills:[],availability:o.availability||'part-time'});return e.id;},
+  },
+  cli:{
+    coll:'clientOnboardings', label:'Client', title:'Start Client Onboarding',
+    steps:['Company & contact','Checklist','Review'],
+    fields:[
+      {id:'company',label:'Company / organization *',ph:'DeSoto County School District'},
+      {id:'contact',label:'Primary contact *',ph:'Angela Porter'},
+      {row:[
+        {id:'email',label:'Contact email',ph:'aporter@district.org',type:'email'},
+        {id:'phone',label:'Contact phone',ph:'662-555-0182',type:'tel'}]},
+      {row:[
+        {id:'service',label:'Service package',type:'select',opts:['Gym Floor Refinishing','Court Striping','Donors Wall / Signage','Full Facility','Outdoor Courts','Other']},
+        {id:'value',label:'Contract value ($)',type:'number',ph:'25000'}]},
+      {id:'startDate',label:'Target start date',type:'date'},
+      {id:'notes',label:'Notes',type:'textarea',ph:'Board approval cycle ~3 weeks…'},
+    ],
+    tpl:()=>OS.CLIENT_STEPS,
+    req:['company','contact'],
+    linkLabel:'Create Account in Sales',
+    link:async(o)=>{const a=await OS.create('accounts',{name:o.company,tier:'B',seats:0,city:'',renewal:OS.addDays(365),goal:o.service||'',notes:o.notes||''});return a.id;},
+  },
+};
+
+function renderTabs(){
+  OS.$('#tabs').innerHTML=[['emp','Employee Onboarding'],['cli','Client Onboarding']]
+    .map(([k,l])=>{const c=OS.cur(CFG[k].coll).filter(o=>o.status!=='complete').length;
+      return `<button class="${view===k?'active':''}" onclick="go('${k}')">${l}${c?`<span class="cnt">${c}</span>`:''}</button>`;}).join('');
+}
+function go(v){view=v;wz={step:1,data:{}};openRow=null;renderTabs();render();}
+const q=()=>OS.$('#q').value.toLowerCase();
+
+/* ---------- wizard ---------- */
+function fieldHtml(f){
+  const v=esc(wz.data[f.id]||'');
+  if(f.type==='select')return `<label>${f.label}</label><select id="wz-${f.id}">${f.opts.map(o=>`<option ${wz.data[f.id]===o?'selected':''}>${o}</option>`).join('')}</select>`;
+  if(f.type==='textarea')return `<label>${f.label}</label><textarea id="wz-${f.id}" placeholder="${f.ph||''}">${v}</textarea>`;
+  return `<label>${f.label}</label><input id="wz-${f.id}" type="${f.type||'text'}" placeholder="${f.ph||''}" value="${v}">`;
+}
+function renderWizard(){
+  const c=CFG[view];
+  const head=c.steps.map((s,i)=>`<div class="ob-step ${wz.step===i+1?'active':wz.step>i+1?'done':''}"><span class="n">${wz.step>i+1?'✓':i+1}</span>${s}</div>`).join('');
+  let body='';
+  if(wz.step===1){
+    body=`<div class="ob-form">${c.fields.map(f=>f.row?`<div class="row">${f.row.map(fieldHtml).join('')}</div>`:fieldHtml(f)).join('')}<div class="err" id="wzErr">Please fill in the required fields (${c.req.map(r=>c.fields.flatMap(x=>x.row||[x]).find(x=>x.id===r).label.replace(' *','')).join(' & ')}).</div></div>`;
+  }else if(wz.step===2){
+    body=`<p class="ob-mini" style="margin-bottom:14px">This checklist will be attached to the new ${c.label.toLowerCase()} onboarding track. You will check steps off as they complete.</p>
+      <div class="ob-checklist">${c.tpl().map(s=>`<div class="ob-check"><span>${esc(s.label)}</span><span class="k">${esc(s.key)}</span></div>`).join('')}</div>`;
+  }else{
+    const d=wz.data;
+    body=`<div class="ob-review">
+      ${Object.entries({[c.label==='Employee'?'Name':'Company']:d[c.req[0]],[c.label==='Employee'?'Role':'Contact']:d[c.req[1]],Email:d.email,Phone:d.phone,
+        ...(view==='emp'?{Type:d.type,Availability:d.availability}:{Service:d.service,Value:d.value?fmt(d.value):'—'}),
+        'Start date':d.startDate||'—',Notes:d.notes||'—'}).map(([k,v])=>`<div class="kv"><span>${k}</span><b>${esc(String(v??'—'))}</b></div>`).join('')}
+      <p class="ob-mini" style="margin-top:14px">Starting creates a live track with ${c.tpl().length} checklist steps. Steps are checked off from the table below; the track auto-completes when all are done.</p></div>`;
+  }
+  return `<div class="panel" style="--accent:var(--lime)"><h3>${c.title}</h3><div class="ob-steps">${head}</div>${body}
+    <div class="ob-nav">
+      ${wz.step>1?`<button class="btn btn-ghost" onclick="wzNav(-1)">← Back</button>`:''}<span class="spacer"></span>
+      ${wz.step<3?`<button class="btn" onclick="wzNav(1)">Continue →</button>`:`<button class="btn btn-green" onclick="wzStart()">Start ${c.label} Onboarding</button>`}
+    </div></div>`;
+}
+function collectStep(){
+  const c=CFG[view];
+  if(wz.step===1){
+    c.fields.flatMap(f=>f.row||[f]).forEach(f=>{const el=OS.$('#wz-'+f.id);if(el)wz.data[f.id]=f.type==='number'?+el.value||0:el.value.trim();});
+    const missing=c.req.some(r=>!wz.data[r]);
+    OS.$('#wzErr').style.display=missing?'block':'none';
+    return !missing;
+  }
+  return true;
+}
+function wzNav(d){if(d>0&&!collectStep())return;wz.step+=d;render();}
+async function wzStart(){
+  const c=CFG[view];
+  const r=await OS.create(c.coll,{...wz.data});
+  OS.toast(`${c.label} onboarding started — ${r.stepsTotal||r.steps.length} steps queued`);
+  wz={step:1,data:{}};render();
+}
+
+/* ---------- tracking table ---------- */
+async function render(){
+  const c=CFG[view];
+  const rows=await OS.list(c.coll);
+  const active=rows.filter(o=>o.status!=='complete');
+  const avg=active.length?Math.round(active.reduce((s,o)=>s+o.progress,0)/active.length):0;
+  const done=rows.filter(o=>o.status==='complete').length;
+  const filtered=rows.filter(o=>[o.name,o.company,o.contact,o.role,o.service,o.email].join(' ').toLowerCase().includes(q()));
+
+  const kpis=`<div class="kpis k3">
+    <div class="kpi" style="--accent:var(--blue)"><div class="lbl">Active Tracks</div><div class="val">${active.length}</div><div class="delta" style="--c:var(--text-dim)">${c.label} onboarding in flight</div></div>
+    <div class="kpi" style="--accent:var(--cyan)"><div class="lbl">Avg. Progress</div><div class="val">${avg}%</div><div class="delta" style="--c:var(--cyan)">across active tracks</div></div>
+    <div class="kpi" style="--accent:var(--green)"><div class="lbl">Completed</div><div class="val">${done}</div><div class="delta" style="--c:var(--green)">all-time</div></div>
+  </div>`;
+
+  const head=view==='emp'
+    ?'<tr><th>Name</th><th>Start Date</th><th>Progress</th><th>Status</th><th>Steps</th><th>Actions</th></tr>'
+    :'<tr><th>Company</th><th>Service</th><th>Value</th><th>Start Date</th><th>Progress</th><th>Status</th><th>Actions</th></tr>';
+
+  const rowHtml=(o)=>{
+    const main=view==='emp'
+      ?`<td><b>${esc(o.name)}</b><span class="sub">${esc(o.role||'')} · ${esc(o.type||'')}</span></td><td>${esc(o.startDate||'—')}</td>`
+      :`<td><b>${esc(o.company)}</b><span class="sub">${esc(o.contact||'')} · ${esc(o.email||'')}</span></td><td>${esc(o.service||'—')}</td><td><b>${fmt(o.value)}</b></td><td>${esc(o.startDate||'—')}</td>`;
+    const detail=openRow===o.id?`<tr class="ob-detail"><td colspan="${view==='emp'?6:7}"><div class="ob-detail-grid">
+      <div><h4 style="font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--text-dim);margin-bottom:12px;font-weight:800">Checklist — click to check off</h4>
+        ${o.steps.map((s,i)=>`<label class="ob-stepcheck ${s.done?'done':''}"><input type="checkbox" ${s.done?'checked':''} onchange="toggleStep('${o.id}',${i},this.checked)"><span>${esc(s.label)}</span><span class="when">${s.done?'done':'pending'}</span></label>`).join('')}</div>
+      <div><h4 style="font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--text-dim);margin-bottom:12px;font-weight:800">Details</h4>
+        <p class="ob-mini">Started ${esc(o.created||'—')}${o.completedAt?` · completed ${esc(o.completedAt)}`:''}</p>
+        <p class="ob-mini" style="margin-top:8px">${esc(o.notes||'No notes yet.')}</p>
+        ${o.status==='complete'&&!o.linkedId?`<button class="btn btn-sm btn-green" style="margin-top:14px" onclick="linkRecord('${o.id}')">${c.linkLabel}</button>`:''}
+        ${o.linkedId?`<p class="ob-mini" style="margin-top:14px;color:var(--lime)">Linked — record created from this track.</p>`:''}
+      </div></div></td></tr>`:'';
+    return `<tr>${main}
+      <td><div class="pbar-row"><div class="progressbar"><i style="width:${o.progress}%"></i></div><span>${o.progress}%</span></div></td>
+      <td><span class="tag ${GEN(o.status)}">${o.status}</span></td>
+      ${view==='emp'?`<td>${o.stepsDone}/${o.stepsTotal}</td>`:''}
+      <td style="white-space:nowrap">
+        <button class="btn btn-sm btn-ghost" onclick="toggleRow('${o.id}')">${openRow===o.id?'Hide steps':'Steps'}</button>
+        <button class="btn btn-sm btn-danger" onclick="delRow('${o.id}')">Delete</button>
+      </td></tr>${detail}`;
+  };
+
+  OS.$('#view').innerHTML=kpis+renderWizard()+`
+    <div class="panel flush" style="--accent:var(--cyan)"><h3 style="padding:24px 24px 0">${c.label} Onboarding Tracks <span class="right">${filtered.length} record(s)</span></h3>
+    <div class="table-wrap"><table>${head}
+      ${filtered.map(rowHtml).join('')||`<tr><td colspan="${view==='emp'?6:7}" class="empty">No ${c.label.toLowerCase()} onboardings yet — start one above.</td></tr>`}
+    </table></div></div>`;
+}
+function toggleRow(id){openRow=openRow===id?null:id;render();}
+async function toggleStep(id,idx,done){
+  const c=CFG[view];
+  const o=OS.cur(c.coll).find(x=>x.id===id);if(!o)return;
+  o.steps[idx].done=done;
+  const r=await OS.patch(c.coll,id,{steps:o.steps});
+  if(r&&r.status==='complete')OS.toast(`${c.label} onboarding complete: ${o.name||o.company}`);
+  render();
+}
+async function linkRecord(id){
+  const c=CFG[view];
+  const o=OS.cur(c.coll).find(x=>x.id===id);if(!o)return;
+  const linkedId=await c.link(o);
+  await OS.patch(c.coll,id,{linkedId});
+  OS.toast(`${c.linkLabel} — done`);render();
+}
+function delRow(id){
+  const c=CFG[view];
+  OS.openModal('Delete Onboarding Track',`<p style="font-size:13.5px;line-height:1.6;color:var(--text)">This permanently removes the track and its checklist progress. This cannot be undone.</p>`);
+  OS.$('#modalSave').textContent='Delete';
+  OS.$('#modalSave').classList.add('btn-danger');
+  OS.onModalSave(async()=>{
+    if(OS.isLive()){const B=(location.protocol==='file:')?'http://localhost:3001':'';await fetch(B+'/api/'+c.coll+'/'+id,{method:'DELETE',headers:{Authorization:'Bearer '+OS.TOKEN}});OS.state()[c.coll]=null;}
+    else{const arr=OS.cur(c.coll);const i=arr.findIndex(x=>x.id===id);if(i>=0)arr.splice(i,1);OS.persistDemo();}
+    OS.closeModal();OS.toast('Onboarding track deleted');render();
+  });
+}
+OS.boot('onboarding','Onboarding',async()=>{await Promise.all([OS.list('employeeOnboardings'),OS.list('clientOnboardings')]);renderTabs();await render();});
+</script>
+<script src="assets/pwa.js" defer></script>
+</body>
+</html>

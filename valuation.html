@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Business Valuation — Lines &amp; Logos</title>
+<link rel="icon" type="image/png" href="icons/favicon-32.png?v=2">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;700;800&family=Archivo+Black&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/os.css?v=9">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#04060d">
+<style>
+.val-hero{background:radial-gradient(120% 140% at 20% 0%,rgba(77,125,255,.22),transparent 55%),var(--panel,#0d1526);border:1px solid var(--line,#1c2946);border-radius:18px;padding:26px;margin-bottom:18px;display:flex;gap:26px;align-items:center;flex-wrap:wrap}
+.gauge{width:140px;height:140px;flex:none}
+.gauge circle{fill:none;stroke-width:11}
+.gauge .bg{stroke:#1a2745}
+.gauge .fg{stroke:url(#grad);stroke-linecap:round;transform:rotate(-90deg);transform-origin:center;transition:stroke-dashoffset 1s ease}
+.val-total{font-size:38px;font-weight:800}
+.brk{display:flex;flex-direction:column;gap:8px;min-width:230px;flex:1}
+.brk .row{display:flex;justify-content:space-between;font-size:13px;padding:7px 0;border-bottom:1px dashed var(--line,#1c2946)}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:12px;margin-bottom:18px}
+.kpi{background:var(--panel,#0d1526);border:1px solid var(--line,#1c2946);border-radius:12px;padding:13px 15px}
+.kpi b{font-size:19px;display:block}.kpi span{font-size:11.5px;color:var(--mut,#8b95b3)}
+.step-card{background:var(--panel,#0d1526);border:1px solid var(--line,#1c2946);border-radius:14px;padding:18px;margin-bottom:14px}
+.step-card h3{margin:0 0 6px;font-size:15px}
+.step-card .impact{display:inline-block;background:#0f2b1c;color:#43d17c;font-size:11.5px;padding:3px 10px;border-radius:99px;font-weight:700;margin-bottom:10px}
+.step-card ol{margin:8px 0;padding-left:20px;font-size:13px;color:var(--tx,#dfe5f3)}
+.step-card ol li{margin:4px 0}
+.step-card .tools{font-size:12.5px;color:var(--mut,#8b95b3);margin-top:8px}
+.step-card a{color:#5bb8ff;text-decoration:none;font-size:12.5px}
+.hand-box{background:linear-gradient(180deg,#141f3d,#0d1526);border:1px solid #2a3a63;border-radius:16px;padding:24px;margin-bottom:18px}
+.hand-opt{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
+.hand-opt button{text-align:left;background:#0a1122;border:1px solid var(--line,#1c2946);border-radius:12px;padding:16px;color:var(--tx,#e8ecf6);cursor:pointer;font-size:13px}
+.hand-opt button:hover{border-color:#4d7dff}
+.hand-opt b{display:block;font-size:14px;margin-bottom:5px}
+.hand-opt small{color:var(--mut,#8b95b3)}
+.wf-steps{display:flex;flex-direction:column;gap:8px;margin-top:12px;font-size:13px}
+.wf-steps div{background:#0a1122;border:1px solid var(--line,#1c2946);border-radius:10px;padding:11px 14px}
+.report-out{background:#0a1122;border:1px solid var(--line,#1c2946);border-radius:12px;padding:18px;font-family:ui-monospace,Menlo,monospace;font-size:12.5px;white-space:pre-wrap;max-height:420px;overflow:auto}
+@media(max-width:680px){.val-hero{flex-direction:column;align-items:flex-start}.hand-opt{grid-template-columns:1fr}}
+</style>
+</head>
+<body data-perms="notifications">
+<main>
+  <div class="topbar">
+    <div><div class="crumb">Business Suite / Valuation</div><h1 class="chrome">Business Valuation</h1></div>
+    <div class="topbar-right">
+      <button class="btn btn-ghost btn-sm" onclick="assumptionsModal()">Assumptions</button>
+      <button class="btn btn-sm" onclick="genReport()">📄 Generate report</button>
+    </div>
+  </div>
+  <div id="handoff"></div>
+  <div class="val-hero" id="hero"></div>
+  <div class="kpis" id="kpis"></div>
+  <div class="section-title" style="font-size:13px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--mut,#8b95b3);margin:20px 0 12px">How to raise the value — ordered by impact</div>
+  <div id="plan"></div>
+  <div id="report" style="margin-top:18px"></div>
+</main>
+<script src="assets/os.js?v=9"></script>
+<script>
+const { boot, raw, fmt, esc, openModal, closeModal, onModalSave, field, toast, isLive, $ } = OS;
+let D = null;
+
+async function load(){
+  if (isLive()) D = await raw('/api/valuation').catch(()=>null);
+  else D = { total: 412000, score: 54, servicesValue: 298000, servicesMultiple: 2.8, softwareValue: 84000, assetsValue: 30000,
+    sde: 106500, ownerComp: 60000, oneTimeAddBacks: 15000, clients: 18, leads: 64, converted: 12, conversionRate: 19,
+    revenue12: 412000, expenses12: 305000, netProfit: 107000, recurringPct: 8, growthPct: 12, topShare: 46,
+    employees: 4, machines: 5, machineValue: 38000, inventoryValue: 14500, campaigns: 1, adSpend: 1200, adRevenue: 3900, roas: 3.25,
+    seasoningMonths: 31, reviews: 7, positiveReviews: 6, plan: demoPlan() };
+  if (!D) return;
+  render(); renderHandoff();
+}
+function demoPlan(){ return [
+  {title:'Build recurring revenue to 30%+ of total',impact:'could add ~$53,000–$106,000 to valuation',why:'Recurring maintenance contracts lift your multiple from ~2.5× toward 4× SDE. Currently 8%.',steps:['1. Create a "Court Care Plan": annual recoat + quarterly inspection','2. Offer it on every completed job via the post-job follow-up email','3. Target 10 maintenance accounts in 90 days','4. Track take-rate in Marketing → Campaigns'],tools:'Use the existing Invoices + Reminders engine.',links:[{name:'Industry maintenance-program benchmark',url:'https://www.gymfloors.com/'}]},
+  {title:'Reduce client concentration below 25%',impact:'multiple +0.2–0.5× SDE',why:'Your largest client is 46% of revenue — buyers discount concentrated revenue heavily.',steps:['1. No new client exceeds 15% of annual revenue','2. Re-quote 20 past leads this month','3. Add 2 nearby markets from the 400-mile radius'],tools:'Leads pipeline + quotes engine already in the suite.',links:[{name:'SBA: manage your business',url:'https://www.sba.gov/business-guide/manage-your-business'}]},
+]; }
+
+function render(){
+  const off = 219.8, circ = 2 * Math.PI * 35;
+  $('#hero').innerHTML = `
+  <svg class="gauge" viewBox="0 0 84 84"><defs><linearGradient id="grad" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#43d17c"/><stop offset="100%" stop-color="#2d5bff"/></linearGradient></defs>
+    <circle class="bg" cx="42" cy="42" r="35"/><circle class="fg" cx="42" cy="42" r="35" stroke-dasharray="${circ}" stroke-dashoffset="${circ*(1-D.score/100)}"/></svg>
+  <div><div style="font-size:12px;color:var(--mut);letter-spacing:.1em;text-transform:uppercase">Value-readiness score</div>
+    <div style="font-size:34px;font-weight:800">${D.score}<span style="font-size:16px;color:var(--mut)">/100</span></div></div>
+  <div style="flex:1;min-width:200px"><div style="font-size:12px;color:var(--mut);letter-spacing:.1em;text-transform:uppercase">Estimated business value</div>
+    <div class="val-total">${fmt(D.total)}</div></div>
+  <div class="brk">
+    <div class="row"><span>Services (${D.servicesMultiple}× SDE)</span><b>${fmt(D.servicesValue)}</b></div>
+    <div class="row"><span>Software (this app)</span><b>${fmt(D.softwareValue)}</b></div>
+    <div class="row"><span>Equipment &amp; inventory</span><b>${fmt(D.assetsValue)}</b></div>
+  </div>`;
+  $('#kpis').innerHTML = [
+    ['Seasoning', D.seasoningMonths + ' mo'],['Revenue (12 mo)', fmt(D.revenue12)],['Net P/L', fmt(D.netProfit)],
+    ['SDE', fmt(Math.round(D.sde))],['Recurring', D.recurringPct + '%'],['Growth', D.growthPct + '%'],
+    ['Clients', D.clients],['Conversion', D.conversionRate + '%'],['Leads → won', D.converted + '/' + D.leads],
+    ['Employees', D.employees],['Machines', D.machines],['Inventory', fmt(D.inventoryValue)],
+    ['ROAS', D.roas ? D.roas + '×' : '—'],['Concentration', D.topShare + '%'],
+  ].map(([l,v]) => `<div class="kpi"><b>${v}</b><span>${l}</span></div>`).join('');
+  $('#plan').innerHTML = (D.plan || []).map((s,i) => `<div class="step-card">
+    <span class="impact">⬆ ${esc(s.impact)}</span>
+    <h3>${i+1}. ${esc(s.title)}</h3>
+    <p style="font-size:13px;color:var(--mut);margin:0 0 6px">${esc(s.why)}</p>
+    <ol>${s.steps.map(st=>`<li>${esc(st)}</li>`).join('')}</ol>
+    <div class="tools">🛠 ${esc(s.tools)}</div>
+    ${(s.links||[]).map(l=>`<div><a href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.name)} ↗</a></div>`).join('')}
+  </div>`).join('');
+}
+
+async function renderHandoff(){
+  let h = { mode: 'inactive' };
+  if (isLive()) h = await raw('/api/valuation/handoff').catch(()=>({mode:'inactive'}));
+  const el = $('#handoff');
+  if (h.mode === 'inactive') {
+    el.innerHTML = '';
+    return;
+  }
+  if (h.mode === 'question') {
+    el.innerHTML = `<div class="hand-box"><h2 style="margin:0 0 6px">👋 New owner setup</h2>
+      <p style="color:var(--mut);font-size:13.5px;margin:0">Handoff mode is on. Before we set up the app for the new owner:</p>
+      <h3 style="margin:14px 0 0;font-size:17px">${esc(h.question)}</h3>
+      <div class="hand-opt">${h.options.map(o=>`<button onclick="answerHandoff('${o.value}')"><b>${esc(o.label)}</b><small>${esc(o.implications)}</small></button>`).join('')}</div></div>`;
+    return;
+  }
+  el.innerHTML = `<div class="hand-box"><h2 style="margin:0 0 6px">👋 New owner setup — ${esc(h.workflow.name)}</h2>
+    <div class="wf-steps">${h.workflow.steps.map(s=>`<div>${esc(s)}</div>`).join('')}</div>
+    <p style="margin:12px 0 0;font-size:12px;color:var(--mut)">Handoff mode: <button class="btn btn-ghost btn-sm" onclick="toggleHandoff(false)">Exit handoff mode</button></p></div>`;
+}
+async function answerHandoff(v){
+  if (isLive()) await raw('/api/valuation/handoff', { method:'POST', body: JSON.stringify({ sameName: v }) });
+  else { OS.demoHandoff = { active:true, sameName: v }; }
+  toast('Choice saved — running the ' + v + ' workflow'); renderHandoff();
+}
+async function toggleHandoff(on){
+  if (isLive()) await raw('/api/valuation/handoff', { method:'POST', body: JSON.stringify({ active: on }) });
+  else OS.demoHandoff = { active: on, sameName: null };
+  renderHandoff();
+}
+
+function assumptionsModal(){
+  openModal('Valuation assumptions', `
+    <p class="hint" style="margin-top:0;font-size:12.5px;color:var(--mut)">SDE = net profit + owner compensation + one-time add-backs. Adjust yours for a truer number.</p>
+    ${field('ownerComp','Owner annual compensation ($)','60000','number')}
+    ${field('addBacks','One-time add-backs /yr ($)','15000','number')}`);
+  onModalSave(async (vals) => {
+    if (isLive()) await raw('/api/valuation/assumptions', { method:'POST', body: JSON.stringify(vals) });
+    toast('Assumptions saved'); closeModal(); load();
+  });
+}
+
+async function genReport(){
+  if (!isLive()) { toast('Connect the server to generate the full report'); return; }
+  const r = await raw('/api/valuation/report');
+  const blob = new Blob([r.markdown], { type: 'text/markdown' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'valuation-report-' + new Date().toISOString().slice(0, 10) + '.md';
+  a.click();
+  $('#report').innerHTML = `<div class="section-title" style="font-size:13px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--mut,#8b95b3);margin:20px 0 12px">Report preview</div><div class="report-out">${esc(r.markdown.slice(0, 4000))}…</div>`;
+  toast('Valuation report downloaded');
+}
+
+// expose handoff toggle for the admin settings later
+window.toggleHandoff = toggleHandoff;
+
+boot('valuation', 'Business Valuation', async () => { await load(); });
+</script>
+</body>
+</html>

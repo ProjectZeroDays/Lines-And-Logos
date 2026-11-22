@@ -1,0 +1,28 @@
+{
+  "name": "lines-and-logos-os",
+  "version": "1.0.0",
+  "description": "Lines & Logos Business OS — all-in-one server for the marketing site, internal Business OS dashboards, client/crew/partner portals, chat, quotes, CRM, and finance. Run with npx: no clone, no build step.",
+  "license": "UNLICENSED",
+  "private": true,
+  "type": "commonjs",
+  "bin": {
+    "lines-and-logos": "bin/cli.js",
+    "ll-os": "bin/cli.js"
+  },
+  "files": [
+    "bin/",
+    "server.js",
+    "lib/",
+    "data/",
+    "app/",
+    "README.md"
+  ],
+  "scripts": {
+    "start": "node bin/cli.js start",
+    "dev": "node bin/cli.js start --dev"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {}
+}

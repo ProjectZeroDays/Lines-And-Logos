@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Service Area — 400 Miles From Memphis | Lines &amp; Logos</title>
+<meta name="description" content="Gym floors, court restriping, and wall wraps across 18 verified cities within a 400-mile radius of Memphis — farther by arrangement.">
+<link rel="icon" type="image/png" href="icons/favicon-32.png">
+<link rel="canonical" href="https://linesandlogosteam.com/service-area.html">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;700;800&family=Archivo+Black&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/theme.css">
+<style>
+:root{--ink:#f6f7fb;--blue:#3b5bff;--cyan:#0ea5e9;--lime:#84cc16;--chrome-1:#1c2440;--line:rgba(38,54,96,.10);--text:#3d4a68;--text-dim:#5f6f95;--radius:18px;--shadow:0 1px 3px rgba(28,42,90,.06),0 16px 40px -18px rgba(28,42,90,.18)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--ink);color:var(--text);font-family:'Space Grotesk',system-ui,sans-serif;font-size:15px;line-height:1.6}
+.wrap{max-width:1180px;margin:0 auto;padding:0 28px}
+h1,h2{font-family:'Archivo Black';color:var(--chrome-1);line-height:1.08;text-transform:uppercase;letter-spacing:-.01em}
+nav{position:sticky;top:0;z-index:100;background:rgba(255,255,255,.88);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+.nav-inner{max-width:1180px;margin:0 auto;padding:22px 28px;display:flex;align-items:center;gap:26px}
+.nav-logo{display:flex;align-items:center;gap:11px;text-decoration:none}
+.nav-logo img{height:50px;filter:drop-shadow(0 4px 10px rgba(59,91,255,.25))}
+.nav-logo b{font-family:'Archivo Black';font-size:13px;letter-spacing:.06em;color:var(--chrome-1);line-height:1.15;display:block}
+.nav-logo small{display:block;font-size:9px;letter-spacing:.24em;color:var(--text-dim);font-weight:700}
+.nav-links{display:flex;gap:4px;margin-left:auto;align-items:center}
+.nav-links a{color:var(--text);text-decoration:none;font-size:14px;font-weight:600;padding:9px 15px;border-radius:100px;transition:.15s}
+.nav-links a:hover{color:var(--blue);background:rgba(59,91,255,.07)}
+.nav-links a.btn{color:#fff;padding:11px 22px}
+.hero{padding:64px 0 40px;background:radial-gradient(900px 380px at 70% -10%,rgba(59,91,255,.10),transparent),radial-gradient(700px 320px at 10% 110%,rgba(14,165,233,.08),transparent)}
+.hero h1{font-size:clamp(36px,5.4vw,60px)}
+.hero h1 .grad{background:linear-gradient(115deg,#3b5bff,#0ea5e9);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.hero p{max-width:640px;margin-top:16px;font-size:16.5px;color:var(--text-dim)}
+section{padding:40px 0}
+.map-panel{border:1px solid var(--line);border-radius:22px;padding:30px;background:#fff;box-shadow:var(--shadow)}
+.radius-map{width:100%;height:auto;display:block}
+.radius-map .ring400{fill:rgba(59,91,255,.06);stroke:rgba(14,165,233,.55);stroke-width:1.5;stroke-dasharray:6 6}
+.radius-map .ring25{fill:rgba(132,204,22,.07);stroke:rgba(132,204,22,.6);stroke-width:1.5}
+.radius-map .spoke{stroke:rgba(14,165,233,.4);stroke-width:1}
+.radius-map .spoke25{stroke:rgba(132,204,22,.4);stroke-width:1}
+.radius-map .lbl{fill:var(--text-dim);font-size:11px;letter-spacing:.08em;font-family:'Space Grotesk'}
+.radius-map .dot{fill:#0ea5e9;stroke:#fff;stroke-width:1.5}
+.radius-map .hq{fill:#84cc16;stroke:#fff;stroke-width:1.5}
+.radius-map text{fill:var(--text);font-size:11.5px;font-family:'Space Grotesk';font-weight:600}
+.city-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(255px,1fr));gap:14px;margin-top:26px}
+.city-card{border:1px solid var(--line);border-radius:14px;padding:16px 18px;background:#fbfcff}
+.city-card b{font-size:14.5px;color:var(--chrome-1)}
+.city-card .mi{float:right;font-size:11.5px;color:var(--cyan);font-weight:700}
+.city-card p{font-size:12.5px;color:var(--text-dim);margin-top:6px;line-height:1.55}
+.note{border:1px solid rgba(245,158,11,.4);border-radius:14px;padding:18px 22px;background:rgba(245,158,11,.07);font-size:13.5px;line-height:1.7;color:var(--text);margin-top:14px}
+.btn{display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,#2f7bff,#1b69ff 55%,#0033a0);color:#fff;font-family:'Archivo';font-weight:800;border:none;border-radius:100px;padding:13px 26px;font-size:14px;text-decoration:none;cursor:pointer;box-shadow:0 6px 20px rgba(27,105,255,.35)}
+.btn:hover{transform:translateY(-1px)}
+@media(max-width:640px){.nav-links{display:none}.nav-inner .btn{margin-left:auto}}
+
+/* footer */
+footer{background:#0b1020;border-top:1px solid rgba(255,255,255,0.06);padding:64px 0 32px}
+.foot-grid{max-width:1100px;margin:0 auto;padding:0 24px;display:grid;grid-template-columns:260px repeat(4,1fr);gap:28px;align-items:start}
+.foot-brand{display:flex;flex-direction:column;gap:0}
+.foot-brand img{width:90px;height:auto;margin-bottom:38px}
+.foot-brand .brand-name{font-weight:700;font-size:18px;color:#fff;margin:0;padding-top:0}
+.foot-address{font-style:normal;color:var(--text-dim);font-size:13px;line-height:1.6;margin-top:8px;text-align:left}
+.foot-address a{color:var(--text-dim);text-decoration:none}
+.foot-address a:hover{color:#fff}
+.foot-social{display:flex;gap:14px;margin-top:16px}
+.foot-social a{width:34px;height:34px;border-radius:8px;background:rgba(255,255,255,0.06);display:grid;place-items:center;color:#d4d8e8;text-decoration:none;font-size:15px;transition:background .2s,color .2s}
+.foot-social a:hover{background:rgba(255,255,255,0.12);color:#fff}
+.foot-col{padding-top:118px}
+.foot-col h4{font-size:12px;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-dim);margin:0 0 14px;font-weight:600}
+.foot-col a{display:block;color:#d4d8e8;text-decoration:none;font-size:13.5px;padding:3.5px 0;opacity:.85;transition:opacity .2s,color .2s}
+.foot-col a:hover{opacity:1;color:#fff}
+.foot-bottom{max-width:1100px;margin:48px auto 0;padding:20px 24px 0;border-top:1px solid rgba(255,255,255,0.06);display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--text-dim)}
+.foot-bottom a{color:var(--text-dim);text-decoration:none}
+.foot-bottom a:hover{color:#fff}
+@media(max-width:960px){.foot-grid{grid-template-columns:repeat(2,1fr);gap:36px 28px}.foot-brand{grid-column:1 / -1}}
+@media(max-width:620px){.foot-grid{grid-template-columns:1fr}.foot-bottom{flex-direction:column;gap:8px;text-align:center}}
+</style>
+</head>
+<body>
+<nav>
+  <div class="nav-inner">
+    <a class="nav-logo" href="index.html"><img src="logo-hero.png" alt="Lines &amp; Logos"><span><b>LINES &amp; LOGOS</b><small>COURTS&ensp;·&ensp;PAINTING&ensp;·&ensp;VINYL&ensp;·&ensp;GRAPHICS</small></span></a>
+        <div class="nav-links">
+      <a class="btn" href="quotes.html">Get Quote</a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="wrap">
+    <h1>One shop.<br><span class="grad">400 miles.</span></h1>
+    <p>Every job runs out of our Memphis shop — and every city below sits inside a true 400-mile radius, about a day's drive or less. Past the edge? <strong>Farther by arrangement</strong> for multi-court and multi-site programs.</p>
+  </div>
+</header>
+
+<section style="padding-top:0">
+  <div class="wrap">
+    <div class="map-panel">
+      <h2 style="margin-bottom:16px">The radius, drawn true to scale</h2>
+      <svg class="radius-map" viewBox="0 0 780 600" aria-hidden="true" focusable="false">
+        <circle cx="390" cy="300" r="208" class="ring400"/><circle cx="390" cy="300" r="52" class="ring25"/>
+        <line x1="390" y1="300" x2="390" y2="92" class="spoke"/><text x="398" y="96" class="lbl">400 miles</text>
+        <g class="city"><circle cx="390" cy="300" r="7" class="hq"/><text x="402" y="304">Memphis</text><title>Memphis, TN — HQ — shop, showroom &amp; dispatch</title></g>
+        <g class="city"><circle cx="489" cy="235" r="5" class="dot"/><text x="497" y="239">Nashville</text><title>Nashville, TN — ~196 mi — School &amp; parks programs</title></g>
+        <g class="city"><circle cx="326" cy="322" r="5" class="dot"/><text x="272" y="326">Little Rock</text><title>Little Rock, AR — ~137 mi — District gym packages</title></g>
+        <g class="city"><circle cx="447" cy="276" r="5" class="dot"/><text x="455" y="280">Jackson</text><title>Jackson, TN — ~77 mi — Court restriping</title></g>
+        <g class="city"><circle cx="385" cy="418" r="5" class="dot"/><text x="393" y="422">Jackson MS</text><title>Jackson, MS — ~197 mi — Athletic branding</title></g>
+        <g class="city"><circle cx="488" cy="341" r="5" class="dot"/><text x="496" y="345">Birmingham</text><title>Birmingham, AL — ~217 mi — Multi-court restripes</title></g>
+        <g class="city"><circle cx="494" cy="299" r="5" class="dot"/><text x="502" y="303">Huntsville</text><title>Huntsville, AL — ~190 mi — Gym &amp; rec branding</title></g>
+        <g class="city"><circle cx="455" cy="331" r="5" class="dot"/><text x="463" y="335">Tupelo</text><title>Tupelo, MS — ~105 mi — Court refinishing</title></g>
+        <g class="city"><circle cx="369" cy="235" r="5" class="dot"/><text x="295" y="239">Jonesboro</text><title>Jonesboro, AR — ~66 mi — Regional contracts</title></g>
+        <g class="city"><circle cx="438" cy="187" r="5" class="dot"/><text x="446" y="191">Paducah</text><title>Paducah, KY — ~175 mi — District facilities</title></g>
+        <g class="city"><circle cx="295" cy="338" r="5" class="dot"/><text x="243" y="342">Hot Springs</text><title>Hot Springs, AR — ~155 mi — Parks &amp; schools</title></g>
+        <g class="city"><circle cx="431" cy="149" r="5" class="dot"/><text x="385" y="153">Cape Girardeau</text><title>Cape Girardeau, MO — ~170 mi — School gyms</title></g>
+        <g class="city"><circle cx="390" cy="175" r="5" class="dot"/><text x="398" y="179">St. Louis</text><title>St. Louis, MO — ~240 mi — Large floor programs</title></g>
+        <g class="city"><circle cx="531" cy="241" r="5" class="dot"/><text x="539" y="245">Louisville</text><title>Louisville, KY — ~320 mi — Gym branding</title></g>
+        <g class="city"><circle cx="559" cy="291" r="5" class="dot"/><text x="567" y="295">Chattanooga</text><title>Chattanooga, TN — ~300 mi — Court graphics</title></g>
+        <g class="city"><circle cx="594" cy="361" r="5" class="dot"/><text x="602" y="365">Atlanta</text><title>Atlanta, GA — ~337 mi — Athletic surfacing</title></g>
+        <g class="city"><circle cx="215" cy="260" r="5" class="dot"/><text x="159" y="264">Tulsa</text><title>Tulsa, OK — ~343 mi — NW-Arkansas corridor</title></g>
+        <g class="city"><circle cx="389" cy="487" r="5" class="dot"/><text x="397" y="491">New Orleans</text><title>New Orleans, LA — ~395 mi — Southernmost edge of the radius</title></g>
+      </svg>
+      <div class="city-grid">
+        <div class="city-card"><b>Memphis, TN</b><span class="mi">HQ</span><p>Shop, showroom &amp; dispatch — 2847 New Broadway St, 38109</p></div>
+        <div class="city-card"><b>Nashville, TN</b><span class="mi">~196 mi</span><p>School &amp; parks programs</p></div>
+        <div class="city-card"><b>Little Rock, AR</b><span class="mi">~137 mi</span><p>District gym packages</p></div>
+        <div class="city-card"><b>Birmingham, AL</b><span class="mi">~217 mi</span><p>Multi-court restripes</p></div>
+        <div class="city-card"><b>St. Louis, MO</b><span class="mi">~240 mi</span><p>Large floor programs</p></div>
+        <div class="city-card"><b>Atlanta, GA</b><span class="mi">~337 mi</span><p>Athletic surfacing</p></div>
+        <div class="city-card"><b>Louisville, KY</b><span class="mi">~320 mi</span><p>Gym branding</p></div>
+        <div class="city-card"><b>New Orleans, LA</b><span class="mi">~395 mi</span><p>Southernmost edge of the radius</p></div>
+      </div>
+      <div class="note" style="margin-top:18px;margin-bottom:14px"><strong>About the radius:</strong> the 400-mile ring is measured straight-line from Memphis — most cities inside it are roughly a 5.5–6.5 hour drive. Jobs at the edge of the radius (or multi-site programs beyond it) may include mileage and lodging terms inside your fixed quote, stated in writing before any work is scheduled.</div>
+      <div class="note"><strong>Beyond the ring:</strong> the map is honest — Dallas, Oklahoma City, and Cincinnati sit just outside 400 miles, so they don't appear here. Multi-court or multi-site programs beyond the radius are quoted individually.</div>
+    </div>
+    <p style="margin-top:26px"><a class="btn" href="quotes.html">Price a project in your city →</a></p>
+  </div>
+</section>
+
+<footer>
+  <div class="foot-grid">
+    <div class="foot-brand">
+      <img src="logo-hero.png" alt="Lines &amp; Logos">
+      <div class="brand-name">Lines &amp; Logos</div>
+      <address class="foot-address">
+        2847 New Broadway St.<br>
+        Memphis, TN 38109<br>
+        <a href="tel:+19015551234">(901) 555-1234</a><br>
+        <a href="mailto:info@linesandlogos.team">info@linesandlogos.team</a>
+      </address>
+      <div class="foot-social">
+        <a href="#" aria-label="Facebook">f</a>
+        <a href="#" aria-label="Instagram">in</a>
+        <a href="#" aria-label="LinkedIn">li</a>
+      </div>
+    </div>
+    <div class="foot-col">
+      <h4>Process</h4>
+      <a href="index.html#process">Our Process</a>
+      <a href="legal.html#warranty">Warranty &amp; Process</a>
+      <a href="index.html#faq">FAQ</a>
+      <a href="legal.html#legal-notice">Legal Notice</a>
+    </div>
+    <div class="foot-col">
+      <h4>Our Work</h4>
+      <a href="index.html#services">Gym Floors &amp; Courts</a>
+      <a href="index.html#services">Wall Wraps &amp; Graphics</a>
+      <a href="index.html#services">Donor Walls</a>
+      <a href="index.html#services">Signage &amp; Surfacing</a>
+      <a href="gallery.html">Photo Gallery</a>
+      <a href="service-area.html">Service Area</a>
+      <a href="case-studies.html">Case Studies</a>
+    </div>
+    <div class="foot-col">
+      <h4>Earn with us</h4>
+      <a href="careers.html">Careers</a>
+      <a href="careers.html">Become a Contractor</a>
+      <a href="partners.html">Earn With Us</a>
+      <a href="partners.html">Partner With Us</a>
+      <a href="affiliate.html">Affiliate Program</a>
+    </div>
+    <div class="foot-col">
+      <h4>Preview</h4>
+      <a href="studio.html">Studio</a>
+      <a href="brand.html">Brand</a>
+      <a href="customer.html">Customer Portal</a>
+      <a href="quotes.html">Get Quote</a>
+      <a href="portal.html">Project Portal</a>
+    </div>
+  </div>
+  <div class="foot-bottom">
+    <span>© 2026 Lines &amp; Logos. All rights reserved.</span>
+    <span>Purchase orders · W-9s · Additional-Insured COIs · Off-hours campus scheduling</span>
+  </div>
+</footer>
+<script defer src="assets/consent.js"></script>
+<script defer src="assets/chat.js?v=11"></script>
+</body>
+</html>

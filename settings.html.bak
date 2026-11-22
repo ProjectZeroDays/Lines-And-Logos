@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Settings — Lines &amp; Logos Business OS</title>
+<link rel="icon" type="image/png" href="logo-hero.png">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;700;800&family=Archivo+Black&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#04060d;--navy:#0a1533;--navy-2:#132a63;--blue:#2d5bff;--blue-hi:#4d7dff;--cyan:#57c7ff;--orange:#ff7a1a;--lime:#c6e02c;--yellow:#ffc21c;--green:#3fae5a;--volley:#8fa8ff;--red:#ff5a5a;--chrome-1:#eef3fc;--line:rgba(120,145,205,.16);--text:#c6d0e6;--text-dim:#7e8cab}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--ink);color:var(--text);font-family:'Space Grotesk',system-ui,sans-serif;min-height:100vh}
+.chrome{background:linear-gradient(180deg,#fff 0%,#dfe7f5 26%,#8ea2c8 50%,#f4f8ff 60%,#7688ad 86%,#ccd8ee 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.topbar{position:sticky;top:0;z-index:50;backdrop-filter:blur(16px);background:rgba(4,6,13,.85);border-bottom:1px solid var(--line);padding:16px 32px;display:flex;align-items:center;gap:18px}
+.topbar img{height:44px}
+.topbar h1{font-family:'Archivo Black',sans-serif;font-size:18px;text-transform:uppercase}
+.topbar a{margin-left:auto;color:var(--text-dim);text-decoration:none;font-size:13.5px;font-weight:700}
+.topbar a:hover{color:#fff}
+.savebar{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:60;display:none;gap:12px;background:linear-gradient(180deg,var(--navy-2),var(--navy));border:1px solid rgba(77,125,255,.5);border-radius:16px;padding:12px 18px;box-shadow:0 24px 60px rgba(0,0,0,.6);align-items:center}
+.savebar.show{display:flex}
+.savebar span{font-size:13px;font-weight:700;color:var(--yellow)}
+.btn{font-family:'Archivo',sans-serif;font-weight:800;font-size:13.5px;color:#fff;border:none;cursor:pointer;padding:11px 22px;border-radius:10px;background:linear-gradient(180deg,#4d7dff,#2d5bff 45%,#1c3fd6);box-shadow:0 0 0 1px rgba(120,160,255,.5) inset;transition:.15s}
+.btn:hover{transform:translateY(-1px)}
+.btn-ghost{background:transparent;box-shadow:0 0 0 1px var(--line) inset;color:var(--chrome-1)}
+main{max-width:1060px;margin:0 auto;padding:44px 28px 140px}
+.group{border:1px solid var(--line);border-radius:20px;background:linear-gradient(180deg,rgba(16,31,77,.4),rgba(4,6,13,.6));padding:30px 32px;margin-bottom:22px}
+.group h2{font-family:'Archivo Black',sans-serif;font-size:16px;text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px;display:flex;align-items:center;gap:11px}
+.group h2::before{content:"";width:10px;height:10px;border-radius:3px;background:var(--accent,var(--blue-hi));box-shadow:0 0 12px var(--accent,var(--blue-hi))}
+.group>p{font-size:13px;color:var(--text-dim);margin-bottom:24px;line-height:1.6}
+.fields{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.f label{display:block;font-size:10.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--text-dim);margin-bottom:7px}
+.f input,.f select{width:100%;padding:11px 13px;border-radius:10px;border:1px solid var(--line);background:rgba(4,6,13,.55);color:#fff;font-family:inherit;font-size:13.5px;outline:none}
+.f input:focus,.f select:focus{border-color:var(--blue-hi);box-shadow:0 0 0 3px rgba(45,91,255,.15)}
+.f input[type=checkbox]{width:18px;height:18px;accent-color:var(--blue-hi);margin-top:4px}
+.f:has(input[type=checkbox]) label{cursor:pointer}
+.toggles{display:flex;gap:26px;flex-wrap:wrap}
+.toggle{display:flex;align-items:center;gap:10px;font-size:13.5px;font-weight:600;color:var(--text);cursor:pointer}
+.switch{position:relative;width:44px;height:24px;flex:none}
+.switch input{opacity:0;width:0;height:0}
+.sl{position:absolute;inset:0;border-radius:100px;background:rgba(120,145,205,.25);transition:.2s;border:1px solid var(--line)}
+.sl::before{content:"";position:absolute;width:18px;height:18px;left:2px;top:2px;border-radius:50%;background:#fff;transition:.2s}
+.switch input:checked + .sl{background:linear-gradient(90deg,var(--blue-hi),var(--cyan));border-color:transparent}
+.switch input:checked + .sl::before{transform:translateX(20px)}
+.login-warn{max-width:520px;margin:120px auto;text-align:center;border:1px solid var(--line);border-radius:20px;padding:44px;background:linear-gradient(180deg,rgba(16,31,77,.5),rgba(4,6,13,.8))}
+.login-warn h2{font-family:'Archivo Black',sans-serif;font-size:22px;text-transform:uppercase;margin-bottom:12px}
+.login-warn p{color:var(--text-dim);margin-bottom:24px}
+.pk-row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.pk-list{font-size:13px;color:var(--text-dim);margin-top:12px}
+.toast{position:fixed;bottom:26px;right:26px;background:linear-gradient(180deg,var(--navy-2),var(--navy));border:1px solid rgba(77,125,255,.5);color:#fff;padding:14px 22px;border-radius:13px;font-size:13.5px;font-weight:600;box-shadow:0 20px 50px rgba(0,0,0,.6);transform:translateY(140px);opacity:0;transition:.35s;z-index:300}
+.toast.show{transform:none;opacity:1}
+@media(max-width:860px){.fields{grid-template-columns:1fr 1fr}}
+@media(max-width:560px){.fields{grid-template-columns:1fr}}
+</style>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#04060d">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Lines & Logos">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+</head>
+<body data-perms="notifications">
+<header class="topbar">
+  <img src="logo-hero.png" alt="Lines &amp; Logos">
+  <h1 class="chrome">Settings</h1>
+  <a href="dashboard.html">← Dashboard</a>
+</header>
+
+<main id="main">
+  <div class="login-warn" id="loginWarn" style="display:none">
+    <h2 class="chrome">Sign in required</h2>
+    <p>Settings are admin-only. Sign in first, then come back here.</p>
+    <a class="btn" style="text-decoration:none;display:inline-block" href="login.html">Go to Login</a>
+  </div>
+</main>
+
+<div class="savebar" id="savebar">
+  <span id="dirtyCount">0 unsaved changes</span>
+  <button class="btn" onclick="save()">Save All Changes</button>
+  <button class="btn btn-ghost" onclick="location.reload()">Discard</button>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const BASE=(location.protocol==='file:')?'http://localhost:3001':'';
+const TOKEN=localStorage.getItem('ll_token');
+let S=null, dirty=0;
+
+const GROUPS=[
+ {key:'company', accent:'#4d7dff', title:'Company', desc:'Identity and service footprint shown across the site, quotes, and emails.', fields:[
+   ['name','Company name','text'],['phone','Phone','text'],['email','Quote email','text'],['serviceRadiusMiles','Service radius (miles)','number']]},
+ {key:'security', accent:'#ff5a5a', title:'Security', desc:'Session length, sign-up policy, and device passkeys.', fields:[
+   ['sessionHours','Session length (hours)','number'],['allowClientSignup','Allow client self-signup','checkbox']], toggles:[['passkeysEnabled','Enable passkey login']]},
+ {key:'agent', accent:'#57c7ff', title:'Outbound Sales Agent', desc:'Controls the automated pipeline: discovery, intro emails, quotes, negotiation, contracts.', fields:[
+   ['tone','Email tone','select:professional,friendly,direct'],['maxEmailsPerDay','Max emails per day','number'],['followUpDays','Follow-up after (days)','number']], toggles:[['enabled','Agent enabled'],['autoQuote','Auto-quote after needs captured'],['autoNegotiate','Auto-send contract after approval']]},
+ {key:'pricing', accent:'#e8a24a', title:'Pricing Agent', desc:'Cost drivers used for every instant quote. Crew day rate, mileage, hotel, per diem.', fields:[
+   ['crewDayRate','Crew day rate ($)','number'],['mileageRate','Mileage rate ($/mi)','number'],['hotelNightly','Hotel nightly ($/room)','number'],['perDiemPerPersonDay','Per diem ($/person/day)','number'],['truckCapacity','Crew per truck','number']]},
+ {key:'quotes', accent:'#ffc21c', title:'Quotes', desc:'Approval gate, margin, and validity for all quotes.', fields:[
+   ['marginPct','Margin (%)','number'],['validityDays','Validity (days)','number'],['approvalEmail','Approval goes to','text']], toggles:[['requireApproval','Owner signoff required before negotiating']]},
+ {key:'contracts', accent:'#c6e02c', title:'Contracts', desc:'Deposit terms and reminder timing for tech + client notifications.', fields:[
+   ['depositPct','Deposit (%)','number'],['reminderHoursBefore','Remind before job (hours)','number']], toggles:[['requireSignoff','Require e-signature on contracts']]},
+ {key:'notifications', accent:'#8fa8ff', title:'Notifications', desc:'Channels used for confirmations, reminders, and alerts.', fields:[
+   ['techPhone','Tech contact phone','text'],['clientChannel','Client channel','select:both,email,sms']], toggles:[['inApp','In-app'],['email','Email'],['sms','SMS (set provider in Email/SMS)']]},
+ {key:'inventory', accent:'#3fae5a', title:'Inventory Agent', desc:'Stock thresholds and auto-reorder behavior for materials.', fields:[
+   ['lowStockDefault','Default reorder point','number'],['reorderCoverDays','Reorder covers (days)','number']], toggles:[['autoReorder','Auto-draft purchase orders'],['consumptionAlerts','Alert when jobs drain stock below reorder point']]},
+ {key:'email', accent:'#ff7a1a', title:'Email / SMS Delivery', desc:'SMTP and SMS provider for live sending. Empty = simulated outbox only.', fields:[
+   ['from','From address','text'],['smtpHost','SMTP host','text'],['smtpPort','SMTP port','number'],['smtpUser','SMTP user','text'],['smtpPass','SMTP password','password'],['smsProvider','SMS provider','text']]},
+ {key:'sales', accent:'#4d7dff', title:'Sales Dashboard', desc:'Targets and thresholds feeding the dashboard KPIs.', fields:[
+   ['revenueTarget','Revenue target ($)','number'],['hotThreshold','Hot lead threshold (score)','number']], toggles:[['autoScore','Auto-score new leads']]},
+ {key:'finance', accent:'#ffc21c', title:'Finance Dashboard', desc:'Overdue rules driving invoice aging and reminder agents.', fields:[
+   ['overdueAfterDays','Overdue after (days)','number']], toggles:[['autoReminders','Auto invoice reminders']]},
+ {key:'ops', accent:'#c6e02c', title:'Operations Dashboard', desc:'Defaults for job dispatch and checklists.', fields:[
+   ['defaultCrew','Default crew','text']], toggles:[['checklistRequired','Checklist required per job']]},
+ {key:'marketing', accent:'#8fa8ff', title:'Marketing Dashboard', desc:'Drip campaign cadence and service-area label.', fields:[
+   ['serviceAreaLabel','Service area label','text'],['dripIntervalDays','Drip interval (days)','number']]},
+];
+
+async function init(){
+  if(!TOKEN){ document.getElementById('loginWarn').style.display='block'; return; }
+  try{
+    const r=await fetch(BASE+'/api/settings',{headers:{Authorization:'Bearer '+TOKEN}});
+    if(!r.ok) throw 0; S=await r;
+  }catch{ document.getElementById('loginWarn').style.display='block'; return; }
+  render();
+}
+function render(){
+  const m=document.getElementById('main');
+  m.innerHTML=GROUPS.map(g=>`
+   <div class="group" style="--accent:${g.accent}">
+     <h2 class="chrome">${g.title}</h2><p>${g.desc}</p>
+     <div class="fields">
+       ${g.fields.map(([k,label,type])=>{
+         const v=S[g.key]&&S[g.key][k];
+         if(type==='checkbox') return `<div class="f"><label>${label}</label><input type="checkbox" data-g="${g.key}" data-k="${k}" ${v?'checked':''}></div>`;
+         if(type.startsWith('select:')) return `<div class="f"><label>${label}</label><select data-g="${g.key}" data-k="${k}">${type.slice(7).split(',').map(o=>`<option ${o===v?'selected':''}>${o}</option>`).join('')}</select></div>`;
+         return `<div class="f"><label>${label}</label><input type="${type}" data-g="${g.key}" data-k="${k}" value="${v??''}"></div>`;
+       }).join('')}
+     </div>
+     ${g.toggles?`<div class="toggles" style="margin-top:20px">${g.toggles.map(([k,label])=>`
+       <label class="toggle"><span class="switch"><input type="checkbox" data-g="${g.key}" data-k="${k}" ${S[g.key]&&S[g.key][k]?'checked':''}><span class="sl"></span></span>${label}</label>`).join('')}</div>`:''}
+     ${g.key==='security'?`<div class="pk-row" style="margin-top:22px">
+        <button class="btn" onclick="enrollPasskey()">+ Enroll this device as a passkey</button>
+        <span class="pk-list" id="pkStatus"></span></div>`:''}
+     ${g.key==='inventory'?`<div class="pk-row" style="margin-top:22px">
+        <button class="btn btn-ghost" onclick="auditNow()">Run inventory audit now</button>
+        <span class="pk-list" id="auditStatus"></span></div>`:''}
+   </div>`).join('');
+  m.addEventListener('input', onChange);
+  m.addEventListener('change', onChange);
+}
+function onChange(e){
+  const t=e.target; if(!t.dataset||!t.dataset.g) return;
+  const g=t.dataset.g, k=t.dataset.k;
+  S[g]=S[g]||{}; S[g][k]=t.type==='checkbox'?t.checked:(t.type==='number'?+t.value:t.value);
+  dirty++; document.getElementById('dirtyCount').textContent=dirty+' unsaved changes';
+  document.getElementById('savebar').classList.add('show');
+}
+async function save(){
+  try{
+    const r=await fetch(BASE+'/api/settings',{method:'PUT',headers:{'Content-Type':'application/json',Authorization:'Bearer '+TOKEN},body:JSON.stringify(S)});
+    if(!r.ok) throw 0;
+    dirty=0; document.getElementById('savebar').classList.remove('show'); toast('Settings saved');
+  }catch{ toast('Save failed — is the server running?'); }
+}
+async function enrollPasskey(){
+  try{
+    const r=await fetch(BASE+'/api/passkey/register',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+TOKEN},body:JSON.stringify({name:(navigator.platform||'Device')+' passkey'})});
+    const j=await r.json(); if(j.error) return toast(j.error);
+    const me=JSON.parse(localStorage.getItem('ll_user')||'{}');
+    localStorage.setItem('ll_passkey',JSON.stringify({email:me.email||'admin@linesandlogos.com',key:j.key}));
+    document.getElementById('pkStatus').textContent='Enrolled: '+j.name+' — one-click login enabled on this device.';
+    toast('Passkey enrolled');
+  }catch{ toast('Enrollment failed — is the server running?'); }
+}
+async function auditNow(){
+  try{
+    const r=await fetch(BASE+'/api/agent/inventory/audit',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+TOKEN}});
+    const j=await r.json();
+    document.getElementById('auditStatus').textContent=j.low.length
+      ? `Low stock: ${j.low.map(i=>i.name+' ('+i.stock+' '+i.unit+')').join(', ')} — ${j.purchaseOrders.length} PO(s) drafted`
+      : 'All stock levels healthy.';
+  }catch{ toast('Audit failed — is the server running?'); }
+}
+function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2600)}
+init();
+</script>
+<script src="assets/pwa.js" defer></script>
+<!-- Lines & Logos Business OS -->
+</body>
+</html>

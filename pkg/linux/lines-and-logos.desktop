@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=Lines & Logos Business OS
+Comment=Scheduling, quotes, CRM, finance, portals — all in one
+Exec=autodropshipstore
+Icon=lines-and-logos
+Type=Application
+Categories=Office;Utility;ProjectManagement;
+StartupNotify=true
+Terminal=false
+Keywords=business;quotes;invoices;crm;schedule;

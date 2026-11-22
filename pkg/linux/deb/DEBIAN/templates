@@ -1,0 +1,46 @@
+Template: lines-logos/port
+Type: string
+Default: 3001
+Description: Port the app listens on (internal if you use a reverse proxy).
+
+Template: lines-logos/domain
+Type: string
+Description: Public domain name (blank to access by IP only).
+ Leave blank if you will point your own reverse proxy at the app.
+
+Template: lines-logos/stripe-pk
+Type: string
+Description: Stripe publishable key (blank to skip — set later in the app).
+ Get it: dashboard.stripe.com/apikeys (pk_live_… or pk_test_…).
+
+Template: lines-logos/stripe-sk
+Type: password
+Description: Stripe secret key (blank to skip — set later in the app).
+ Get it: dashboard.stripe.com/apikeys → Secret key → Reveal. Guard it like a password.
+
+Template: lines-logos/stripe-wh
+Type: password
+Description: Stripe webhook signing secret, whsec_… (blank to skip — set later in the app).
+ Get it: dashboard.stripe.com/webhooks → Add endpoint → your-domain/api/stripe/webhook →
+ invoice.paid, invoice.payment_failed, invoice.voided, invoice.marked_uncollectible,
+ credit_note.created, checkout.session.completed → Signing secret.
+
+Template: lines-logos/openrouter
+Type: password
+Description: OpenRouter API key — FREE AI default (blank to skip — set later in the app).
+ Get it: openrouter.ai/keys → Create Key. Powers the website chat assistant + AI agents.
+
+Template: lines-logos/anthropic
+Type: password
+Description: Anthropic (Claude) API key — optional, paid (blank to skip).
+ Get it: console.anthropic.com/settings/keys
+
+Template: lines-logos/openai
+Type: password
+Description: OpenAI (ChatGPT) API key — optional, paid (blank to skip).
+ Get it: platform.openai.com/api-keys
+
+Template: lines-logos/gemini
+Type: password
+Description: Google Gemini API key — optional, free tier (blank to skip).
+ Get it: aistudio.google.com/apikey

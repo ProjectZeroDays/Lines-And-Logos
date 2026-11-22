@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Team &amp; HR — Lines &amp; Logos Business OS</title>
+<link rel="icon" type="image/png" href="icons/favicon-32.png?v=2">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;700;800&family=Archivo+Black&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/os.css?v=9">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#04060d">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Lines & Logos">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+</head>
+<body data-perms="notifications">
+<main>
+  <div class="topbar">
+    <div><div class="crumb">Business OS / Team &amp; HR</div><h1 class="chrome">Team &amp; HR</h1></div>
+    <div class="topbar-right">
+      <input class="search" id="q" placeholder="Search…" oninput="render()">
+      <button class="btn btn-sm" id="addBtn" onclick="addItem()">+ Add</button>
+    </div>
+  </div>
+  <div class="tabs2" id="tabs"></div>
+  <div id="view"></div>
+</main>
+<script src="assets/os.js?v=9"></script>
+<script>
+const {fmt,esc,GEN}=OS;
+let view='crew';
+const TABS=[['crew','Crew'],['applicants','Applicants'],['recruiting','Recruiting'],['vendors','Vendors & POs']];
+const ADD={crew:'+ Add Contractor',applicants:'',recruiting:'+ Add Candidate',vendors:'+ Add Vendor'};
+function renderTabs(){OS.$('#tabs').innerHTML=TABS.map(([k,l])=>`<button class="${view===k?'active':''}" onclick="go('${k}')">${l}</button>`).join('');
+  const b=OS.$('#addBtn');b.textContent=ADD[view]||'+ Add';b.style.display=ADD[view]?'inline-block':'none';}
+function go(v){view=v;renderTabs();render();}
+const q=()=>OS.$('#q').value.toLowerCase();
+const match=(...xs)=>xs.join(' ').toLowerCase().includes(q());
+const CSTAGES=['applied','screen','interview','offer','hired'];
+
+async function render(){
+  await ({crew:vCrew,applicants:vApplicants,recruiting:vRecruiting,vendors:vVendors})[view]();
+  renderTabs();
+}
+async function vCrew(){
+  const rows=await OS.list('employees');
+  OS.$('#view').innerHTML=`<div class="panel flush" style="--accent:var(--volley)"><h3 style="padding:24px 24px 0">Crew &amp; 1099 Contractors</h3><div class="table-wrap"><table>
+    <tr><th>Name</th><th>Role</th><th>Skills</th><th>Type</th><th>Availability</th><th>W-9 / Docs</th><th>Rating</th></tr>
+    ${rows.filter(e=>match(e.name,e.role,(e.skills||[]).join(' '))).map(e=>`<tr>
+      <td><b>${esc(e.name)}</b></td><td>${esc(e.role)}</td>
+      <td>${(e.skills||[]).map(s=>`<span class="tag t-grey" style="margin:1px 2px">${esc(s)}</span>`).join('')}</td>
+      <td><span class="tag t-blue">${e.type}</span></td>
+      <td><span class="tag ${e.availability==='full-time'?'t-lime':'t-yellow'}">${e.availability}</span></td>
+      <td>${e.w9Signed?'<span class="tag t-green">signed · dispatchable</span>':'<span class="tag t-yellow">pending portal</span>'}</td>
+      <td><b style="color:var(--yellow)">★ ${e.rating}</b></td>
+    </tr>`).join('')}
+  </table></div></div>`;
+}
+async function vApplicants(){
+  const rows=await OS.list('applicants');
+  OS.$('#view').innerHTML=`<div class="banner warn" style="display:block">Onboarding pipeline: apply → AI screen → approve → portal link → e-sign W-9/1099/scope/safety/offer → dispatchable.</div>
+  <div class="panel flush" style="--accent:var(--orange)"><h3 style="padding:24px 24px 0">Applicants — AI-screened <span class="right">Applicant Screening Agent</span></h3><div class="table-wrap"><table>
+    <tr><th>Applicant</th><th>Position</th><th>Experience</th><th>Skills</th><th>AI Score</th><th>Recommendation</th><th>Status</th><th>Actions</th></tr>
+    ${rows.filter(a=>match(a.firstName,a.lastName,a.position,a.skills)).map(a=>`<tr>
+      <td><b>${esc(a.firstName)} ${esc(a.lastName)}</b><span class="sub">${esc(a.email)} · ${esc(a.phone)}</span></td>
+      <td>${esc(a.position)}</td><td>${esc(String(a.experience))} yrs</td><td><span class="sub" style="color:var(--text)">${esc(a.skills)}</span></td>
+      <td><b style="color:var(--cyan);font-size:15px">${a.aiScore}</b></td>
+      <td><span class="tag ${GEN(a.recommendation)}">${a.recommendation}</span></td>
+      <td><span class="tag ${GEN(a.status)}">${a.status}</span></td>
+      <td style="white-space:nowrap">${a.status==='new'?`
+        <button class="btn btn-sm btn-green" onclick="approve('${a.id}')">Approve</button>
+        <button class="btn btn-sm btn-danger" onclick="reject('${a.id}')">Reject</button>`:'—'}</td>
+    </tr>`).join('')||'<tr><td colspan="8" class="empty">No applicants — public form at /api/apply</td></tr>'}
+  </table></div></div>`;
+}
+async function approve(id){
+  const r=await OS.approveApplicant(id);
+  OS.openModal('Approved — Portal Link Issued',
+    `<label>Employee</label><input value="${esc(r.employee.name)} — ${esc(r.employee.role)}" readonly>
+     <label>Portal URL (send to contractor)</label><input value="${location.origin}${r.portalUrl}" readonly id="portalUrl">
+     <p style="font-size:12.5px;color:var(--text-dim);line-height:1.6">The contractor signs W-9, 1099 acknowledgment, scope of work, safety agreement, and offer letter at this link. When all five are signed they become dispatchable.</p>`);
+  OS.$('#modalSave').textContent='Copy Link';
+  OS.onModalSave(()=>{navigator.clipboard&&navigator.clipboard.writeText(OS.$('#portalUrl').value);OS.closeModal();OS.toast('Portal link copied');render();});
+  render();
+}
+async function reject(id){
+  OS.openModal('Reject Applicant',`<label>Reason (optional)</label><textarea id="f-reason" placeholder="Not enough experience with hardwood refinishing…"></textarea>`);
+  OS.onModalSave(async()=>{await OS.rejectApplicant(id,OS.field('f-reason'));OS.closeModal();OS.toast('Applicant rejected');render();});
+}
+async function vRecruiting(){
+  const rows=await OS.list('candidates');
+  const cols=CSTAGES.map(st=>({st,rows:rows.filter(c=>c.stage===st&&match(c.name,c.position))}));
+  OS.$('#view').innerHTML=`<div class="pipe" style="grid-template-columns:repeat(5,1fr)">${cols.map(c=>`<div class="pipe-col"><h4>${c.st}<span>${c.rows.length}</span></h4>
+    ${c.rows.map(x=>`<div class="pipe-card"><b>${esc(x.name)}</b><small>${esc(x.position)}<br>${esc(x.source)}</small>
+      <span class="tag t-blue">score ${x.score}</span>
+      ${c.st!=='hired'?`<div style="margin-top:10px"><button class="btn btn-sm btn-ghost" onclick="advanceCand('${x.id}','${c.st}')">Advance →</button></div>`:''}
+    </div>`).join('')||'<small style="color:var(--text-dim)">Empty</small>'}
+  </div>`).join('')}</div>`;
+}
+async function advanceCand(id,stage){
+  const next=CSTAGES[CSTAGES.indexOf(stage)+1];if(!next)return;
+  await OS.patch('candidates',id,{stage:next});OS.toast(`Candidate → ${next}`);render();
+}
+async function vVendors(){
+  const [vendors,pos]=await Promise.all([OS.list('vendors'),OS.list('purchaseOrders')]);
+  OS.$('#view').innerHTML=`<div class="grid-2 eq">
+  <div class="panel flush" style="--accent:var(--volley)"><h3 style="padding:24px 24px 0">Vendor Registry</h3><div class="table-wrap"><table>
+    <tr><th>Vendor</th><th>Category</th><th>Rating</th><th>Status</th><th>Last Order</th></tr>
+    ${vendors.filter(v=>match(v.name,v.category)).map(v=>`<tr>
+      <td><b>${esc(v.name)}</b></td><td>${esc(v.category)}</td><td><b style="color:var(--yellow)">★ ${v.rating}</b></td>
+      <td>${v.preferred?'<span class="tag t-lime">preferred</span>':'<span class="tag t-grey">backup</span>'}</td><td>${v.lastOrder||'—'}</td>
+    </tr>`).join('')}
+  </table></div></div>
+  <div class="panel flush" style="--accent:var(--yellow)"><h3 style="padding:24px 24px 0">Purchase Orders <span class="right"><button class="btn btn-sm btn-ghost" onclick="newPO()">+ New PO</button></span></h3><div class="table-wrap"><table>
+    <tr><th>Number</th><th>Vendor</th><th>Item</th><th>Amount</th><th>Status</th></tr>
+    ${pos.map(p=>`<tr><td><b>${esc(p.number)}</b></td><td>${esc(p.vendor)}</td><td>${esc(p.item||'')}</td><td><b>${fmt(p.amount)}</b></td><td><span class="tag ${GEN(p.status)}">${p.status}</span></td></tr>`).join('')}
+  </table></div></div>
+  </div>`;
+}
+function newPO(){
+  OS.openModal('New Purchase Order',`
+    <label>Vendor</label><select id="f-vendor">${OS.cur('vendors').map(v=>`<option value="${v.id}">${esc(v.name)}</option>`).join('')}</select>
+    <label>Item</label><input id="f-item" placeholder="Court paint + tape">
+    <label>Amount ($)</label><input id="f-amount" type="number" min="0">`);
+  OS.onModalSave(async()=>{const r=await OS.create('purchaseOrders',{vendorId:OS.field('f-vendor'),item:OS.field('f-item'),amount:+OS.field('f-amount')||0,status:'sent'});OS.closeModal();OS.toast(`PO ${r.number} sent`);render();});
+}
+function addItem(){
+  if(view==='crew'){OS.openModal('Add Contractor',`<label>Name</label><input id="f-name"><label>Role</label><input id="f-role" placeholder="Floor Installer"><label>Skills (comma-separated)</label><input id="f-skills" placeholder="hardwood, sanding"><label>Availability</label><select id="f-av"><option>full-time</option><option>part-time</option></select>`);
+    OS.onModalSave(async()=>{await OS.create('employees',{name:OS.field('f-name')||'Unknown',role:OS.field('f-role'),skills:OS.field('f-skills').split(/,\s*/).filter(Boolean),availability:OS.field('f-av'),type:'1099',w9Signed:false,rating:4.0});OS.closeModal();OS.toast('Contractor added — issue portal link from Applicants');render();});}
+  else if(view==='recruiting'){OS.openModal('Add Candidate',`<label>Name</label><input id="f-name"><label>Position</label><input id="f-pos"><label>Source</label><select id="f-src"><option>Website apply</option><option>Referral</option><option>Job board</option></select>`);
+    OS.onModalSave(async()=>{await OS.create('candidates',{name:OS.field('f-name')||'Unknown',position:OS.field('f-pos'),source:OS.field('f-src'),stage:'applied',score:50});OS.closeModal();OS.toast('Candidate added');render();});}
+  else if(view==='vendors'){OS.openModal('Add Vendor',`<label>Name</label><input id="f-name"><label>Category</label><input id="f-cat"><label>Rating</label><input id="f-rating" type="number" step="0.1" min="1" max="5" value="4.0">`);
+    OS.onModalSave(async()=>{await OS.create('vendors',{name:OS.field('f-name')||'Unknown',category:OS.field('f-cat'),rating:+OS.field('f-rating')||4,preferred:false,lastOrder:null});OS.closeModal();OS.toast('Vendor added');render();});}
+}
+OS.boot('team','Team & HR',async()=>{await Promise.all([OS.list('employees'),OS.list('applicants'),OS.list('candidates'),OS.list('vendors'),OS.list('purchaseOrders')]);renderTabs();await render();});
+</script>
+<script src="assets/pwa.js" defer></script>
+</body>
+</html>

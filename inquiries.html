@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Inquiries — Lines &amp; Logos Business OS</title>
+<meta name="description" content="Send Lines & Logos a message about your gym floor, court, or wall project — attach photos or plans and we reply within one business day.">
+<link rel="canonical" href="https://linesandlogosteam.com/inquiries.html">
+<link rel="icon" type="image/png" href="icons/favicon-32.png?v=2">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;700;800&family=Archivo+Black&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#04060d;--navy:#0a1533;--navy-2:#132a63;--blue:#2d5bff;--blue-hi:#4d7dff;--cyan:#57c7ff;--orange:#ff7a1a;--lime:#c6e02c;--yellow:#ffc21c;--green:#3fae5a;--red:#ff5a5a;--volley:#8fa8ff;--chrome-1:#eef3fc;--line:rgba(120,145,205,.16);--text:#c6d0e6;--text-dim:#7e8cab}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--ink);color:var(--text);font-family:'Space Grotesk',system-ui,sans-serif;min-height:100vh;overflow-x:clip}
+.chrome{background:linear-gradient(180deg,#fff 0%,#dfe7f5 26%,#8ea2c8 50%,#f4f8ff 60%,#7688ad 86%,#ccd8ee 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.topbar{position:sticky;top:0;z-index:50;backdrop-filter:blur(16px);background:rgba(4,6,13,.85);border-bottom:1px solid var(--line);padding:16px 32px;display:flex;align-items:center;gap:18px}
+.topbar img{height:44px}
+.topbar h1{font-family:'Archivo Black',sans-serif;font-size:18px;text-transform:uppercase}
+.topbar .crumb{font-size:12px;color:var(--text-dim);letter-spacing:.12em;text-transform:uppercase;font-weight:600}
+.topbar a{margin-left:auto;color:var(--text-dim);text-decoration:none;font-size:13.5px;font-weight:700}
+.topbar a:hover{color:#fff}
+.btn{font-family:'Archivo',sans-serif;font-weight:800;font-size:13px;color:#fff;border:none;cursor:pointer;padding:11px 20px;border-radius:10px;background:linear-gradient(180deg,#4d7dff,#2d5bff 45%,#1c3fd6);box-shadow:0 0 0 1px rgba(120,160,255,.5) inset;transition:.15s}
+.btn:hover{transform:translateY(-1px)}
+.btn-ghost{background:transparent;box-shadow:0 0 0 1px var(--line) inset;color:var(--chrome-1)}
+.btn-sm{padding:8px 14px;font-size:12px;border-radius:9px}
+main{max-width:1180px;margin:0 auto;padding:36px 28px 90px}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:26px}
+.stat{border:1px solid var(--line);border-radius:16px;padding:20px 22px;background:linear-gradient(180deg,rgba(16,31,77,.4),rgba(4,6,13,.6));position:relative;overflow:hidden}
+.stat::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:var(--accent)}
+.stat b{font-family:'Archivo Black',sans-serif;font-size:28px;display:block;margin-bottom:4px}
+.stat span{font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--text-dim);font-weight:700}
+.tabs{display:flex;gap:8px;margin-bottom:22px;flex-wrap:wrap}
+.tab{font-family:'Archivo',sans-serif;font-weight:700;font-size:13px;padding:10px 18px;border-radius:10px;border:1px solid var(--line);background:transparent;color:var(--text-dim);cursor:pointer;transition:.2s}
+.tab.active{background:linear-gradient(180deg,#4d7dff,#2d5bff);border-color:transparent;color:#fff}
+.panel{border:1px solid var(--line);border-radius:18px;background:linear-gradient(180deg,rgba(16,31,77,.35),rgba(4,6,13,.6));padding:24px;margin-bottom:18px}
+.iq{border:1px solid var(--line);border-left:3px solid var(--accent,var(--blue));border-radius:14px;padding:20px 22px;margin-bottom:14px;background:rgba(4,6,13,.4);transition:.2s}
+.iq:hover{border-color:rgba(77,125,255,.45)}
+.iq .head{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:10px}
+.iq .head b{color:#fff;font-size:15px}
+.iq .src{font-size:10.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;padding:4px 10px;border-radius:100px;border:1px solid}
+.src-site{color:var(--cyan);border-color:rgba(87,199,255,.4);background:rgba(87,199,255,.08)}
+.src-contact{color:var(--yellow);border-color:rgba(255,194,28,.4);background:rgba(255,194,28,.08)}
+.src-chat{color:var(--lime);border-color:rgba(198,224,44,.4);background:rgba(198,224,44,.08)}
+.st{font-size:10.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;padding:4px 10px;border-radius:100px;border:1px solid}
+.st-new{color:var(--orange);border-color:rgba(255,122,26,.45);background:rgba(255,122,26,.1)}
+.st-analyzed{color:var(--yellow);border-color:rgba(255,194,28,.45);background:rgba(255,194,28,.1)}
+.st-replied{color:#7ad892;border-color:rgba(63,174,90,.45);background:rgba(63,174,90,.1)}
+.iq .msg{font-size:14.5px;line-height:1.65;margin:8px 0}
+.iq .meta{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--text-dim);margin-top:8px}
+.iq .meta i{font-style:normal;color:var(--cyan);font-weight:700}
+.ai-box{margin-top:14px;border-top:1px dashed rgba(120,145,205,.2);padding-top:14px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+.ai-box div{background:rgba(45,91,255,.06);border:1px solid rgba(77,125,255,.25);border-radius:12px;padding:12px 14px;font-size:12.5px;line-height:1.6}
+.ai-box b{display:block;font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--text-dim);margin-bottom:6px}
+.reply-box{grid-column:1/-1;background:rgba(198,224,44,.05)!important;border-color:rgba(198,224,44,.3)!important}
+.thread{border:1px solid var(--line);border-radius:14px;padding:16px 18px;margin-bottom:12px;background:rgba(4,6,13,.4)}
+.thread .m{padding:9px 14px;border-radius:12px;margin-bottom:8px;font-size:13.5px;line-height:1.6;max-width:82%}
+.thread .m.agent{background:rgba(45,91,255,.12);border:1px solid rgba(77,125,255,.3);margin-left:auto}
+.thread .m.customer{background:rgba(120,145,205,.08);border:1px solid var(--line)}
+.thread .who{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--text-dim);font-weight:700;margin-bottom:4px}
+.login-warn{max-width:520px;margin:120px auto;text-align:center;border:1px solid var(--line);border-radius:20px;padding:44px;background:linear-gradient(180deg,rgba(16,31,77,.5),rgba(4,6,13,.8))}
+.login-warn h2{font-family:'Archivo Black',sans-serif;font-size:22px;text-transform:uppercase;margin-bottom:12px}
+.login-warn p{color:var(--text-dim);margin-bottom:24px}
+.toast{position:fixed;bottom:26px;right:26px;background:linear-gradient(180deg,var(--navy-2),var(--navy));border:1px solid rgba(77,125,255,.5);color:#fff;padding:14px 22px;border-radius:13px;font-size:13.5px;font-weight:600;box-shadow:0 20px 50px rgba(0,0,0,.6);transform:translateY(140px);opacity:0;transition:.35s;z-index:300}
+.toast.show{transform:none;opacity:1}
+@media(max-width:900px){.stats{grid-template-columns:repeat(2,1fr)}.ai-box{grid-template-columns:1fr}}
+@media(max-width:560px){.topbar{padding:12px 14px;gap:10px;flex-wrap:wrap}.topbar img{height:32px}.topbar .crumb{display:none}.topbar a{margin-left:auto;font-size:12px}main{padding:16px 12px}.tabs .btn{flex:1 1 40%}}
+
+/* canonical footer (self-contained; uses this page's dark theme vars) */
+.wrap{max-width:var(--maxw,1180px);margin:0 auto;padding:0 32px}
+footer{padding:60px 0 36px;border-top:1px solid var(--line,rgba(255,255,255,.08));background:linear-gradient(180deg,var(--ink,#04060d),var(--navy,#0a1226))}
+.foot-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:44px;margin-bottom:44px}
+.foot-grid h4{font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--chrome-1,#eef3fc);margin:0 0 14px}
+.foot-grid>div:not(.foot-brand) a{display:block;color:var(--text-dim,#8b94a7);text-decoration:none;font-size:14px;margin-bottom:9px}
+.foot-grid>div:not(.foot-brand) a:hover{color:#fff}
+.foot-brand img{height:180px;width:auto;margin-bottom:16px}
+.foot-brand .foot-address{display:block;margin-top:14px;font-style:normal;text-align:left;line-height:1.6;color:var(--text-dim,#8b94a7);font-size:13.5px}
+.foot-bottom{display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;border-top:1px solid var(--line,rgba(255,255,255,.08));padding-top:24px;font-size:12.5px;color:var(--text-dim,#8b94a7)}
+@media(max-width:900px){.foot-grid{grid-template-columns:1fr 1fr;gap:28px}}
+@media(max-width:600px){.wrap{padding:0 20px}}
+@media(max-width:520px){.foot-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <img src="logo-hero.png" alt="Lines &amp; Logos">
+  <div><h1 class="chrome">Inquiries</h1></div>
+  <span class="crumb">Sales / AI Agent Desk</span>
+  <a href="dashboard.html">← Dashboard</a>
+</header>
+<main id="main">
+  <div class="login-warn" id="loginWarn" style="display:none">
+    <h2 class="chrome">Sign in required</h2><p>This console is admin-only.</p>
+    <a class="btn" style="text-decoration:none;display:inline-block" href="login.html">Go to Login</a>
+  </div>
+</main>
+<div class="toast" id="toast"></div>
+<script>
+const BASE=(location.protocol==='file:')?'http://localhost:3001':'';
+const TOKEN=localStorage.getItem('ll_token');
+let TAB='inquiries';
+async function api(p,m='GET',b){ const r=await fetch(BASE+p,{method:m,headers:{'Content-Type':'application/json',Authorization:'Bearer '+TOKEN},body:b?JSON.stringify(b):undefined}); return r.json(); }
+async function init(){
+  if(!TOKEN){ document.getElementById('loginWarn').style.display='block'; return; }
+  const [iq,chats]=await Promise.all([api('/api/inquiries'),api('/api/chats')]);
+  if(iq.error){ document.getElementById('loginWarn').style.display='block'; return; }
+  window._iq=iq; window._chats=chats;
+  window._revs=(await api('/api/reviews')).filter(r=>r.status!=='rejected');
+  window._gal=await api('/api/gallery');
+  render();
+}
+async function approveReview(id,act){
+  await api('/api/reviews/'+id+'/'+act,'POST',{});
+  window._revs=(await api('/api/reviews')).filter(r=>r.status!=='rejected'); render(); toast('Review '+act+'d');
+}
+async function approveGal(id,act){
+  await api('/api/gallery/'+id+'/'+act,'POST',{});
+  window._gal=await api('/api/gallery'); render(); toast('Image '+act+'d');
+}
+async function curateGal(){
+  const r=await api('/api/agent/gallery/curate','POST',{});
+  window._gal=await api('/api/gallery'); render(); toast('AI curated '+r.curated+' image(s)');
+}
+function render(){
+  const counts={ new:_iq.filter(i=>i.status==='new').length, analyzed:_iq.filter(i=>i.status==='analyzed').length, replied:_iq.filter(i=>i.status==='replied').length };
+  const chatMsgs=_chats.reduce((s,c)=>s+c.messages.length,0);
+  document.getElementById('main').innerHTML=`
+  <div class="stats">
+    <div class="stat" style="--accent:var(--orange)"><b class="chrome">${counts.new}</b><span>New</span></div>
+    <div class="stat" style="--accent:var(--yellow)"><b class="chrome">${counts.analyzed}</b><span>Analyzed</span></div>
+    <div class="stat" style="--accent:var(--green)"><b class="chrome">${counts.replied}</b><span>Replied</span></div>
+    <div class="stat" style="--accent:var(--cyan)"><b class="chrome">${_chats.length}</b><span>AI chat threads (${chatMsgs} msgs)</span></div>
+  </div>
+  <div class="tabs">
+    <button class="tab ${TAB==='inquiries'?'active':''}" onclick="TAB='inquiries';render()">Inquiries (${_iq.length})</button>
+    <button class="tab ${TAB==='chats'?'active':''}" onclick="TAB='chats';render()">AI Chat Threads (${_chats.length})</button>
+    <button class="tab ${TAB==='mods'?'active':''}" onclick="TAB='mods';render()">Reviews (${_revs.filter(r=>r.status==='pending').length}) &amp; Gallery (${_gal.filter(g=>g.status==='pending').length})</button>
+    <button class="btn" style="margin-left:auto" onclick="runAgent('analyze')">Analyze New</button>
+    <button class="btn" onclick="runAgent('respond')">Respond to All Analyzed</button>
+  </div>
+  ${TAB==='inquiries' ? (_iq.map(iq=>`
+    <div class="iq" style="--accent:${iq.status==='new'?'var(--orange)':iq.status==='analyzed'?'var(--yellow)':'var(--green)'}">
+      <div class="head">
+        <b>${esc(iq.name)}</b>
+        <span class="src src-${iq.source}">${iq.source}</span>
+        <span class="st st-${iq.status}">${iq.status}</span>
+        ${iq.sentiment?`<span class="st" style="color:${iq.sentiment==='negative'?'#ff9d9d':iq.sentiment==='positive'?'#7ad892':'var(--text-dim)'};border-color:var(--line)">${iq.sentiment}</span>`:''}
+        <span style="margin-left:auto;font-size:12px;color:var(--text-dim)">${esc(iq.email||'')} · ${new Date(iq.createdAt).toLocaleDateString()}</span>
+      </div>
+      <div class="msg">"${esc(iq.message)}"</div>
+      ${iq.status!=='new'?`
+      <div class="ai-box">
+        <div><b>Intent</b>${esc(iq.intent||'—')}</div>
+        <div><b>Extracted</b>${Object.entries(iq.extracted||{}).map(([k,v])=>v?`${k}: <i>${esc(v)}</i>`:null).filter(Boolean).join('<br>')||'—'}</div>
+        <div><b>Urgency</b>${esc(iq.urgency||'—')}</div>
+        <div class="reply-box"><b>Agent's reply ${iq.status==='replied'?'(sent '+new Date(iq.repliedAt).toLocaleTimeString()+')':'(draft)'}</b>${esc(iq.reply||'—')}</div>
+      </div>
+      <div style="margin-top:14px;display:flex;gap:10px">
+        ${iq.status==='analyzed'?`<button class="btn btn-sm" onclick="respondOne('${iq.id}')">Send Reply</button>`:''}
+        ${iq.status==='new'?`<button class="btn btn-sm" onclick="analyzeOne('${iq.id}')">Analyze</button>`:''}
+      </div>`:''}
+    </div>`).join('') || '<div class="panel">No inquiries yet.</div>'):''}
+  ${TAB==='chats' ? (_chats.map(c=>`
+    <div class="thread">
+      <div style="font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--text-dim);font-weight:700;margin-bottom:12px">Thread ${c.session.slice(0,10)} · ${c.messages.length} messages</div>
+      ${c.messages.map(m=>`<div class="m ${m.from}"><div class="who">${m.from==='agent'?'AI Customer Service':'Customer'}</div>${esc(m.text)}</div>`).join('')}
+    </div>`).join('') || '<div class="panel">No chat threads yet.</div>'):''}
+  ${TAB==='mods' ? (`
+    <div class="panel" style="--accent:var(--yellow)"><h3 style="font-family:'Archivo',sans-serif;font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--chrome-2);margin-bottom:18px">Reviews awaiting approval</h3>
+    ${_revs.filter(r=>r.status==='pending').map(r=>`
+      <div class="iq" style="--accent:var(--yellow)">
+        <div class="head"><b>${esc(r.author||r.name)}</b><span style="color:var(--yellow);letter-spacing:2px">${'★'.repeat(r.rating||5)}</span><span class="st st-new">pending</span><span style="margin-left:auto;font-size:12px;color:var(--text-dim)">${esc(r.company||'')}</span></div>
+        <div class="msg">"${esc(r.text)}"</div>
+        <div style="margin-top:12px;display:flex;gap:10px">
+          <button class="btn btn-sm" onclick="approveReview('${r.id}','approve')">Approve → site</button>
+          <button class="btn btn-ghost btn-sm" onclick="approveReview('${r.id}','reject')">Reject</button>
+        </div>
+      </div>`).join('')||'<p style="color:var(--text-dim);font-size:13.5px">No pending reviews.</p>'}
+    </div>
+    <div class="panel" style="--accent:var(--green)"><h3 style="font-family:'Archivo',sans-serif;font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--chrome-2);margin-bottom:18px">Job gallery — AI &amp; admin moderation</h3>
+    <div style="margin-bottom:16px"><button class="btn btn-ghost btn-sm" onclick="curateGal()">Run AI curation (approves shots from signed jobs)</button></div>
+    ${_gal.map(g=>`
+      <div class="iq" style="--accent:${g.status==='approved'?'var(--green)':g.status==='pending'?'var(--yellow)':'var(--red)'}">
+        <div class="head"><b>${esc(g.caption)}</b><span class="st st-${g.status==='approved'?'replied':g.status==='pending'?'new':'analyzed'}">${g.status}${g.curatedBy?' · AI':g.approvedBy?' · admin':''}</span></div>
+        ${g.status==='pending'?`<div style="display:flex;gap:10px"><button class="btn btn-sm" onclick="approveGal('${g.id}','approve')">Approve → site</button><button class="btn btn-ghost btn-sm" onclick="approveGal('${g.id}','reject')">Reject</button></div>`:''}
+      </div>`).join('')}
+    </div>`):''}
+  <div class="panel" style="margin-top:26px">
+    <b style="color:#fff;font-size:14px">Simulate incoming traffic</b>
+    <p style="font-size:13px;color:var(--text-dim);margin:8px 0 14px">Push a sample site inquiry and chat message through the pipeline to watch the agent work.</p>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <button class="btn btn-ghost btn-sm" onclick="simulate('site')">+ Site inquiry</button>
+      <button class="btn btn-ghost btn-sm" onclick="simulate('contact')">+ Contact-page message</button>
+      <button class="btn btn-ghost btn-sm" onclick="simulate('chat')">+ Chat message</button>
+    </div>
+  </div>`;
+}
+async function runAgent(act){
+  const r=await api('/api/agent/inquiries/'+act,'POST',{});
+  toast(act==='analyze' ? r.analyzed+' inquiry(s) analyzed' : r.responded+' reply(ies) sent');
+  window._iq=await api('/api/inquiries'); render();
+}
+async function respondOne(id){ await api('/api/agent/inquiries/respond','POST',{id}); toast('Reply sent'); window._iq=await api('/api/inquiries'); render(); }
+async function analyzeOne(id){
+  await api('/api/agent/inquiries/analyze','POST',{});
+  window._iq=await api('/api/inquiries'); render();
+}
+const SAMPLES={
+  site:{name:'AD Sheryl Vance',email:'s.vance@bhamcity.k12.al.us',phone:'(205) 555-0119',source:'site',message:'Need 6 outdoor courts restriped at our athletic complex in Birmingham, roughly 45,000 sq ft total. Hoping to get it done before fall sports start — urgent.'},
+  contact:{name:'Rev. Tom Okafor',email:'t.okafor@lrfellowship.org',phone:'(501) 555-0177',source:'contact',message:'Our fellowship hall needs wall wraps and a donors recognition wall, about 2,400 sq ft of wall space in Little Rock. Love what you did at Bellevue.'},
+};
+async function simulate(kind){
+  if(kind==='chat'){
+    await fetch(BASE+'/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({session:'sim-'+Date.now(),message:'Do you handle parking lot striping for a church in Jackson, MS? About 18,000 sq ft.'})});
+  } else {
+    await fetch(BASE+'/api/inquiries',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(SAMPLES[kind])});
+  }
+  toast('Simulated — run Analyze to see the agent extract intent'); init();
+}
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2600)}
+init();
+</script>
+<!-- Lines & Logos Business OS -->
+<script defer src="assets/consent.js"></script>
+<script defer src="assets/chat.js?v=11"></script>
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <img src="logo-hero.png" alt="Lines &amp; Logos">
+        <address class="foot-address">2847 New Broadway St.<br>Memphis, TN 38109</address>
+      </div>
+      <div>
+        <h4>Partners</h4>
+        <a href="careers.html">Become a Contractor</a>
+        <a href="partners.html#apply">Become an Affiliate</a>
+        <a href="partners.html">Earn With Us</a>
+        <a href="partners.html#how">Affiliate Guide</a>
+        <a href="partners.html#tiers">Earnings &amp; Payouts</a>
+      </div>
+      <div>
+        <h4>Support</h4><a href="mailto:info@linesandlogos.team">Contact Support</a>
+        <a href="gallery.html">Photo Gallery</a>
+        <a href="PREVIEW.html">Preview</a>
+        <a href="legal.html#trust">Verification &amp; Trust</a>
+        <a href="legal.html#data-retention">Data Retention</a>
+      </div>
+      <div>
+        <h4>Legal</h4>
+        <a href="legal.html#terms">Terms of Service</a>
+        <a href="legal.html#privacy">Privacy Policy</a>
+        <a href="legal.html#acceptable-use">Acceptable Use Policy</a>
+        <a href="legal.html#provider-terms">Provider Terms</a>
+        <a href="legal.html#refunds">Refund Policy</a>
+        <a href="legal.html#cookies">Cookie Policy</a>
+        <a href="legal.html#legal-notice">Legal Notice</a>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>© 2026 Lines &amp; Logos. All rights reserved.</span>
+    </div>
+  </div>
+</footer>
+</body>
+</html>

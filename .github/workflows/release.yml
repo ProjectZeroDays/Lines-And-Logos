@@ -1,0 +1,124 @@
+name: Release
+
+on:
+  push:
+    tags: [ 'v*' ]
+
+permissions:
+  contents: write
+
+jobs:
+  # ---------- Node bundles (zero-dependency; run anywhere Node runs) ----------
+  bundles:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Package platform bundles
+        run: |
+          mkdir -p dist
+          for platform in windows macos linux; do
+            mkdir -p pkg/lines-and-logos-$platform
+            cp -r server.js package.json *.html assets data icons manifest.webmanifest README.md pkg/lines-and-logos-$platform/
+          done
+          cp start-windows.bat pkg/lines-and-logos-windows/
+          cp start-mac.command pkg/lines-and-logos-macos/ && chmod +x pkg/lines-and-logos-macos/start-mac.command
+          cp start-linux.sh pkg/lines-and-logos-linux/ && chmod +x pkg/lines-and-logos-linux/start-linux.sh
+          cd pkg/lines-and-logos-windows && zip -qr ../../dist/lines-and-logos-windows.zip . && cd ../..
+          cd pkg/lines-and-logos-macos   && zip -qr ../../dist/lines-and-logos-macos.zip .   && cd ../..
+          cd pkg/lines-and-logos-linux   && zip -qr ../../dist/lines-and-logos-linux.zip .   && cd ../..
+          zip -qr dist/lines-and-logos-source.zip . -x 'dist/*' 'pkg/*' '.git/*' '*.bak' 'electron/*' 'capacitor/*'
+      - name: Smoke-test the server
+        run: |
+          node server.js & SERVER=$!
+          sleep 2
+          curl -fsS http://localhost:3001/api/health
+          curl -fsS http://localhost:3001/ >/dev/null
+          kill $SERVER
+      - name: Upload node bundles
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/*.zip
+          generate_release_notes: true
+
+  # ---------- Desktop binaries (Electron: NSIS installer, DMG, AppImage/deb) ----------
+  desktop:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, macos-latest, ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install and build
+        working-directory: electron
+        run: |
+          npm install
+          npx electron-builder --publish never
+      - name: Upload desktop artifacts
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            electron/dist/*.exe
+            electron/dist/*.dmg
+            electron/dist/*.zip
+            electron/dist/*.AppImage
+            electron/dist/*.deb
+            electron/dist/*.snap
+
+  # ---------- Android APK (Capacitor + Gradle) ----------
+  android:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+      - name: Stage web assets and sync
+        run: |
+          chmod +x scripts/build-mobile.sh
+          scripts/build-mobile.sh
+        env:
+          SERVER_URL: ${{ vars.SERVER_URL }}
+      - name: Build debug APK
+        working-directory: capacitor/android
+        run: ./gradlew assembleDebug
+      - name: Upload APK
+        uses: softprops/action-gh-release@v2
+        with:
+          files: capacitor/android/app/build/outputs/apk/debug/app-debug.apk
+
+  # ---------- iOS build (unsigned; archive + export needs your Apple certs) ----------
+  ios:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Stage web assets and sync
+        run: |
+          chmod +x scripts/build-mobile.sh
+          scripts/build-mobile.sh
+      - name: Build unsigned iOS app
+        working-directory: capacitor/ios/App
+        run: |
+          pod install --repo-update || true
+          xcodebuild build -workspace App.xcworkspace -scheme App -configuration Release -destination 'generic/platform=iOS Simulator' -derivedDataPath build
+      - name: Zip iOS build products
+        run: |
+          cd capacitor/ios/App/build/Build/Products 2>/dev/null || cd capacitor/ios/App/build
+          zip -qr "$OLDPWD/lines-and-logos-ios-unsigned.zip" . || true
+      - name: Upload iOS archive
+        uses: softprops/action-gh-release@v2
+        with:
+          files: capacitor/ios/App/lines-and-logos-ios-unsigned.zip

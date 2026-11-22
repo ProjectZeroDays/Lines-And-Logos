@@ -1,0 +1,17 @@
+{
+  "appId": "com.linesandlogos.os",
+  "appName": "Lines & Logos",
+  "webDir": "www",
+  "backgroundColor": "#04060d",
+  "server": {
+    "url": "https://lines-and-logos.ok.kimi.link/login.html?source=app",
+    "cleartext": false
+  },
+  "ios": {
+    "contentInset": "automatic",
+    "scheme": "LinesAndLogos"
+  },
+  "android": {
+    "allowMixedContent": false
+  }
+}

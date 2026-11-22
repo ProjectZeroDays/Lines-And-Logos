@@ -1,0 +1,21 @@
+.git
+.gitignore
+node_modules
+.env
+.env.*
+*.bak
+PREVIEW.html
+data/db.json
+data/backups
+data/uploads
+# wrapper-app sources live outside the server image
+electron
+capacitor
+native
+releases
+pkg
+scripts/install-vps.sh
+scripts/installer.nsi
+Dockerfile
+docker-compose.yml
+.dockerignore

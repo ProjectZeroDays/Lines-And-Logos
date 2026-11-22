@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sales — Lines &amp; Logos Business OS</title>
+<link rel="icon" type="image/png" href="icons/favicon-32.png?v=2">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;700;800&family=Archivo+Black&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/os.css?v=9">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#04060d">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Lines & Logos">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+</head>
+<body data-perms="notifications">
+<main>
+  <div class="topbar">
+    <div><div class="crumb">Business OS / Sales</div><h1 class="chrome">Sales &amp; Pipeline</h1></div>
+    <div class="topbar-right">
+      <input class="search" id="q" placeholder="Search…" oninput="render()">
+      <button class="btn btn-sm" id="addBtn" onclick="addItem()">+ New Lead</button>
+    </div>
+  </div>
+  <div class="tabs2" id="tabs"></div>
+  <div id="view"></div>
+</main>
+<script src="assets/os.js?v=9"></script>
+<script>
+const {fmt,esc,TIER,GEN}=OS;
+let view='leads';
+const TABS=[['leads','Leads'],['accounts','Accounts'],['contacts','Contacts'],['quotes','Quotes']];
+const ADD={leads:'+ New Lead',accounts:'+ New Account',contacts:'+ New Contact',quotes:'+ New Quote'};
+function renderTabs(){const counts={leads:OS.cur('leads').length,accounts:OS.cur('accounts').length,contacts:OS.cur('contacts').length,quotes:OS.cur('quotes').length};
+  OS.$('#tabs').innerHTML=TABS.map(([k,l])=>`<button class="${view===k?'active':''}" onclick="go('${k}')">${l}<span class="cnt">${counts[k]}</span></button>`).join('');
+  OS.$('#addBtn').textContent=ADD[view];}
+function go(v){view=v;renderTabs();render();}
+const q=()=>OS.$('#q').value.toLowerCase();
+const match=(...xs)=>xs.join(' ').toLowerCase().includes(q());
+const STAGES=['new','contacted','quoted','won'];
+
+async function render(){
+  await ({leads:vLeads,accounts:vAccounts,contacts:vContacts,quotes:vQuotes})[view]();
+  renderTabs();
+}
+async function vLeads(){
+  const leads=await OS.list('leads');
+  const cols=STAGES.map(st=>({st,rows:leads.filter(l=>(l.stage||'new')===st&&match(l.name,l.company,l.service))}));
+  OS.$('#view').innerHTML=`
+  <div class="pipe">${cols.map(c=>`<div class="pipe-col"><h4>${c.st}<span>${c.rows.length}</span></h4>
+    ${c.rows.map(l=>`<div class="pipe-card"><b>${esc(l.name)}</b><small>${esc(l.company)}<br>${esc(l.service)} · ${esc(l.source)}</small>
+      <span class="tag ${TIER(l.tier)}">${l.tier} · ${l.score}</span>
+      <div style="margin-top:10px;display:flex;gap:6px">${c.st!=='won'?`<button class="btn btn-sm btn-ghost" onclick="advance('${l.id}','${c.st}')">Advance →</button>`:''}</div>
+    </div>`).join('')||'<small style="color:var(--text-dim)">Empty</small>'}
+  </div>`).join('')}</div>
+  <div class="panel flush" style="--accent:var(--orange)"><h3 style="padding:24px 24px 0">All Leads — AI-scored <span class="right">Lead Score Agent</span></h3><div class="table-wrap"><table>
+    <tr><th>Contact</th><th>Service</th><th>Source</th><th>Score</th><th>Tier</th><th>Stage</th><th>Next Step</th></tr>
+    ${leads.filter(l=>match(l.name,l.company,l.service)).map(l=>`<tr>
+      <td><b>${esc(l.name)}</b><span class="sub">${esc(l.company)}</span></td>
+      <td>${esc(l.service)}</td><td>${esc(l.source)}</td>
+      <td><b style="color:var(--cyan);font-size:15px">${l.score}</b></td>
+      <td><span class="tag ${TIER(l.tier)}">${l.tier}</span></td><td>${l.stage}</td>
+      <td><span class="sub" style="color:var(--text)">${esc(l.nextStep||'—')}</span></td>
+    </tr>`).join('')}
+  </table></div></div>`;
+}
+async function advance(id,stage){
+  const next=STAGES[STAGES.indexOf(stage)+1];if(!next)return;
+  await OS.patch('leads',id,{stage:next});OS.toast(`Lead advanced to ${next}`);render();
+}
+async function vAccounts(){
+  const rows=await OS.list('accounts');
+  OS.$('#view').innerHTML=`<div class="panel flush" style="--accent:var(--volley)"><h3 style="padding:24px 24px 0">Accounts — health-scored <span class="right">Health Score Agent</span></h3><div class="table-wrap"><table>
+    <tr><th>Account</th><th>Tier</th><th>Health</th><th>Renewal</th><th>Goal</th><th>Notes</th></tr>
+    ${rows.filter(a=>match(a.name,a.city)).map(a=>`<tr>
+      <td><b>${esc(a.name)}</b><span class="sub">${esc(a.city)}</span></td>
+      <td><span class="tag t-blue">${a.tier}</span></td>
+      <td><span class="hdot h-${a.health}">${a.health}</span><span class="sub">${esc((a.healthNotes||[])[0]||'')}</span></td>
+      <td>${a.renewal||'—'}</td><td>${esc(a.goal||'—')}</td><td><span class="sub">${esc(a.notes||'')}</span></td>
+    </tr>`).join('')}
+  </table></div></div>`;
+}
+async function vContacts(){
+  const rows=await OS.list('contacts');
+  OS.$('#view').innerHTML=`<div class="panel flush" style="--accent:var(--cyan)"><h3 style="padding:24px 24px 0">Contacts</h3><div class="table-wrap"><table>
+    <tr><th>Name</th><th>Account</th><th>Role</th><th>Email</th><th>Phone</th><th>Decision Maker</th></tr>
+    ${rows.filter(c=>match(c.name,c.role,c.account)).map(c=>`<tr>
+      <td><b>${esc(c.name)}</b></td><td>${esc(c.account)}</td><td>${esc(c.role)}</td>
+      <td><a href="mailto:${esc(c.email)}">${esc(c.email)}</a></td><td>${esc(c.phone)}</td>
+      <td>${c.decisionMaker?'<span class="tag t-lime">yes</span>':'<span class="tag t-grey">influencer</span>'}</td>
+    </tr>`).join('')}
+  </table></div></div>`;
+}
+async function vQuotes(){
+  const rows=await OS.list('quotes');
+  OS.$('#view').innerHTML=`<div class="panel flush" style="--accent:var(--yellow)"><h3 style="padding:24px 24px 0">Quotes — track → convert to job</h3><div class="table-wrap"><table>
+    <tr><th>Number</th><th>Title</th><th>Account</th><th>Amount</th><th>Status</th><th>Valid Until</th><th></th></tr>
+    ${rows.filter(x=>match(x.title,x.account,x.number)).map(x=>`<tr>
+      <td><b>${esc(x.number)}</b></td><td>${esc(x.title)}</td><td>${esc(x.account)}</td>
+      <td><b>${fmt(x.amount)}</b></td><td><span class="tag ${GEN(x.status)}">${x.status}</span></td><td>${x.validUntil||'—'}</td>
+      <td>${x.status!=='accepted'?`<button class="btn btn-sm btn-green" onclick="convert('${x.id}')">Convert → Job</button>`:''}</td>
+    </tr>`).join('')}
+  </table></div></div>`;
+}
+async function convert(id){
+  const r=await OS.convertQuote(id);
+  OS.toast(`Quote accepted → job created: ${r.job.title}`);render();
+}
+function addItem(){
+  const acctOpts=OS.cur('accounts').map(a=>`<option value="${a.id}">${esc(a.name)}</option>`).join('');
+  const forms={
+    leads:['New Lead',`<label>Contact Name</label><input id="f-name"><label>Company</label><input id="f-company"><label>Service</label><select id="f-service"><option>Full Facility</option><option>Gym Refresh</option><option>Court Restripe</option><option>Wall Wraps</option><option>Donors Wall</option><option>Signage & Striping</option><option>Playground Surfacing</option></select><label>Source</label><select id="f-source"><option>Website</option><option>Referral</option><option>Outbound</option><option>Cold call</option></select>`,
+      async()=>{const r=await OS.create('leads',{name:OS.field('f-name')||'Unknown',company:OS.field('f-company')||'Unknown',service:OS.field('f-service'),source:OS.field('f-source'),stage:'new'});return `Lead scored ${r.score} (${r.tier}) by Lead Score Agent`}],
+    accounts:['New Account',`<label>Account Name</label><input id="f-name"><label>City</label><input id="f-city"><label>Tier</label><select id="f-tier"><option>A</option><option>B</option><option>C</option></select><label>Goal</label><input id="f-goal">`,
+      async()=>{await OS.create('accounts',{name:OS.field('f-name')||'Unknown',city:OS.field('f-city'),tier:OS.field('f-tier'),goal:OS.field('f-goal')});return 'Account created'}],
+    contacts:['New Contact',`<label>Name</label><input id="f-name"><label>Account</label><select id="f-acct">${acctOpts}</select><label>Role</label><input id="f-role"><label>Email</label><input id="f-email" type="email"><label>Phone</label><input id="f-phone">`,
+      async()=>{await OS.create('contacts',{name:OS.field('f-name')||'Unknown',accountId:OS.field('f-acct'),role:OS.field('f-role'),email:OS.field('f-email'),phone:OS.field('f-phone'),decisionMaker:false});return 'Contact created'}],
+    quotes:['New Quote',`<label>Title</label><input id="f-title"><label>Account</label><select id="f-acct">${acctOpts}</select><label>Amount ($)</label><input id="f-amount" type="number" min="0">`,
+      async()=>{const r=await OS.create('quotes',{title:OS.field('f-title')||'Quote',accountId:OS.field('f-acct'),amount:+OS.field('f-amount')||0,status:'draft'});return `Quote ${r.number} drafted`}],
+  };
+  const [title,html,save]=forms[view];
+  OS.openModal(title,html);
+  OS.onModalSave(async()=>{const msg=await save();OS.closeModal();OS.toast(msg);render();});
+}
+OS.boot('sales','Sales',async()=>{await OS.list('accounts');await render();});
+</script>
+<script src="assets/pwa.js" defer></script>
+</body>
+</html>

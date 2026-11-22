@@ -1,0 +1,13 @@
+#!/bin/sh
+set -e
+. /usr/share/debconf/confmodule
+db_input medium lines-logos/port || true
+db_input low lines-logos/domain || true
+db_input low lines-logos/stripe-pk || true
+db_input low lines-logos/stripe-sk || true
+db_input low lines-logos/stripe-wh || true
+db_input low lines-logos/openrouter || true
+db_input low lines-logos/anthropic || true
+db_input low lines-logos/openai || true
+db_input low lines-logos/gemini || true
+db_go

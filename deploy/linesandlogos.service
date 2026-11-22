@@ -1,0 +1,22 @@
+[Unit]
+Description=Lines & Logos Business OS
+After=network.target
+
+[Service]
+Type=simple
+User=www-data
+WorkingDirectory=/opt/lines-and-logos
+Environment=NODE_ENV=production
+Environment=PORT=3001
+EnvironmentFile=-/opt/lines-and-logos/.env
+ExecStart=/usr/bin/node server.js
+Restart=always
+RestartSec=5
+# Hardening
+NoNewPrivileges=true
+ProtectSystem=full
+ProtectHome=true
+ReadWritePaths=/opt/lines-and-logos/data
+
+[Install]
+WantedBy=multi-user.target

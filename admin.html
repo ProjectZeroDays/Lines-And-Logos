@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agents &amp; Admin — Lines &amp; Logos Business OS</title>
+<link rel="icon" type="image/png" href="icons/favicon-32.png?v=2">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;700;800&family=Archivo+Black&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/os.css?v=9">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#04060d">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Lines & Logos">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+</head>
+<body data-perms="notifications">
+<main>
+  <div class="topbar">
+    <div><div class="crumb">Business OS / Agents &amp; Admin</div><h1 class="chrome">Agents &amp; Admin</h1></div>
+    <div class="topbar-right">
+      <input class="search" id="q" placeholder="Search…" oninput="render()">
+    </div>
+  </div>
+  <div class="tabs2" id="tabs"></div>
+  <div id="view"></div>
+</main>
+<script src="assets/os.js?v=9"></script>
+<script>
+const {fmt,ago,esc,GEN}=OS;
+let view='agents';
+const TABS=[['agents','AI Agents'],['customers','Customers · CRM'],['employees','Employees'],['field','Field Map'],['payroll','Payroll'],['hiring','Hiring'],['affiliates','Affiliates'],['approvals','Approvals'],['integrations','Integrations'],['support','Support'],['wiki','Wiki & SOPs'],['policies','Policies'],['notifications','Notifications'],['governance','Governance'],['memory','Memory'],['claw','Kimi Claw'],['settings','Settings']];
+function renderTabs(){const pend=OS.cur('approvals').filter(a=>a.status==='pending').length;const openFu=(OS.cur('followUps')||[]).filter(f=>f.status==='open').length;
+  OS.$('#tabs').innerHTML=TABS.map(([k,l])=>`<button class="${view===k?'active':''}" onclick="go('${k}')">${l}${k==='approvals'&&pend?`<span class="cnt">${pend}</span>`:''}${k==='customers'&&openFu?`<span class="cnt">${openFu}</span>`:''}</button>`).join('');}
+function go(v){view=v;renderTabs();render();}
+const q=()=>OS.$('#q').value.toLowerCase();
+const match=(...xs)=>xs.join(' ').toLowerCase().includes(q());
+
+async function render(){
+  await ({agents:vAgents,customers:vCustomers,employees:vEmployees,field:vField,payroll:vPayroll,hiring:vHiring,affiliates:vAffiliates,approvals:vApprovals,integrations:vIntegrations,support:vSupport,wiki:vWiki,policies:vPolicies,notifications:vNotifs,governance:vGovernance,memory:vMemory,claw:vClaw,settings:vSettings})[view]();
+  renderTabs();
+}
+
+/* ---------- AGENTS CONSOLE ---------- */
+const AGENTS=[
+  {key:'prospect-scout',name:'Prospect Scout Agent',desc:'Finds decision-makers at facilities in our territory, verifies POC / email / phone / website / business name, adds them to the pipeline, and drafts intro emails for your approval.',auto:true,icon:'<circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/><path d="M11 8v3l2 2"/>'},
+  {key:'lead-score',name:'Lead Score Agent',desc:'Scores every new lead 0–100 and tiers it hot/warm/cold. Runs automatically on lead intake.',auto:true,icon:'<path d="M13 2L4 14h6l-1 8 9-12h-6z"/>'},
+  {key:'dispatch',name:'Job Dispatch Agent',desc:'Matches open jobs to contractors by skill keywords, rating, and current workload.',icon:'<path d="M14 6l-8.5 8.5a2.1 2.1 0 003 3L17 9"/><path d="M15 5l4 4"/>'},
+  {key:'reminder',name:'Invoice Reminder Agent',desc:'Drafts dunning emails with escalating tone — friendly ≤7 days, firm 8–14, final 15+.',icon:'<path d="M6 2h12v20l-3-2-3 2-3-2-3 2z"/><path d="M9 7h6M9 11h6"/>'},
+  {key:'health',name:'Health Score Agent',desc:'Grades every account green/yellow/red from overdue invoices, renewal proximity, tickets, and feedback.',icon:'<path d="M12 3l8 4v5c0 5-3.5 8-8 9-4.5-1-8-4-8-9V7z"/>'},
+  {key:'watch',name:'Competitor Watch Agent',desc:'Scans competitor moves and pricing; flags anything needing action this week.',icon:'<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/>'},
+  {key:'daily-ops',name:'Daily Ops Agent',desc:'Morning brief: today\'s jobs, open quotes, overdue invoices, hot leads, approvals. Runs 07:00 via cron.',auto:true,icon:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/>'},
+  {key:'status-email',name:'Job Status Update Agent',desc:'Drafts customer progress emails from live job state.',icon:'<path d="M3 8l9 6 9-6"/><rect x="3" y="5" width="18" height="14" rx="2"/>'},
+  {key:'repurpose',name:'Content Repurposing Agent',desc:'Turns one blog or case study into LinkedIn, Instagram, Facebook, and X posts.',icon:'<path d="M3 11l18-7-7 18-2.5-7.5z"/>'},
+  {key:'competitor',name:'Competitor Analysis Agent',desc:'Deep-dive on one competitor: profile, impact on pipeline, counter-moves.',icon:'<path d="M12 2l3 6 7 1-5 5 1 7-6-3-6 3 1-7-5-5 7-1z"/>'},
+  {key:'crm',name:'CRM Manager Agent',desc:'Sweeps accounts: sends post-job surveys, issues tax-correct invoices on completion, queues stale-touch and renewal follow-ups.',auto:true,icon:'<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.5 3.4-5.5 6.5-5.5s5.7 2 6.5 5.5"/><path d="M17 8l2 2 4-4"/>'},
+  {key:'finance-watchdog',name:'Financial Watchdog Agent',desc:'Scans Stripe-side payments, expenses, and contractor payouts for odd behavior — spikes, duplicates, stalls — and raises alerts.',auto:true,icon:'<path d="M12 3l8 4v5c0 5-3.5 8-8 9-4.5-1-8-4-8-9V7z"/><path d="M12 8v5M12 16.5v.5"/>'},
+  {key:'pricing',name:'Pricing & Tax Agent',desc:'Builds line-item quotes with the estimated combined state + local sales tax for the job city; QuickBooks is the source of truth once connected.',auto:true,icon:'<path d="M13 2L4 14h6l-1 8 9-12h-6z"/><path d="M17 9h4M19 7v4"/>'},
+  {key:'hiring',name:'Hiring & Onboarding Agent',desc:'Sends new-hire e-sign packets (W-4, I-9, W-9, state forms), stores signed paperwork, auto-schedules the video interview.',auto:true,icon:'<circle cx="9" cy="7" r="3.5"/><path d="M2.5 20c.8-3.5 3.4-5.5 6.5-5.5s5.7 2 6.5 5.5"/><path d="M16 3.5l5 5M21 3.5l-5 5"/>'},
+  {key:'procurement',name:'Procurement Agent',desc:'Sources best price + ship date across vendors, drafts POs to Approvals, orders on approval, tracks delivery to restock.',auto:true,icon:'<path d="M3 7h13v10H3z"/><path d="M16 10h3l2 3v4h-5"/><circle cx="7" cy="17" r="1.6"/><circle cx="17" cy="17" r="1.6"/>'},
+];
+async function vAgents(){
+  OS.$('#view').innerHTML=`
+  <div class="banner info" style="display:block">${AGENTS.length} autonomous agents run the busywork — heuristic core, LLM-upgradeable (OpenAI/Anthropic keys). Every run is logged to the activity trail. <b>${OS.isLive()?'Live mode':'Demo mode'}</b>.</div>
+  <div class="agents-grid">
+    ${AGENTS.map(a=>`
+    <div class="agent-card">
+      <div class="ah"><div class="orb2"><svg viewBox="0 0 24 24">${a.icon}</svg></div><b>${a.name}</b></div>
+      <p>${a.desc}</p>
+      ${a.auto?'<span class="auto">● runs automatically</span>':''}
+      <button class="btn btn-sm" onclick="runAgentNow('${a.key}')">▶ Run Agent</button>
+    </div>`).join('')}
+    <div class="agent-out" id="agentOut"></div>
+  </div>`;
+}
+async function runAgentNow(key){
+  const out=OS.$('#agentOut');out.classList.add('open');
+  out.innerHTML='<h4>Running…</h4>';
+  const agent=AGENTS.find(a=>a.key===key);
+  const r=await OS.runAgent(key,{});
+  out.innerHTML=`<h4>${agent.name} — ran ${ago(r.ranAt)} · logged to activity trail</h4>${renderResult(key,r.result)}`;
+  out.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+function renderResult(key,res){
+  if(key==='prospect-scout') return `<div class="kpis" style="margin-bottom:16px">
+    <div class="kpi" style="--accent:var(--blue-hi)"><div class="lbl">Reviewed</div><div class="val">${res.reviewed??0}</div></div>
+    <div class="kpi" style="--accent:var(--cyan)"><div class="lbl">Verified</div><div class="val">${res.verified??0}</div></div>
+    <div class="kpi" style="--accent:var(--lime)"><div class="lbl">Added to pipeline</div><div class="val">${res.addedToPipeline??0}</div></div>
+    <div class="kpi" style="--accent:var(--yellow)"><div class="lbl">Intro emails queued</div><div class="val">${res.emailsQueued??0}</div><div class="delta">approve in Approvals tab</div></div></div>
+    ${(res.added||[]).length?`<div class="table-wrap"><table><tr><th>Business</th><th>Score</th><th>Tier</th><th>Verification</th></tr>${res.added.map(a=>`<tr><td><b>${esc(a.business)}</b></td><td>${a.score}</td><td><span class="tag ${GEN(a.tier)}">${esc(a.tier)}</span></td><td>${a.confidence??'—'}% checks passed</td></tr>`).join('')}</table></div>`:'<p style="color:var(--text-dim);font-size:13px">Prospect pool is empty for today — the nightly cron refills and rescans automatically.</p>'}
+    <p style="color:var(--text-dim);font-size:12px;margin-top:10px">Every email is a CAN-SPAM-compliant intro (physical address + opt-out) and waits for your approval before sending.</p>`;
+  if(key==='dispatch'||key==='lead-score'||key==='reminder'||key==='status-email') return `<pre>${esc(JSON.stringify(res,null,2))}</pre>`;
+  if(key==='repurpose') return `<p style="font-size:13px;color:var(--text-dim);margin-bottom:12px">Source: <b style="color:#fff">${esc(res.content)}</b></p>`+res.posts.map(p=>`<div class="post-card"><b>${esc(p.channel)}</b><p>${esc(p.text)}</p></div>`).join('');
+  if(key==='health') return `<div class="table-wrap"><table><tr><th>Account</th><th>Health</th><th>Risk notes</th></tr>${res.map(a=>`<tr><td><b>${esc(a.account)}</b></td><td><span class="hdot h-${a.level}">${a.level}</span></td><td>${a.notes.map(esc).join('<br>')}</td></tr>`).join('')}</table></div>`;
+  if(key==='watch') return `<div class="table-wrap"><table><tr><th>Competitor</th><th>Threat</th><th>Latest move</th><th>Pricing</th><th>Flag</th></tr>${res.map(c=>`<tr><td><b>${esc(c.name)}</b></td><td><span class="tag ${GEN(c.threat)}">${c.threat}</span></td><td>${esc(c.move)} <span class="sub">${c.daysAgo}d ago</span></td><td>${esc(c.pricing)}</td><td><span class="tag ${GEN(c.flag)}">${c.flag}</span></td></tr>`).join('')}</table></div>`;
+  if(key==='daily-ops') return `<pre>${esc(JSON.stringify(res,null,2))}</pre>`;
+  if(key==='competitor') return `<div class="table-wrap"><table><tr><th>Competitor</th><td><b>${esc(res.profile.name)}</b> — ${esc(res.profile.focus)}</td></tr><tr><th>Impact</th><td>${esc(res.impact)}</td></tr><tr><th>Counter-moves</th><td>${res.counters.map((c,i)=>`${i+1}. ${esc(c)}`).join('<br>')}</td></tr></table></div>`;
+  if(key==='crm') return `<div class="kpis" style="margin-bottom:16px">
+    <div class="kpi" style="--accent:var(--cyan)"><div class="lbl">Surveys sent</div><div class="val">${res.surveysSent}</div></div>
+    <div class="kpi" style="--accent:var(--yellow)"><div class="lbl">Invoices issued</div><div class="val">${res.invoicesSent}</div></div>
+    <div class="kpi" style="--accent:var(--lime)"><div class="lbl">Follow-ups queued</div><div class="val">${res.followUpsCreated}</div></div></div>
+    ${(res.details||[]).length?`<div class="table-wrap"><table><tr><th>Action</th></tr>${res.details.map(d=>`<tr><td>${esc(d)}</td></tr>`).join('')}</table></div>`:'<p style="color:var(--text-dim);font-size:13px">Nothing due — every completed job has a survey and invoice, and no account is stale or inside the renewal window.</p>'}`;
+  if(key==='finance-watchdog') return `<div class="kpis" style="margin-bottom:16px">
+    <div class="kpi" style="--accent:var(--red)"><div class="lbl">New alerts</div><div class="val">${res.newAlerts}</div></div>
+    <div class="kpi" style="--accent:var(--yellow)"><div class="lbl">Open total</div><div class="val">${res.openTotal}</div></div></div>
+    ${(res.alerts||[]).length?`<div class="table-wrap"><table><tr><th>Severity</th><th>Alert</th><th>Detail</th></tr>${res.alerts.map(a=>`<tr><td><span class="tag ${GEN(a.severity)}">${a.severity}</span></td><td><b>${esc(a.title)}</b></td><td>${esc(a.detail)}</td></tr>`).join('')}</table></div>`:'<p style="color:var(--text-dim);font-size:13px">Clean scan — no odd behavior detected in payments, expenses, or payouts.</p>'}`;
+  if(key==='pricing') return `<div class="table-wrap"><table>
+    <tr><th>Service</th><td><b>${esc(res.service)}</b> — ${res.sqft.toLocaleString()} sq ft · ${res.miles} mi · ${res.crew} crew × ${res.days} day(s)</td></tr>
+    ${res.lineItems.map(li=>`<tr><td style="padding-left:28px">${esc(li.label)}</td><td style="text-align:right"><b>${fmt(li.amount)}</b></td></tr>`).join('')}
+    <tr><td><b>Pre-tax total</b></td><td style="text-align:right"><b>${fmt(res.total)}</b></td></tr>
+    <tr><td><b>Est. ${esc(res.taxStateName)} sales tax (${res.taxRate}%)</b></td><td style="text-align:right"><b>${fmt(res.taxAmount)}</b></td></tr>
+    <tr><td><b>Grand total</b></td><td style="text-align:right"><b style="color:#7ad892">${fmt(res.grandTotal)}</b></td></tr>
+    <tr><td style="color:var(--text-dim)">Tax source</td><td style="text-align:right"><span class="tag ${res.taxSource==='quickbooks'?'t-green':'t-blue'}">${res.taxSource}</span></td></tr>
+  </table></div><p style="font-size:12px;color:var(--text-dim);margin-top:10px">${esc(res.taxDisclaimer||'')}</p>`;
+  if(key==='hiring') return `<div class="kpis" style="margin-bottom:16px">
+    <div class="kpi" style="--accent:var(--blue-hi)"><div class="lbl">Packets sent</div><div class="val">${res.packetsSent??0}</div></div>
+    <div class="kpi" style="--accent:var(--yellow)"><div class="lbl">Awaiting signature</div><div class="val">${res.awaitingSignature??0}</div></div>
+    <div class="kpi" style="--accent:var(--cyan)"><div class="lbl">Returned signed</div><div class="val">${res.returned??0}</div></div>
+    <div class="kpi" style="--accent:var(--lime)"><div class="lbl">Interviews just scheduled</div><div class="val">${res.interviewsJustScheduled??0}</div></div></div>
+    ${(res.interviews||[]).length?`<div class="table-wrap"><table><tr><th>Candidate</th><th>Position</th><th>When</th><th>Status</th></tr>${res.interviews.map(iv=>`<tr><td><b>${esc(iv.name||iv.applicant||'')}</b></td><td>${esc(iv.position||'—')}</td><td>${esc(String(iv.when||'').replace('T',' ').slice(0,16))}</td><td><span class="tag ${GEN(iv.status)}">${esc(iv.status)}</span></td></tr>`).join('')}</table></div>`:'<p style="color:var(--text-dim);font-size:13px">No interviews on the books yet.</p>'}`;
+  if(key==='procurement'){ const pos=res.pos||(res.results||[]).flatMap(r=>r.pos||[]);
+    const comps=res.comparisons||(res.results||[]).flatMap(r=>r.comparisons||[]);
+    return `<div class="kpis" style="margin-bottom:16px">
+    <div class="kpi" style="--accent:var(--yellow)"><div class="lbl">POs drafted</div><div class="val">${pos.length}</div></div>
+    <div class="kpi" style="--accent:var(--cyan)"><div class="lbl">Vendor offers compared</div><div class="val">${comps.reduce((s,c)=>s+((c.considered||[]).length),0)}</div></div>
+    ${res.jobsReviewed!==undefined?`<div class="kpi" style="--accent:var(--blue-hi)"><div class="lbl">Jobs reviewed</div><div class="val">${res.jobsReviewed}</div></div>`:''}</div>
+    ${pos.length?`<div class="table-wrap"><table><tr><th>PO</th><th>Vendor</th><th>Items</th><th>Total</th><th>ETA</th></tr>${pos.map(p=>`<tr><td><b>${esc(p.number)}</b></td><td>${esc(p.vendor)}</td><td><span class="sub">${esc((p.items||[]).map(l=>l.name).join(', '))}</span></td><td><b>${fmt(p.total)}</b></td><td>${esc(p.shipEta||'—')}</td></tr>`).join('')}</table></div>`:'<p style="color:var(--text-dim);font-size:13px">Nothing to order — no open material needs, or every need is already covered by an open PO.</p>'}
+    <p style="color:var(--text-dim);font-size:12px;margin-top:10px">Drafted POs land in the <b>Approvals</b> queue — nothing is ordered until an admin approves.</p>`; }
+  return `<pre>${esc(JSON.stringify(res,null,2))}</pre>`;
+}
+
+/* ---------- APPROVALS ---------- */
+async function vApprovals(){
+  const rows=await OS.list('approvals');
+  OS.$('#view').innerHTML=`<div class="panel flush" style="--accent:var(--yellow)"><h3 style="padding:24px 24px 0">Approval Queue</h3><div class="table-wrap"><table>
+    <tr><th>Request</th><th>Type</th><th>Amount</th><th>Requested By</th><th>Status</th><th>Actions</th></tr>
+    ${rows.filter(a=>match(a.title,a.type,a.requestedBy)).map(a=>`<tr>
+      <td><b>${esc(a.title)}</b><span class="sub">requested ${a.created}</span></td>
+      <td><span class="tag t-blue">${esc(a.type)}</span></td><td><b>${a.amount?fmt(a.amount):'—'}</b></td>
+      <td>${esc(a.requestedBy)}</td><td><span class="tag ${GEN(a.status)}">${a.status}</span></td>
+      <td style="white-space:nowrap">${a.status==='pending'?`
+        <button class="btn btn-sm btn-green" onclick="decide('${a.id}','approve')">Approve</button>
+        <button class="btn btn-sm btn-danger" onclick="decide('${a.id}','reject')">Reject</button>`:'—'}</td>
+    </tr>`).join('')||'<tr><td colspan="6" class="empty">Queue is clear</td></tr>'}
+  </table></div></div>`;
+}
+async function decide(id,d){await OS.decideApproval(id,d);OS.toast(`Request ${d==='approve'?'approved':'rejected'}`);render();}
+
+/* ---------- SUPPORT ---------- */
+async function vSupport(){
+  const [tickets,feedback]=await Promise.all([OS.list('tickets'),OS.list('feedback')]);
+  OS.$('#view').innerHTML=`<div class="grid-2 eq">
+  <div class="panel flush" style="--accent:var(--orange)"><h3 style="padding:24px 24px 0">Support Tickets <span class="right"><button class="btn btn-sm btn-ghost" onclick="newTicket()">+ New Ticket</button></span></h3><div class="table-wrap"><table>
+    <tr><th>Subject</th><th>Account</th><th>Priority</th><th>Status</th><th></th></tr>
+    ${tickets.filter(t=>match(t.subject,t.account)).map(t=>`<tr>
+      <td><b>${esc(t.subject)}</b><span class="sub">${t.created}</span></td><td>${esc(t.account)}</td>
+      <td><span class="tag ${GEN(t.priority)}">${t.priority}</span></td><td><span class="tag ${GEN(t.status)}">${t.status}</span></td>
+      <td>${t.status!=='resolved'?`<button class="btn btn-sm btn-green" onclick="resolveTicket('${t.id}')">Resolve</button>`:''}</td>
+    </tr>`).join('')}
+  </table></div></div>
+  <div class="panel flush" style="--accent:var(--lime)"><h3 style="padding:24px 24px 0">Client Feedback</h3><div class="table-wrap"><table>
+    <tr><th>Account</th><th>Rating</th><th>Comment</th><th>Date</th></tr>
+    ${feedback.map(f=>`<tr><td><b>${esc(f.account)}</b></td><td><b style="color:var(--yellow)">${'★'.repeat(f.rating)}</b></td><td>${esc(f.comment)}</td><td>${f.date}</td></tr>`).join('')}
+  </table></div></div>
+  </div>`;
+}
+function newTicket(){
+  OS.openModal('New Ticket',`<label>Account</label><select id="f-acct">${OS.cur('accounts').map(a=>`<option value="${a.id}">${esc(a.name)}</option>`).join('')}</select><label>Subject</label><input id="f-subject"><label>Priority</label><select id="f-pri"><option>normal</option><option>high</option><option>low</option></select>`);
+  OS.onModalSave(async()=>{await OS.create('tickets',{accountId:OS.field('f-acct'),subject:OS.field('f-subject')||'Support request',priority:OS.field('f-pri'),status:'open',created:OS.today()});OS.closeModal();OS.toast('Ticket opened');render();});
+}
+async function resolveTicket(id){await OS.patch('tickets',id,{status:'resolved'});OS.toast('Ticket resolved');render();}
+
+/* ---------- WIKI / POLICIES ---------- */
+async function vWiki(){
+  const rows=await OS.list('wiki');
+  OS.$('#view').innerHTML=`<div class="grid-2 eq">${rows.filter(w=>match(w.title,w.category)).map(w=>`
+    <div class="panel" style="--accent:var(--cyan)"><h3>${esc(w.title)}</h3>
+    <span class="tag t-blue" style="margin-bottom:12px;display:inline-block">${esc(w.category)}</span>
+    <p style="font-size:13.5px;line-height:1.8;color:var(--text)">${esc(w.body)}</p></div>`).join('')}</div>`;
+}
+async function vPolicies(){
+  const rows=await OS.list('policies');
+  OS.$('#view').innerHTML=`<div class="panel flush" style="--accent:var(--volley)"><h3 style="padding:24px 24px 0">Policy Registry</h3><div class="table-wrap"><table>
+    <tr><th>Policy</th><th>Version</th><th>Owner</th><th>Last Updated</th></tr>
+    ${rows.map(p=>`<tr><td><b>${esc(p.name)}</b></td><td><span class="tag t-blue">v${p.version}</span></td><td>${esc(p.owner)}</td><td>${p.updated}</td></tr>`).join('')}
+  </table></div></div>`;
+}
+
+/* ---------- NOTIFICATIONS ---------- */
+async function vNotifs(){
+  const rows=await OS.list('notifications');
+  OS.$('#view').innerHTML=`<div class="panel flush" style="--accent:var(--cyan)"><h3 style="padding:24px 24px 0">Notification Ledger — every outbound email/SMS <span class="right">status: sent | failed</span></h3><div class="table-wrap"><table>
+    <tr><th>Sent</th><th>Channel</th><th>To</th><th>Subject</th><th>Preview</th><th>Status</th></tr>
+    ${rows.filter(n=>match(n.to,n.subject)).map(n=>`<tr>
+      <td>${ago(n.sentAt)}</td><td><span class="tag t-blue">${n.channel}</span></td><td>${esc(n.to)}</td>
+      <td><b>${esc(n.subject)}</b></td><td><span class="sub" style="color:var(--text)">${esc(n.preview||'')}</span></td>
+      <td><span class="tag ${n.status==='sent'?'t-green':'t-red'}">${n.status}</span></td>
+    </tr>`).join('')}
+  </table></div></div>`;
+}
+
+/* ---------- CUSTOMERS · CRM ---------- */
+async function vCustomers(){
+  const [accounts,surveys,followUps,visitors,contacts]=await Promise.all([OS.list('accounts'),OS.list('surveys'),OS.list('followUps'),OS.list('crmVisitors'),OS.list('contacts')]);
+  const rated=surveys.filter(s=>s.status==='responded');
+  const avg=rated.length?(rated.reduce((s,x)=>s+x.rating,0)/rated.length).toFixed(1):'—';
+  const openFu=followUps.filter(f=>f.status==='open');
+  OS.$('#view').innerHTML=`
+  <div class="kpis">
+    <div class="kpi" style="--accent:var(--blue-hi)"><div class="lbl">Accounts</div><div class="val">${accounts.length}</div><div class="delta">in the CRM</div></div>
+    <div class="kpi" style="--accent:var(--orange)"><div class="lbl">Open follow-ups</div><div class="val">${openFu.length}</div><div class="delta" style="--c:var(--orange)">CRM Agent queue</div></div>
+    <div class="kpi" style="--accent:var(--yellow)"><div class="lbl">Survey score</div><div class="val">${avg}${avg!=='—'?'★':''}</div><div class="delta">${rated.length}/${surveys.length} responded</div></div>
+    <div class="kpi" style="--accent:var(--lime)"><div class="lbl">Chat visitors</div><div class="val">${visitors.length}</div><div class="delta" style="--c:var(--lime)">${visitors.filter(v=>v.leadId).length} became leads</div></div>
+  </div>
+  <div class="banner info" style="display:block">The <b>CRM Manager Agent</b> sends a survey after every completed job, issues the tax-correct invoice, and queues follow-ups for stale accounts and upcoming renewals.
+    <button class="btn btn-sm" style="margin-left:12px" onclick="runSweep()">▶ Run CRM Sweep</button></div>
+  <div class="grid-2 eq">
+  <div class="panel flush" style="--accent:var(--orange)"><h3 style="padding:24px 24px 0">Follow-up Queue</h3><div class="table-wrap"><table>
+    <tr><th>Account</th><th>Type</th><th>Note</th><th>Due</th><th>Status</th><th></th></tr>
+    ${followUps.filter(f=>match(f.account,f.note)).map(f=>`<tr>
+      <td><b>${esc(f.account)}</b></td><td><span class="tag ${f.type==='renewal'?'t-volley':'t-blue'}">${esc(f.type)}</span></td>
+      <td>${esc(f.note)}</td><td>${f.due||'—'}</td><td><span class="tag ${GEN(f.status)}">${f.status}</span></td>
+      <td>${f.status==='open'?`<button class="btn btn-sm btn-green" onclick="resolveFu('${f.id}')">Done</button>`:''}</td>
+    </tr>`).join('')||'<tr><td colspan="6" class="empty">Queue clear — run the CRM sweep to repopulate</td></tr>'}
+  </table></div></div>
+  <div class="panel flush" style="--accent:var(--yellow)"><h3 style="padding:24px 24px 0">Post-job Surveys</h3><div class="table-wrap"><table>
+    <tr><th>Account</th><th>Job</th><th>Sent</th><th>Status</th><th>Rating</th><th>Comment</th></tr>
+    ${surveys.map(s=>`<tr><td><b>${esc(s.account)}</b></td><td>${esc(s.job)}</td><td>${(s.sentAt||'').slice(0,10)}</td>
+      <td><span class="tag ${GEN(s.status)}">${s.status}</span></td>
+      <td>${s.rating?`<b style="color:var(--yellow)">${'★'.repeat(s.rating)}</b>`:'—'}</td><td>${esc(s.comment||'')}</td></tr>`).join('')||'<tr><td colspan="6" class="empty">No surveys yet — complete a job or run the sweep</td></tr>'}
+  </table></div></div>
+  </div>
+  <div class="panel flush" style="--accent:var(--lime)"><h3 style="padding:24px 24px 0">Website Chat — Visitors Captured by the AI Assistant</h3><div class="table-wrap"><table>
+    <tr><th>Visitor</th><th>Contact</th><th>City</th><th>Messages</th><th>Last seen</th><th>CRM</th></tr>
+    ${visitors.filter(v=>match(v.name,v.email,v.city)).map(v=>`<tr>
+      <td><b>${esc(v.name||'(not given yet)')}</b></td>
+      <td>${esc(v.email||'—')}${v.phone?`<span class="sub">${esc(v.phone)}</span>`:''}</td>
+      <td>${esc(v.city||'—')}</td><td>${v.messages}</td><td>${ago(v.lastSeen)}</td>
+      <td>${v.leadId?'<span class="tag t-green">lead created</span>':'<span class="tag t-yellow">capture pending</span>'}</td></tr>`).join('')||'<tr><td colspan="6" class="empty">No chat visitors captured yet</td></tr>'}
+  </table></div></div>
+  <div class="panel flush" style="--accent:var(--blue-hi)"><h3 style="padding:24px 24px 0">Accounts <span class="right"><button class="btn btn-sm btn-ghost" onclick="newAccount()">+ New Account</button></span></h3><div class="table-wrap"><table>
+    <tr><th>Account</th><th>City</th><th>Tier</th><th>Health</th><th>Renewal</th><th>Contacts</th></tr>
+    ${accounts.filter(a=>match(a.name,a.city)).map(a=>`<tr>
+      <td><b>${esc(a.name)}</b><span class="sub">${esc(a.goal||'')}</span></td><td>${esc(a.city||'—')}</td>
+      <td><span class="tag ${a.tier==='A'?'t-hot':'t-blue'}">${a.tier||'—'}</span></td>
+      <td><span class="hdot h-${a.health||'green'}">${a.health||'green'}</span></td>
+      <td>${a.renewal||'—'}</td><td>${contacts.filter(c=>c.accountId===a.id).length}</td></tr>`).join('')}
+  </table></div></div>`;
+}
+async function runSweep(){const r=await OS.crmSweepNow();OS.toast(`CRM sweep: ${r.surveysSent} survey(s), ${r.invoicesSent} invoice(s), ${r.followUpsCreated} follow-up(s)`);render();}
+async function resolveFu(id){await OS.patch('followUps',id,{status:'done'});OS.toast('Follow-up completed');render();}
+function newAccount(){
+  OS.openModal('New Account',`<label>Name</label><input id="f-name"><label>City</label><input id="f-city" placeholder="Nashville, TN"><label>Tier</label><select id="f-tier"><option>A</option><option selected>B</option><option>C</option></select><label>Goal</label><input id="f-goal">`);
+  OS.onModalSave(async()=>{await OS.create('accounts',{name:OS.field('f-name')||'New Account',city:OS.field('f-city')||'Memphis, TN',tier:OS.field('f-tier'),goal:OS.field('f-goal')});OS.closeModal();OS.toast('Account added');render();});
+}
+
+/* ---------- EMPLOYEES ---------- */
+async function vEmployees(){
+  const [employees,timeEntries,payouts,onb]=await Promise.all([OS.list('employees'),OS.list('timeEntries'),OS.list('payouts'),OS.list('employeeOnboardings')]);
+  const since=OS.addDays(-14);
+  const pendP=payouts.filter(p=>p.status==='pending');
+  OS.$('#view').innerHTML=`
+  <div class="kpis">
+    <div class="kpi" style="--accent:var(--blue-hi)"><div class="lbl">Contractors</div><div class="val">${employees.length}</div><div class="delta">${employees.filter(e=>e.w9Signed).length} dispatchable (W-9 ✓)</div></div>
+    <div class="kpi" style="--accent:var(--cyan)"><div class="lbl">Hours · 14d</div><div class="val">${timeEntries.filter(t=>t.date>=since).reduce((s,t)=>s+t.hours,0)}</div><div class="delta">this pay period</div></div>
+    <div class="kpi" style="--accent:var(--orange)"><div class="lbl">Pending payouts</div><div class="val">${fmt(pendP.reduce((s,p)=>s+p.amount,0))}</div><div class="delta" style="--c:var(--orange)">${pendP.length} awaiting payment</div></div>
+    <div class="kpi" style="--accent:var(--lime)"><div class="lbl">Onboarding</div><div class="val">${onb.filter(o=>o.status!=='complete').length}</div><div class="delta" style="--c:var(--lime)">active tracks</div></div>
+  </div>
+  <div class="panel flush" style="--accent:var(--blue-hi)"><h3 style="padding:24px 24px 0">Team — 1099 contractor roster <span class="right"><button class="btn btn-sm" onclick="runPayroll()">▶ Run Payroll (14d)</button></span></h3><div class="table-wrap"><table>
+    <tr><th>Name</th><th>Role</th><th>Type</th><th>W-9</th><th>Rating</th><th>Availability</th><th>Hours · 14d</th><th>Skills</th></tr>
+    ${employees.filter(e=>match(e.name,e.role)).map(e=>{const h=timeEntries.filter(t=>t.employeeId===e.id&&t.date>=since).reduce((s,t)=>s+t.hours,0);return `<tr>
+      <td><b>${esc(e.name)}</b></td><td>${esc(e.role)}</td><td><span class="tag t-blue">${e.type}</span></td>
+      <td>${e.w9Signed?'<span class="tag t-green">signed</span>':'<span class="tag t-red">pending</span>'}</td>
+      <td><b style="color:var(--yellow)">${e.rating}★</b></td><td>${esc(e.availability)}</td><td><b>${h}h</b></td>
+      <td><span class="sub">${esc((e.skills||[]).join(', '))}</span></td></tr>`;}).join('')}
+  </table></div></div>
+  <div class="panel flush" style="--accent:var(--orange)"><h3 style="padding:24px 24px 0">Contractor Payouts — Stripe transfer rail</h3><div class="table-wrap"><table>
+    <tr><th>Contractor</th><th>Period</th><th>Hours</th><th>Rate</th><th>Amount</th><th>Status</th><th>Transfer</th><th></th></tr>
+    ${payouts.map(p=>`<tr>
+      <td><b>${esc(p.employee)}</b></td><td>${p.periodStart} → ${p.periodEnd}</td><td>${p.hours}h</td><td>$${p.rate}/h</td>
+      <td><b>${fmt(p.amount)}</b></td><td><span class="tag ${p.status==='paid'?'t-green':'t-yellow'}">${p.status}</span></td>
+      <td><span class="sub">${esc(p.transferRef||p.method||'—')}</span></td>
+      <td>${p.status==='pending'?`<button class="btn btn-sm btn-green" onclick="payOut('${p.id}')">Pay Now</button>`:''}</td></tr>`).join('')||'<tr><td colspan="8" class="empty">No payouts yet — run payroll to aggregate this period’s time entries</td></tr>'}
+  </table></div></div>
+  <div class="panel flush" style="--accent:var(--volley)"><h3 style="padding:24px 24px 0">Onboarding Tracks</h3><div class="table-wrap"><table>
+    <tr><th>Hire</th><th>Role</th><th>Start</th><th>Progress</th><th>Status</th></tr>
+    ${onb.map(o=>`<tr><td><b>${esc(o.name)}</b></td><td>${esc(o.role)}</td><td>${o.startDate}</td>
+      <td><div class="bar-track" style="width:130px;display:inline-block;vertical-align:middle"><div class="bar-fill" style="width:${o.progress||0}%;background:linear-gradient(90deg,var(--blue-hi),var(--cyan))"></div></div> <span class="sub">${o.stepsDone||0}/${o.stepsTotal||0}</span></td>
+      <td><span class="tag ${GEN(o.status)}">${o.status}</span></td></tr>`).join('')||'<tr><td colspan="5" class="empty">No onboarding tracks</td></tr>'}
+  </table></div></div>`;
+}
+async function runPayroll(){const r=await OS.runPayrollNow();OS.toast(r.created?`Payroll run: ${r.created} payout(s) created`:'No unpaid time entries this period');render();}
+async function payOut(id){const r=await OS.payPayoutNow(id);if(r.error){OS.toast(r.error);return}OS.toast(`Paid ${r.employee} ${fmt(r.amount)} (${r.transferRef})`);render();}
+
+
+/* ---------- HIRING PIPELINE ---------- */
+async function vHiring(){
+  let pkgs, interviews, applicants;
+  if(OS.isLive()){ const h=await OS.raw('/api/hiring'); pkgs=h.packages||[]; interviews=h.interviews||[]; applicants=h.applicants||[]; }
+  else { pkgs=OS.cur('hirePackages')||[]; interviews=OS.cur('interviews')||[]; applicants=await OS.list('applicants'); }
+  const STAGE=s=>({sent:'t-blue',returned:'t-yellow','interview-scheduled':'t-green',hired:'t-green',rejected:'t-red'}[s]||'t-blue');
+  OS.$('#view').innerHTML=`
+  <div class="banner info" style="display:block">The <b>Hiring & Onboarding Agent</b> e-mails every approved applicant a state-correct e-sign packet (W-4, I-9, W-9, direct deposit, offer letter, safety agreement). When the signed packet comes back it is stored in the database and the agent books the video interview, puts it on the calendar, and notifies this dashboard.</div>
+  <div class="kpis">
+    <div class="kpi" style="--accent:var(--blue-hi)"><div class="lbl">Packets sent</div><div class="val">${pkgs.length}</div><div class="delta">awaiting signature: ${pkgs.filter(p=>p.status==='sent').length}</div></div>
+    <div class="kpi" style="--accent:var(--yellow)"><div class="lbl">Returned signed</div><div class="val">${pkgs.filter(p=>p.status==='returned').length}</div><div class="delta" style="--c:var(--yellow)">stored in database</div></div>
+    <div class="kpi" style="--accent:var(--lime)"><div class="lbl">Interviews</div><div class="val">${interviews.filter(i=>i.status==='scheduled').length}</div><div class="delta" style="--c:var(--lime)">scheduled</div></div>
+    <div class="kpi" style="--accent:var(--cyan)"><div class="lbl">Applicants</div><div class="val">${applicants.length}</div><div class="delta">in pipeline</div></div>
+  </div>
+  <div class="panel flush" style="--accent:var(--blue-hi)"><h3 style="padding:24px 24px 0">E-Sign Packets — new-hire paperwork</h3><div class="table-wrap"><table>
+    <tr><th>Hire</th><th>Position</th><th>Documents</th><th>Sent</th><th>Status</th><th>Signed Packet</th></tr>
+    ${pkgs.filter(p=>match(p.name,p.position)).map(p=>`<tr>
+      <td><b>${esc(p.name)}</b><span class="sub">${esc(p.email||'')}</span></td><td>${esc(p.position||'—')}</td>
+      <td><span class="sub">${(p.docs||[]).map(d=>esc(d.name||d)).join(' · ')}</span></td>
+      <td>${esc(p.sentAt?String(p.sentAt).slice(0,10):'—')}</td>
+      <td><span class="tag ${STAGE(p.status)}">${esc(p.status)}</span></td>
+      <td>${p.signedDocs?`<span class="tag t-green">stored (${p.signedDocs.length} docs)</span>`:'<span class="sub">—</span>'}</td></tr>`).join('')||'<tr><td colspan="6" class="empty">No packets yet — approve an applicant in Sales → Applicants and the agent sends the packet automatically</td></tr>'}
+  </table></div></div>
+  <div class="panel flush" style="--accent:var(--lime)"><h3 style="padding:24px 24px 0">Video Interviews — auto-scheduled on packet return</h3><div class="table-wrap"><table>
+    <tr><th>Candidate</th><th>Position</th><th>When</th><th>Link</th><th>Status</th><th></th></tr>
+    ${interviews.map(iv=>`<tr>
+      <td><b>${esc(iv.applicant||iv.name||'')}</b></td><td>${esc(iv.position||'—')}</td>
+      <td><b>${esc(String(iv.when||'').replace('T',' ').slice(0,16))}</b></td>
+      <td>${iv.link?`<a href="${esc(iv.link)}" target="_blank" style="color:var(--cyan)">join call ↗</a>`:'—'}</td>
+      <td><span class="tag ${GEN(iv.status)}">${esc(iv.status)}</span></td>
+      <td style="white-space:nowrap">${iv.status==='scheduled'?`
+        <button class="btn btn-sm btn-green" onclick="ivDecide('${iv.id}','completed')">Done</button>
+        <button class="btn btn-sm btn-danger" onclick="ivDecide('${iv.id}','cancelled')">Cancel</button>`:''}</td></tr>`).join('')||'<tr><td colspan="6" class="empty">No interviews scheduled</td></tr>'}
+  </table></div></div>`;
+}
+async function ivDecide(id,status){await OS.patch('interviews',id,{status});OS.toast(`Interview ${status}`);render();}
+
+/* ---------- AFFILIATES ---------- */
+async function vAffiliates(){
+  let affs, commissions;
+  if(OS.isLive()){ affs=await OS.raw('/api/affiliates'); commissions=await OS.list('commissions'); }
+  else { affs=(OS.cur('affiliates')||[]).map(af=>({...af,ledger:(OS.cur('commissions')||[]).filter(c=>c.affiliateId===af.id)})); commissions=OS.cur('commissions')||[]; }
+  const pendC=commissions.filter(c=>c.status==='pending').reduce((s,c)=>s+c.amount,0);
+  const paidC=commissions.filter(c=>c.status==='paid').reduce((s,c)=>s+c.amount,0);
+  OS.$('#view').innerHTML=`
+  <div class="banner info" style="display:block">Partners earn a cut of every completed job they refer. Rates are editable per partner below — the program-wide default & recommended rate live in <b>Settings → Affiliate Program</b> and power the public <a href="partners.html" style="color:var(--cyan)">Earn With Us</a> page. Payout requests route through <b>Approvals</b>.</div>
+  <div class="kpis">
+    <div class="kpi" style="--accent:var(--cyan)"><div class="lbl">Active partners</div><div class="val">${affs.filter(a=>a.status==='active').length}</div><div class="delta">${affs.length} total</div></div>
+    <div class="kpi" style="--accent:var(--yellow)"><div class="lbl">Pending commissions</div><div class="val">${fmt(pendC)}</div><div class="delta" style="--c:var(--yellow)">owed on completion</div></div>
+    <div class="kpi" style="--accent:var(--lime)"><div class="lbl">Paid out</div><div class="val">${fmt(paidC)}</div><div class="delta" style="--c:var(--lime)">lifetime</div></div>
+    <div class="kpi" style="--accent:var(--orange)"><div class="lbl">Applications</div><div class="val">${affs.filter(a=>a.status==='applied').length}</div><div class="delta" style="--c:var(--orange)">awaiting review</div></div>
+  </div>
+  <div class="panel flush" style="--accent:var(--cyan)"><h3 style="padding:24px 24px 0">Partner Roster</h3><div class="table-wrap"><table>
+    <tr><th>Partner</th><th>Code</th><th>Type</th><th>Rate %</th><th>Pipeline</th><th>Earned</th><th>Status</th><th></th></tr>
+    ${affs.filter(a=>match(a.name,a.code,a.email)).map(af=>{
+      const lg=commissions.filter(c=>c.affiliateId===af.id);
+      const earned=lg.reduce((s,c)=>s+c.amount,0);
+      const refs=af.referrals!==undefined?af.referrals:((af.stats&&af.stats.referrals)!==undefined?af.stats.referrals:'—');
+      return `<tr>
+      <td><b>${esc(af.name)}</b><span class="sub">${esc(af.email||'')}</span></td>
+      <td><span class="tag t-blue">${esc(af.code)}</span></td><td>${esc(af.type)}</td>
+      <td><input type="number" min="0" max="50" step="0.5" value="${af.pct??''}" placeholder="default" style="width:70px;padding:6px 8px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);border-radius:8px;color:#fff" onchange="affSetPct('${af.id}',this.value)"></td>
+      <td><b>${refs}</b></td><td><b>${fmt(earned)}</b></td>
+      <td><span class="tag ${GEN(af.status)}">${esc(af.status)}</span></td>
+      <td style="white-space:nowrap">${af.status==='applied'?`<button class="btn btn-sm btn-green" onclick="affAct('${af.id}','approve')">Approve</button>`:''}
+        ${af.status==='active'?`<button class="btn btn-sm btn-danger" onclick="affAct('${af.id}','suspend')">Suspend</button>`:''}
+        ${af.status==='suspended'?`<button class="btn btn-sm btn-green" onclick="affAct('${af.id}','approve')">Reinstate</button>`:''}</td></tr>`;}).join('')||'<tr><td colspan="8" class="empty">No partners yet — share the Earn With Us page</td></tr>'}
+  </table></div></div>
+  <div class="panel flush" style="--accent:var(--yellow)"><h3 style="padding:24px 24px 0">Commission Ledger</h3><div class="table-wrap"><table>
+    <tr><th>Partner</th><th>Job</th><th>Rate</th><th>Amount</th><th>Status</th><th>Created</th></tr>
+    ${commissions.map(c=>`<tr><td><b>${esc(c.affiliate||c.affiliateId)}</b></td><td>${esc(c.job||c.jobId||'—')}</td>
+      <td>${c.pct}%</td><td><b>${fmt(c.amount)}</b></td>
+      <td><span class="tag ${c.status==='paid'?'t-green':c.status==='pending'?'t-yellow':'t-blue'}">${esc(c.status)}</span></td>
+      <td><span class="sub">${esc(String(c.created||'').slice(0,10))}</span></td></tr>`).join('')||'<tr><td colspan="6" class="empty">No commissions yet</td></tr>'}
+  </table></div></div>`;
+}
+async function affAct(id,action){
+  if(OS.isLive()){ await OS.raw(`/api/affiliates/${id}/${action}`,{method:'POST',body:'{}'}); }
+  else { await OS.patch('affiliates',id,{status:action==='approve'?'active':'suspended'}); }
+  OS.toast(`Partner ${action==='approve'?'approved':'suspended'}`);render();
+}
+async function affSetPct(id,v){const pct=v===''?null:+v;await OS.patch('affiliates',id,{pct});OS.toast(pct===null?'Rate reset to program default':`Partner rate set to ${pct}%`);}
+
+/* ---------- INTEGRATIONS ---------- */
+async function vIntegrations(){
+  const ig=await OS.getIntegrations();
+  const qb=ig.quickbooks, st=ig.stripe;
+  OS.$('#view').innerHTML=`
+  <div class="grid-2 eq">
+  <div class="panel" style="--accent:var(--green)"><h3>QuickBooks — Sales Tax</h3>
+    <p style="font-size:13.5px;color:var(--text-dim);line-height:1.7;margin-bottom:14px">When connected, QuickBooks is the source of truth for sales-tax rates on quotes and invoices; the built-in 16-state table is the fallback and every quote carries the estimate disclaimer.</p>
+    <div class="table-wrap" style="margin-bottom:16px"><table>
+      <tr><td>Status</td><td><span class="tag ${qb.connected?'t-green':'t-grey'}">${qb.connected?'connected ('+esc(qb.environment)+')':'not connected — simulated'}</span></td></tr>
+      <tr><td>Realm ID</td><td>${esc(qb.realmId||'—')}</td></tr>
+      <tr><td>Tax sync</td><td>${qb.syncTax?'on':'off'}</td></tr>
+      <tr><td>Last sync</td><td>${qb.lastSync?ago(qb.lastSync):'never'}</td></tr>
+    </table></div>
+    ${qb.connected
+      ?`<button class="btn btn-sm" onclick="qbSync()">↻ Sync Tax Rates</button> <button class="btn btn-sm btn-danger" onclick="qbDisconnect()">Disconnect</button>`
+      :`<button class="btn btn-sm" onclick="qbConnect()">Connect QuickBooks (sandbox)</button>`}
+    <p style="font-size:12px;color:var(--text-dim);margin-top:14px;line-height:1.6">OAuth handshake is simulated in this build — drop real Intuit app keys in production to exchange tokens.</p>
+  </div>
+  <div class="panel" style="--accent:var(--volley)"><h3>Stripe — Account Monitoring &amp; Payouts</h3>
+    <p style="font-size:13.5px;color:var(--text-dim);line-height:1.7;margin-bottom:14px">Powers the Financial Watchdog (odd-behavior alerts), the P&L account feed, and contractor payout transfers. Secret key is read from the <code style="color:var(--cyan)">STRIPE_SECRET_KEY</code> env var only — never stored.</p>
+    <div class="table-wrap" style="margin-bottom:16px"><table>
+      <tr><td>Status</td><td><span class="tag ${st.connected?'t-green':'t-grey'}">${st.connected?'connected':'not connected — simulated feed'}</span></td></tr>
+      <tr><td>Secret key</td><td>${st.secretKeySet?'<span class="tag t-green">live — from env</span>':'<span class="tag t-yellow">not set — simulated</span>'}</td></tr>
+      <tr><td>Last sync</td><td>${st.lastSync?ago(st.lastSync):'never'}</td></tr>
+    </table></div>
+    ${st.connected
+      ?`<button class="btn btn-sm btn-danger" onclick="stDisconnect()">Disconnect</button>`
+      :`<button class="btn btn-sm" onclick="stConnect()">Connect Stripe</button>`}
+    <p style="font-size:12px;color:var(--text-dim);margin-top:14px;line-height:1.6">Live account feed activates automatically when the secret key is present. See Finance → Watchdog for alerts and Finance → Payouts for transfers.</p>
+  </div>
+  </div>
+  <div class="panel flush" style="--accent:var(--cyan)"><h3 style="padding:24px 24px 0">Tax Rate Table — estimated combined state + local (used until QuickBooks syncs)</h3><div class="table-wrap"><table>
+    <tr><th>State</th><th>Rate</th><th>State</th><th>Rate</th></tr>
+    ${ig.taxRates.reduce((rows,t,i,arr)=>{if(i%2===0)rows.push([t,arr[i+1]]);return rows},[]).map(([a,b])=>`<tr><td>${esc(a.name)}</td><td><b>${a.rate}%</b></td>${b?`<td>${esc(b.name)}</td><td><b>${b.rate}%</b></td>`:'<td></td><td></td>'}</tr>`).join('')}
+  </table></div></div>`;
+}
+async function qbConnect(){await OS.integrationAction('quickbooks','connect',{environment:'sandbox'});OS.toast('QuickBooks connected (sandbox)');render();}
+async function qbDisconnect(){await OS.integrationAction('quickbooks','disconnect');OS.toast('QuickBooks disconnected');render();}
+async function qbSync(){const r=await OS.integrationAction('quickbooks','sync-taxes');OS.toast(`Tax sync complete — ${r.synced} state rates verified`);render();}
+async function stConnect(){await OS.integrationAction('stripe','connect',{publishableKey:''});OS.toast('Stripe connected — set STRIPE_SECRET_KEY for the live feed');render();}
+async function stDisconnect(){await OS.integrationAction('stripe','disconnect');OS.toast('Stripe disconnected');render();}
+
+
+/* ---------- FIELD MAP (live crew location, work hours only) ---------- */
+async function vField(){
+  let rows;
+  if(OS.isLive()){ try{ rows=await OS.raw('/api/locations'); }catch(e){ rows=null; } }
+  if(!rows){ // demo fallback
+    const emps=await OS.list('employees');
+    rows=emps.map((e,i)=>({employeeId:e.id,name:e.name,role:e.role,consent:i<2,clockedIn:i===0,
+      last:i===0?{lat:35.1296,lng:-89.9591,at:new Date().toISOString()}:null,
+      today:{pings:i===0?14:0,totalMin:i===0?70:0,onsiteMin:i===0?55:0},
+      assignedJob:'MSCS — Gym Refresh (3 gyms)'}));
+  }
+  const jobs=(await OS.list('jobs')).filter(j=>j.siteLat&&j.siteLng);
+  // equirectangular projection around data centroid
+  const pts=[...rows.filter(r=>r.last).map(r=>r.last),...jobs.map(j=>({lat:j.siteLat,lng:j.siteLng}))];
+  const cLat=pts.length?pts.reduce((s,p)=>s+p.lat,0)/pts.length:35.05, cLng=pts.length?pts.reduce((s,p)=>s+p.lng,0)/pts.length:-89.94;
+  const W=900,H=420,PAD=46;
+  const span=Math.max(0.02,...pts.map(p=>Math.max(Math.abs(p.lat-cLat),Math.abs(p.lng-cLng)*1.25)))*2.3;
+  const X=lng=>PAD+((lng-cLng)/span+0.5)*(W-2*PAD), Y=lat=>PAD+(0.5-(lat-cLat)/span)*(H-2*PAD);
+  const svg=`<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;display:block">
+    <rect width="${W}" height="${H}" fill="rgba(10,21,51,.55)"/>
+    ${Array.from({length:9},(_,i)=>`<line x1="${i*W/8}" y1="0" x2="${i*W/8}" y2="${H}" stroke="rgba(120,145,205,.08)"/>`).join('')}
+    ${Array.from({length:6},(_,i)=>`<line x1="0" y1="${i*H/5}" x2="${W}" y2="${i*H/5}" stroke="rgba(120,145,205,.08)"/>`).join('')}
+    ${jobs.map(j=>`<rect x="${X(j.siteLng)-5}" y="${Y(j.siteLat)-5}" width="10" height="10" fill="none" stroke="#57c7ff" stroke-width="1.6" transform="rotate(45 ${X(j.siteLng)} ${Y(j.siteLat)})"><title>${esc(j.title)} — ${esc(j.account)}</title></rect>`).join('')}
+    ${rows.filter(r=>r.last).map(r=>`<g><circle cx="${X(r.last.lng)}" cy="${Y(r.last.lat)}" r="14" fill="rgba(63,174,90,.15)"/><circle cx="${X(r.last.lng)}" cy="${Y(r.last.lat)}" r="6" fill="${r.clockedIn?'#7ad892':'#7e8cab'}" stroke="#04060d" stroke-width="2"><title>${esc(r.name)} — ${ago(r.last.at)}</title></circle><text x="${X(r.last.lng)+11}" y="${Y(r.last.lat)+4}" fill="#c6d0e6" font-size="11" font-weight="700">${esc(r.name.split(' ')[0])}</text></g>`).join('')}
+    <text x="${PAD}" y="${H-14}" fill="#7e8cab" font-size="10.5">◇ job site &nbsp;&nbsp; ● tech (green = clocked in) · work-hours data only · pings retained 90 days</text>
+  </svg>`;
+  OS.$('#view').innerHTML=`
+  <div class="banner info" style="display:block">Live crew positions <b>while clocked in only</b>. Consent is required before any ping is accepted; off-the-clock location is never recorded. ${OS.isLive()?'' :'<b>Demo data</b> — connect the server for live positions.'}</div>
+  <div class="kpis">
+    <div class="kpi" style="--accent:var(--lime)"><div class="lbl">Clocked in now</div><div class="val">${rows.filter(r=>r.clockedIn).length}</div><div class="delta">of ${rows.length} techs</div></div>
+    <div class="kpi" style="--accent:var(--cyan)"><div class="lbl">Consented</div><div class="val">${rows.filter(r=>r.consent).length}</div><div class="delta">signed location consent</div></div>
+    <div class="kpi" style="--accent:var(--blue-hi)"><div class="lbl">On-site min today</div><div class="val">${rows.reduce((s,r)=>s+(r.today?.onsiteMin||0),0)}</div><div class="delta">within 150 m of a job site</div></div>
+    <div class="kpi" style="--accent:var(--yellow)"><div class="lbl">Pings today</div><div class="val">${rows.reduce((s,r)=>s+(r.today?.pings||0),0)}</div><div class="delta">auto-purged after 90 days</div></div>
+  </div>
+  <div class="panel flush" style="--accent:var(--cyan)"><h3 style="padding:24px 24px 0">Territory map — Memphis metro</h3><div style="padding:10px 14px 18px">${svg}</div></div>
+  <div class="panel flush" style="--accent:var(--blue-hi);margin-top:22px"><h3 style="padding:24px 24px 0">Tech status — work-hours detail</h3><div class="table-wrap"><table>
+    <tr><th>Tech</th><th>Consent</th><th>Clock</th><th>Last ping</th><th>Today tracked</th><th>On-site</th><th>Assigned job</th></tr>
+    ${rows.map(r=>`<tr>
+      <td><b>${esc(r.name)}</b><br><span class="sub">${esc(r.role||'')}</span></td>
+      <td>${r.consent?'<span class="tag t-green">signed</span>':'<span class="tag t-red">missing</span>'}</td>
+      <td>${r.clockedIn?'<span class="tag t-lime">clocked in</span>':'<span class="tag t-blue">off clock</span>'}</td>
+      <td>${r.last?ago(r.last.at):'<span class="sub">never</span>'}</td>
+      <td>${r.today?r.today.totalMin:0} min <span class="sub">(${r.today?r.today.pings:0} pings)</span></td>
+      <td><b>${r.today?r.today.onsiteMin:0} min</b></td>
+      <td>${esc(r.assignedJob||'—')}</td></tr>`).join('')}
+  </table></div></div>`;
+}
+
+/* ---------- PAYROLL (admin-visible progress of the whole process) ---------- */
+async function vPayroll(){
+  let data;
+  if(OS.isLive()){ try{ data=await OS.raw('/api/payroll'); }catch(e){ data=null; } }
+  if(!data){ // demo fallback
+    const emps=await OS.list('employees');const tes=await OS.list('timeEntries');
+    const since=OS.addDays(-14);
+    const rows=emps.map(e=>{const mine=tes.filter(t=>t.employeeId===e.id&&t.date>=since);
+      const hours=mine.reduce((s,t)=>s+t.hours,0);const app=mine.filter(t=>t.approved).reduce((s,t)=>s+t.hours,0);
+      const reg=Math.min(hours,40),ot=Math.max(0,hours-40);
+      return{employeeId:e.id,employee:e.name,rate:22,hours,approvedHours:app,pendingHours:hours-app,regular:reg,overtime:ot,
+        amount:Math.round(reg*22+ot*33),ready:hours===0||app===hours,onsiteTodayMin:55,trackedTodayMin:70};});
+    data={summary:{periodStart:since,periodEnd:new Date().toISOString().slice(0,10),settings:{payoutDay:'Friday'},rows,totalReady:rows.filter(r=>r.ready).reduce((s,r)=>s+r.amount,0)},runs:[],payouts:[]};
+  }
+  const S=data.summary,rows=S.rows||[];
+  const pend=rows.filter(r=>r.pendingHours>0);
+  OS.$('#view').innerHTML=`
+  <div class="banner info" style="display:block">Pay period <b>${S.periodStart}</b> → <b>${S.periodEnd}</b> · payout every <b>${esc(S.settings?.payoutDay||'Friday')}</b>. Every step is visible: clock-in → location-verified hours → your approval → payout. ${OS.isLive()?'':'<b>Demo data.</b>'}</div>
+  <div class="kpis">
+    <div class="kpi" style="--accent:var(--blue-hi)"><div class="lbl">Total hours</div><div class="val">${rows.reduce((s,r)=>s+r.hours,0)}</div><div class="delta">this period</div></div>
+    <div class="kpi" style="--accent:var(--lime)"><div class="lbl">Ready to pay</div><div class="val">${fmt(S.totalReady||0)}</div><div class="delta">${rows.filter(r=>r.ready&&r.hours>0).length} techs approved</div></div>
+    <div class="kpi" style="--accent:var(--yellow)"><div class="lbl">Hours awaiting approval</div><div class="val">${pend.reduce((s,r)=>s+r.pendingHours,0)}</div><div class="delta" style="--c:var(--yellow)">${pend.length} techs pending</div></div>
+    <div class="kpi" style="--accent:var(--cyan)"><div class="lbl">Payroll runs</div><div class="val">${(data.runs||[]).length}</div><div class="delta">history below</div></div>
+  </div>
+  <div class="panel flush" style="--accent:var(--lime)"><h3 style="padding:24px 24px 0">This period — per-tech progress
+    <span class="right"><button class="btn btn-sm" onclick="payrollRun()">▶ Run Payroll</button></span></h3><div class="table-wrap"><table>
+    <tr><th>Tech</th><th>Hours</th><th>Reg / OT</th><th>Rate</th><th>On-site today</th><th>Amount</th><th>Status</th><th></th></tr>
+    ${rows.map(r=>`<tr>
+      <td><b>${esc(r.employee)}</b></td>
+      <td><b>${r.hours}</b>${r.pendingHours?` <span class="sub">(${r.pendingHours} pending)</span>`:''}</td>
+      <td>${r.regular} / ${r.overtime}</td><td>${fmt(r.rate)}/h</td>
+      <td>${r.onsiteTodayMin||0} min <span class="sub">of ${r.trackedTodayMin||0} tracked</span></td>
+      <td><b>${fmt(r.amount)}</b></td>
+      <td>${r.ready?'<span class="tag t-green">ready</span>':'<span class="tag t-yellow">needs approval</span>'}</td>
+      <td>${r.pendingHours?`<button class="btn btn-sm" onclick="payrollApprove('${r.employeeId}')">Approve ${r.pendingHours}h</button>`:''}</td></tr>`).join('')||'<tr><td colspan="8" class="sub">No time entries this period.</td></tr>'}
+  </table></div>
+  <p style="font-size:12px;color:var(--text-dim);padding:12px 24px 20px;line-height:1.6">Hours come from crew clock in/out in the portal. On-site minutes are computed from consented, clocked-in location pings within 150 m of the job site — cross-check before approving. Approving hours unlocks the payroll run.</p></div>
+  <div class="panel flush" style="--accent:var(--cyan);margin-top:22px"><h3 style="padding:24px 24px 0">Payroll history</h3><div class="table-wrap"><table>
+    <tr><th>Run</th><th>Period</th><th>Techs</th><th>Total</th><th>Created</th></tr>
+    ${(data.runs||[]).map(r=>`<tr><td><b>${esc(r.id)}</b></td><td>${esc(r.periodStart)} → ${esc(r.periodEnd)}</td><td>${(r.rows||[]).length}</td><td><b>${fmt(r.total||0)}</b></td><td>${ago(r.createdAt)}</td></tr>`).join('')||'<tr><td colspan="5" class="sub">No payroll runs yet — approve hours above, then Run Payroll.</td></tr>'}
+  </table></div></div>`;
+}
+async function payrollApprove(empId){
+  if(OS.isLive()){ try{ await OS.raw('/api/payroll/approve-hours',{method:'POST',body:JSON.stringify({employeeId:empId})}); OS.toast('Hours approved'); render(); return; }catch(e){ OS.toast('Approve failed: '+e.message); return; } }
+  OS.toast('Demo mode — connect the server to approve hours');
+}
+async function payrollRun(){
+  if(OS.isLive()){ try{ const r=await OS.raw('/api/payroll/run',{method:'POST',body:'{}'});
+    if(r.error){OS.toast(r.error+(r.notReady?': '+r.notReady.join(', '):''))}else{OS.toast('Payroll run created — $'+(r.run&&r.run.total||0).toLocaleString());}
+    render(); return; }catch(e){ OS.toast('Run failed: '+e.message); return; } }
+  OS.toast('Demo mode — connect the server to run payroll');
+}
+
+/* ---------- SETTINGS ---------- */async function vSettings(){
+  const s=await OS.get('settings');
+  const aiP=await OS.aiApi('providers'),aiR=await OS.aiApi('routing'),aiU=await OS.aiApi('usage'),aiS=await OS.aiApi('setup');
+  const usageOf=id=>((aiU.byProvider||{})[id])||{requests:0,tokens:0,errors:0};
+  const provOpts=sel=>'<option value="">—</option>'+(aiR.providers||[]).map(p=>'<option value="'+p.id+'"'+(sel===p.id?' selected':'')+'>'+esc(p.name)+(p.hasKey?'':' (no key)')+'</option>').join('');
+  const presetOpts=(aiP.presets||[]).map(p=>'<option value="'+p.id+'">'+esc(p.name)+(p.free?' (free)':'')+'</option>').join('');
+  const q1=s=>"'",q2=s=>"'";
+  const aiCards=(aiP.providers||[]).map(p=>{
+    const u=usageOf(p.id);
+    return '<div class="panel" style="--accent:'+(p.free?'var(--lime)':'var(--blue-hi)')+';margin-bottom:12px"><div style="display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap"><div><b>'+esc(p.name)+'</b> <span style="font-size:11px;color:var(--text-dim)">'+esc(p.type)+'</span> '
+      +(p.free?' <span style="font-size:10px;background:var(--lime);color:#04060d;padding:2px 7px;border-radius:99px;font-weight:700">FREE</span>':'')
+      +(p.isDefault?' <span style="font-size:10px;background:var(--blue-hi);color:#04060d;padding:2px 7px;border-radius:99px;font-weight:700">DEFAULT</span>':'')
+      +(p.enabled?'':' <span style="font-size:10px;background:var(--orange);color:#04060d;padding:2px 7px;border-radius:99px;font-weight:700">OFF</span>')
+      +'</div><div style="display:flex;gap:8px;align-items:center"><button class="btn sm" onclick="testAiProvider(&quot;'+p.id+'&quot;)">Test</button>'
+      +(p.isDefault?'':'<button class="btn sm" onclick="setAiDefault(&quot;'+p.id+'&quot;)">Make default</button>')
+      +'<button class="btn sm ghost" onclick="delAiProvider(&quot;'+p.id+'&quot;)">Delete</button></div></div>'
+      +'<div style="display:grid;grid-template-columns:2fr 2fr 1fr 1fr;gap:10px;margin-top:10px;align-items:end">'
+      +'<div><label style="display:block;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--text-dim);margin:0 0 7px">API key</label><input class="search" id="ai-key-'+p.id+'" value="'+esc(p.keyMasked||'')+'" placeholder="'+(p.hasKey?'•••• (saved — paste to replace)':'paste key')+'"></div>'
+      +'<div><label style="display:block;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--text-dim);margin:0 0 7px">Models</label><input class="search" id="ai-models-'+p.id+'" value="'+esc((p.models||[]).join(', '))+'"></div>'
+      +'<div><label style="display:block;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--text-dim);margin:0 0 7px">Req/min</label><input class="search" id="ai-rpm-'+p.id+'" type="number" min="1" value="'+(p.rpm||60)+'"></div>'
+      +'<div style="display:flex;gap:12px;align-items:center;padding-bottom:8px"><label style="font-size:12px;display:flex;gap:5px;align-items:center"><input type="checkbox" id="ai-en-'+p.id+'"'+(p.enabled?' checked':'')+'> on</label><button class="btn sm" onclick="saveAiProvider(&quot;'+p.id+'&quot;)">Save</button></div></div>'
+      +'<div style="font-size:11.5px;color:var(--text-dim);margin-top:6px">'+esc(p.baseUrl||'')+' · today: '+u.requests+' req · '+u.tokens+' tok · '+u.errors+' err</div>'
+      +(p.note?'<div style="font-size:11.5px;color:var(--orange);margin-top:4px">'+esc(p.note)+'</div>':'')
+      +'</div>';
+  }).join('');
+  const aiRouteRows=(aiR.agents||[]).map(a=>{const r=(aiR.routing||{})[a.key]||{mode:'auto'};
+    return '<tr><td style="font-size:12.5px">'+esc(a.name)+'</td>'
+      +'<td><select class="search" id="ai-mode-'+a.key+'"><option value="auto"'+(r.mode!=='fixed'?' selected':'')+'>auto (best)</option><option value="fixed"'+(r.mode==='fixed'?' selected':'')+'>fixed</option></select></td>'
+      +'<td><select class="search" id="aip-'+a.key+'">'+provOpts(r.providerId||'')+'</select></td>'
+      +'<td><select class="search" id="aif-'+a.key+'">'+provOpts((r.fallbackIds||[])[0]||'')+'</select></td>'
+      +'<td><button class="btn sm" onclick="saveAiRoute(&quot;'+a.key+'&quot;)">Save</button></td></tr>';
+  }).join('');
+  const aiSection='<div class="panel" style="--accent:var(--cyan);margin-top:22px"><h3>AI Providers (BYOK) &amp; Agent Routing</h3>'
+    +(aiS.configured?'<div style="font-size:12px;color:var(--text-dim);margin-bottom:10px">OpenCode key: <code>'+esc(aiS.opencodeKeyMasked||'—')+'</code> · setup complete</div>'
+      :'<div style="border:1px solid var(--orange);border-radius:10px;padding:12px 14px;margin-bottom:14px;font-size:13px"><b>First-run AI setup.</b> Add a provider key below — the agents run on built-in heuristics until a live provider is connected. <button class="btn sm" onclick="runAiSetup()">Generate OpenCode key</button></div>')
+    +(aiCards||'<div style="font-size:13px;color:var(--text-dim);margin-bottom:10px">No providers yet.</div>')
+    +'<h4 style="margin:16px 0 8px;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--text-dim)">Add provider</h4>'
+    +'<div style="display:grid;grid-template-columns:2fr 3fr auto;gap:10px;align-items:end"><div><label style="display:block;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--text-dim);margin:0 0 7px">Preset</label><select class="search" id="ai-new-preset">'+presetOpts+'</select></div>'
+    +'<div><label style="display:block;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--text-dim);margin:0 0 7px">API key</label><input class="search" id="ai-new-key" placeholder="paste key — stored masked"></div>'
+    +'<button class="btn" onclick="addAiProvider()">Add</button></div>'
+    +'<h4 style="margin:16px 0 8px;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--text-dim)">Local model (this machine — full tensor weights, zero API cost)</h4>'
+    +'<div id="ai-local" style="border:1px solid var(--line);border-radius:12px;padding:14px;font-size:12.5px;color:var(--text-dim)">Loading…</div>'
+    +'<h4 style="margin:16px 0 8px;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--text-dim)">Per-agent routing (auto = best enabled provider · fixed = your choice, falls back on failure)</h4>'
+    +'<table class="tbl"><thead><tr><th>Agent</th><th>Mode</th><th>Provider</th><th>Fallback</th><th></th></tr></thead><tbody>'+(aiRouteRows||'<tr><td colspan="5" style="font-size:12.5px;color:var(--text-dim)">Add an enabled provider to configure routing.</td></tr>')+'</tbody></table>'
+    +'<h4 style="margin:16px 0 8px;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--text-dim)">Try it</h4>'
+    +'<div style="display:grid;grid-template-columns:1fr 3fr auto;gap:10px;align-items:end"><div><label style="display:block;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--text-dim);margin:0 0 7px">Agent</label><select class="search" id="ai-try-agent">'+(aiR.agents||[]).map(a=>'<option value="'+a.key+'">'+esc(a.name)+'</option>').join('')+'</select></div>'
+    +'<div><label style="display:block;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--text-dim);margin:0 0 7px">Prompt</label><input class="search" id="ai-try-prompt" placeholder="Ask something…"></div>'
+    +'<button class="btn" onclick="aiTry()">Run</button></div>'
+    +'<pre id="ai-try-out" style="white-space:pre-wrap;font-size:12.5px;margin-top:10px;color:var(--text-dim)"></pre></div>';
+  OS.$('#view').innerHTML=`<div class="grid-2 eq">
+  <div class="panel" style="--accent:var(--blue-hi)"><h3>Company &amp; Notifications</h3>
+    <label style="display:block;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--text-dim);margin:0 0 7px">Company Name</label>
+    <input class="search" style="width:100%;margin-bottom:15px" id="s-company" value="${esc(s.companyName)}">
+    <label style="display:block;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--text-dim);margin:0 0 7px">Admin Email</label>
+    <input class="search" style="width:100%;margin-bottom:15px" id="s-admin" value="${esc(s.adminEmail)}">
+    <label style="display:block;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--text-dim);margin:0 0 7px">From Email</label>
+    <input class="search" style="width:100%;margin-bottom:15px" id="s-from" value="${esc(s.fromEmail)}">
+    <label style="display:block;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--text-dim);margin:0 0 7px">Invoice Terms (days)</label>
+    <input class="search" style="width:100%;margin-bottom:20px" id="s-terms" type="number" value="${s.invoiceTermsDays}">
+    <button class="btn" onclick="saveSettings()">Save Settings</button>
+  </div>
+  <div class="panel" style="--accent:var(--orange)"><h3>Demo Mode</h3>
+    <p style="font-size:12.5px;color:var(--text-dim);line-height:1.7;margin:0 0 14px">When enabled, the OS runs without a live server: seeded demo data, no login gate, changes persist to browser storage only. Intended for previews and walkthroughs — <b>turn this off before real business use.</b></p>
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
+      <div><b id="demoStateLbl" style="font-size:14px">${demoOn()?'ON — demo data, no login required':'OFF — normal sign-in required'}</b><br><small style="color:var(--text-dim);font-size:11.5px" id="demoStateSub">${demoOn()?'ll_demo flag is set in this browser':'ll_demo flag is not set'}</small></div>
+      <button class="btn ${demoOn()?'btn-ghost':''}" onclick="toggleDemo()" id="demoToggleBtn">${demoOn()?'Disable Demo Mode':'Enable Demo Mode'}</button>
+    </div>
+  </div>
+  <div class="panel" style="--accent:var(--lime)"><h3>Automations</h3>
+    <div class="table-wrap"><table>
+      <tr><th>Automation</th><th>Schedule</th><th>Endpoint</th></tr>
+      <tr><td><b>Daily Ops Agent</b><span class="sub">brief + invoice reminders</span></td><td>${esc(s.dailyCron)}</td><td><code style="color:var(--cyan);font-size:12px">GET /api/cron/daily</code></td></tr>
+      <tr><td><b>Weekly Report</b><span class="sub">KPIs + competitor watch</span></td><td>${esc(s.weeklyCron)}</td><td><code style="color:var(--cyan);font-size:12px">GET /api/cron/weekly</code></td></tr>
+    </table></div>
+    <p style="font-size:12.5px;color:var(--text-dim);line-height:1.7;margin-top:16px">Reminder cadence: <b style="color:var(--text)">${esc(s.reminderCadence)}</b>. Protect cron routes with <code style="color:var(--cyan)">CRON_SECRET</code> in production.</p>
+    <button class="btn btn-ghost" onclick="runCron()">▶ Run Daily Cron Now</button>
+  </div></div>
+  <div class="panel" style="--accent:var(--cyan);margin-top:22px"><h3>Affiliate Program — partner commission rates</h3>
+    <p style="font-size:12.5px;color:var(--text-dim);line-height:1.7;margin:0 0 18px">These numbers power the public <a href="partners.html" style="color:var(--cyan)">Earn With Us</a> page and every partner dashboard. The <b>recommended rate</b> is shown to prospects as the program benchmark; the <b>default rate</b> is what a partner earns unless you override it on their row in the Affiliates tab. ${esc((s.affiliate&&s.affiliate.note)||'')}</p>
+    <div class="kpis" style="margin-bottom:18px">
+      <div class="kpi" style="--accent:var(--cyan)"><div class="lbl">Recommended %</div><div class="val" style="font-size:26px">${(s.affiliate||{}).recommendedPct??10}%</div><div class="delta">shown on partners page</div></div>
+      <div class="kpi" style="--accent:var(--lime)"><div class="lbl">Default %</div><div class="val" style="font-size:26px">${(s.affiliate||{}).defaultPct??10}%</div><div class="delta">applied to new partners</div></div>
+      <div class="kpi" style="--accent:var(--yellow)"><div class="lbl">Min payout</div><div class="val" style="font-size:26px">$${(s.affiliate||{}).minPayout??50}</div><div class="delta">per request</div></div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:14px">
+      <div><label class="lbl" style="display:block;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--text-dim);margin:0 0 7px">Default %</label><input class="search" style="width:100%" id="s-af-def" type="number" step="0.5" min="0" max="50" value="${(s.affiliate||{}).defaultPct??10}"></div>
+      <div><label class="lbl" style="display:block;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--text-dim);margin:0 0 7px">Recommended %</label><input class="search" style="width:100%" id="s-af-rec" type="number" step="0.5" min="0" max="50" value="${(s.affiliate||{}).recommendedPct??10}"></div>
+      <div><label class="lbl" style="display:block;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--text-dim);margin:0 0 7px">Promoter tier %</label><input class="search" style="width:100%" id="s-af-promoter" type="number" step="0.5" min="0" max="50" value="${((s.affiliate||{}).tiers||{}).promoter??10}"></div>
+      <div><label class="lbl" style="display:block;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--text-dim);margin:0 0 7px">Creator tier %</label><input class="search" style="width:100%" id="s-af-creator" type="number" step="0.5" min="0" max="50" value="${((s.affiliate||{}).tiers||{}).creator??12}"></div>
+      <div><label class="lbl" style="display:block;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--text-dim);margin:0 0 7px">Partner tier %</label><input class="search" style="width:100%" id="s-af-partner" type="number" step="0.5" min="0" max="50" value="${((s.affiliate||{}).tiers||{}).partner??15}"></div>
+      <div><label class="lbl" style="display:block;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--text-dim);margin:0 0 7px">Min payout $</label><input class="search" style="width:100%" id="s-af-min" type="number" min="0" value="${(s.affiliate||{}).minPayout??50}"></div>
+      <div><label class="lbl" style="display:block;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--text-dim);margin:0 0 7px">Cookie days</label><input class="search" style="width:100%" id="s-af-cookie" type="number" min="0" value="${(s.affiliate||{}).cookieDays??90}"></div>
+      <div><label class="lbl" style="display:block;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--text-dim);margin:0 0 7px">Payout days</label><input class="search" style="width:100%" id="s-af-days" value="${esc((s.affiliate||{}).payoutDays||'1st & 15th of the month')}"></div>
+    </div>
+    <div style="margin-top:16px;display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+      <button class="btn" onclick="saveAffiliateSettings()">Save Affiliate Settings</button>
+      <label style="font-size:13px;color:var(--text-dim);display:flex;gap:8px;align-items:center"><input type="checkbox" id="s-af-enabled" ${((s.affiliate||{}).enabled!==false)?'checked':''}> Program enabled (application form open)</label>
+      <label style="font-size:13px;color:var(--text-dim);display:flex;gap:8px;align-items:center"><input type="checkbox" id="s-af-auto" ${((s.affiliate||{}).autoApprove!==false)?'checked':''}> Auto-approve applications</label>
+    </div>
+  </div>
+  <div class="grid-2 eq" style="margin-top:22px">
+  <div class="panel" style="--accent:var(--orange)"><h3>Lead Generation — Prospect Scout</h3>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+      <div><label class="lbl" style="display:block;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--text-dim);margin:0 0 7px">Daily prospect cap</label><input class="search" style="width:100%" id="s-lg-cap" type="number" min="1" max="50" value="${(s.leadGen||{}).dailyCap??8}"></div>
+      <div><label class="lbl" style="display:block;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--text-dim);margin:0 0 7px">From name</label><input class="search" style="width:100%" id="s-lg-name" value="${esc((s.leadGen||{}).fromName||'Trey Smith')}"></div>
+      <div><label class="lbl" style="display:block;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--text-dim);margin:0 0 7px">From email</label><input class="search" style="width:100%" id="s-lg-email" value="${esc((s.leadGen||{}).fromEmail||'info@linesandlogos.team')}"></div>
+      <div><label class="lbl" style="display:block;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--text-dim);margin:0 0 7px">Postal address (CAN-SPAM)</label><input class="search" style="width:100%" id="s-lg-addr" value="${esc((s.leadGen||{}).physicalAddress||'Lines & Logos · Memphis, TN')}"></div>
+    </div>
+    <label style="font-size:13px;color:var(--text-dim);display:flex;gap:8px;align-items:center;margin:16px 0 8px"><input type="checkbox" id="s-lg-enabled" ${((s.leadGen||{}).enabled!==false)?'checked':''}> Scout runs nightly (territory pool)</label>
+    <label style="font-size:13px;color:var(--text-dim);display:flex;gap:8px;align-items:center;margin-bottom:16px"><input type="checkbox" id="s-lg-approve" ${((s.leadGen||{}).requireApprovalToSend!==false)?'checked':''}> Require my approval before any intro email sends <b style="color:var(--lime)">(recommended)</b></label>
+    <button class="btn" onclick="saveLeadGenSettings()">Save Lead-Gen Settings</button>
+  </div>
+  <div class="panel" style="--accent:var(--cyan)"><h3>Field Tracking &amp; Payroll</h3>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+      <div><label class="lbl" style="display:block;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--text-dim);margin:0 0 7px">Ping interval (min)</label><input class="search" style="width:100%" id="s-tr-int" type="number" min="1" max="60" value="${(s.tracking||{}).intervalMin??5}"></div>
+      <div><label class="lbl" style="display:block;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--text-dim);margin:0 0 7px">Retention (days)</label><input class="search" style="width:100%" id="s-tr-ret" type="number" min="1" max="365" value="${(s.tracking||{}).retentionDays??90}"></div>
+      <div><label class="lbl" style="display:block;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--text-dim);margin:0 0 7px">On-site radius (m)</label><input class="search" style="width:100%" id="s-tr-rad" type="number" min="25" max="2000" value="${(s.tracking||{}).onsiteRadiusM??150}"></div>
+      <div><label class="lbl" style="display:block;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--text-dim);margin:0 0 7px">Default hourly $</label><input class="search" style="width:100%" id="s-pr-rate" type="number" min="1" step="0.5" value="${(s.payroll||{}).defaultHourlyRate??22}"></div>
+      <div><label class="lbl" style="display:block;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--text-dim);margin:0 0 7px">OT threshold (h/wk)</label><input class="search" style="width:100%" id="s-pr-ot" type="number" min="1" value="${(s.payroll||{}).overtimeThreshold??40}"></div>
+      <div><label class="lbl" style="display:block;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--text-dim);margin:0 0 7px">OT multiplier ×</label><input class="search" style="width:100%" id="s-pr-otm" type="number" min="1" step="0.1" value="${(s.payroll||{}).otMultiplier??1.5}"></div>
+      <div><label class="lbl" style="display:block;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--text-dim);margin:0 0 7px">Period (days)</label><input class="search" style="width:100%" id="s-pr-days" type="number" min="7" max="31" value="${(s.payroll||{}).payPeriodDays??14}"></div>
+      <div><label class="lbl" style="display:block;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--text-dim);margin:0 0 7px">Payout day</label><input class="search" style="width:100%" id="s-pr-day" value="${esc((s.payroll||{}).payoutDay||'Friday')}"></div>
+    </div>
+    <label style="font-size:13px;color:var(--text-dim);display:flex;gap:8px;align-items:center;margin:16px 0 8px"><input type="checkbox" id="s-tr-enabled" ${((s.tracking||{}).enabled!==false)?'checked':''}> Location tracking enabled (consent + clock-in still required)</label>
+    <label style="font-size:13px;color:var(--text-dim);display:flex;gap:8px;align-items:center;margin-bottom:8px"><input type="checkbox" id="s-tr-consent" ${((s.tracking||{}).requireConsent!==false)?'checked':''}> Require signed consent <b style="color:var(--lime)">(legal — keep on)</b></label>
+    <label style="font-size:13px;color:var(--text-dim);display:flex;gap:8px;align-items:center;margin-bottom:16px"><input type="checkbox" id="s-pr-approve" ${((s.payroll||{}).requireHoursApproval!==false)?'checked':''}> Require hours approval before payroll run <b style="color:var(--lime)">(recommended)</b></label>
+    <button class="btn" onclick="saveTrackingSettings()">Save Tracking &amp; Payroll</button>
+  </div></div>
+  ${aiSection}`;
+  setTimeout(loadLocalStatus, 80);
+}
+async function saveAffiliateSettings(){
+  await OS.saveSettings({affiliate:{
+    enabled:OS.$('#s-af-enabled').checked, autoApprove:OS.$('#s-af-auto').checked,
+    defaultPct:+OS.field('s-af-def')||10, recommendedPct:+OS.field('s-af-rec')||10,
+    minPayout:+OS.field('s-af-min')||0, cookieDays:+OS.field('s-af-cookie')||90,
+    payoutDays:OS.field('s-af-days')||'1st & 15th of the month',
+    tiers:{promoter:+OS.field('s-af-promoter')||10, creator:+OS.field('s-af-creator')||12, partner:+OS.field('s-af-partner')||15},
+  }});
+  OS.toast('Affiliate program saved — partners page updated'); render();
+}
+async function saveLeadGenSettings(){
+  await OS.saveSettings({leadGen:{
+    enabled:OS.$('#s-lg-enabled').checked, requireApprovalToSend:OS.$('#s-lg-approve').checked,
+    dailyCap:+OS.field('s-lg-cap')||8, fromName:OS.field('s-lg-name')||'Trey Smith',
+    fromEmail:OS.field('s-lg-email')||'info@linesandlogos.team', physicalAddress:OS.field('s-lg-addr')||'Lines & Logos · Memphis, TN',
+  }});
+  OS.toast('Lead-gen settings saved'); render();
+}
+async function saveTrackingSettings(){
+  await OS.saveSettings({
+    tracking:{enabled:OS.$('#s-tr-enabled').checked, requireConsent:OS.$('#s-tr-consent').checked,
+      intervalMin:+OS.field('s-tr-int')||5, retentionDays:+OS.field('s-tr-ret')||90, onsiteRadiusM:+OS.field('s-tr-rad')||150},
+    payroll:{defaultHourlyRate:+OS.field('s-pr-rate')||22, overtimeThreshold:+OS.field('s-pr-ot')||40,
+      otMultiplier:+OS.field('s-pr-otm')||1.5, payPeriodDays:+OS.field('s-pr-days')||14,
+      payoutDay:OS.field('s-pr-day')||'Friday', requireHoursApproval:OS.$('#s-pr-approve').checked},
+  });
+  OS.toast('Tracking & payroll settings saved'); render();
+}
+async function addAiProvider(){const key=OS.$('#ai-new-key').value.trim();if(!key){OS.toast('Paste an API key first');return;}await OS.aiApi('providers',{method:'POST',body:JSON.stringify({preset:OS.$('#ai-new-preset').value,apiKey:key,enabled:true})});OS.toast('Provider added');render();}
+async function saveAiProvider(id){await OS.aiApi('providers',{method:'POST',body:JSON.stringify({id,apiKey:OS.$('#ai-key-'+id).value,models:OS.$('#ai-models-'+id).value,rpm:+OS.$('#ai-rpm-'+id).value||60,enabled:OS.$('#ai-en-'+id).checked})});OS.toast('Provider saved');render();}
+async function delAiProvider(id){if(!confirm('Delete this provider?'))return;await OS.aiApi('providers',{method:'DELETE',body:JSON.stringify({id})});OS.toast('Deleted');render();}
+async function setAiDefault(id){await OS.aiApi('providers',{method:'POST',body:JSON.stringify({id,isDefault:true})});OS.toast('Default provider set');render();}
+async function testAiProvider(id){OS.toast('Testing provider…');const r=await OS.aiApi('providers/test',{method:'POST',body:JSON.stringify({id})});OS.toast(r.ok?('OK — '+r.provider+' ('+r.latencyMs+'ms): '+r.text):(r.simulated?'No live provider/key — simulated mode':('Failed: '+(r.reason||'unknown'))),6000);}
+async function saveAiRoute(agent){await OS.aiApi('routing',{method:'POST',body:JSON.stringify({agent,mode:OS.$('#ai-mode-'+agent).value,providerId:OS.$('#aip-'+agent).value||null,fallbackIds:[OS.$('#aif-'+agent).value||null]})});OS.toast('Routing saved: '+agent);}
+async function runAiSetup(){const r=await OS.aiApi('setup',{method:'POST',body:JSON.stringify({})});if(r.opencodeKey){try{await navigator.clipboard.writeText(r.opencodeKey);}catch(e){}OS.toast('Setup done — OpenCode key generated & copied (shown once)',8000);}else{OS.toast('AI setup already completed');}render();}
+async function aiTry(){const out=OS.$('#ai-try-out');out.textContent='Running…';const r=await OS.aiApi('assist',{method:'POST',body:JSON.stringify({agent:OS.$('#ai-try-agent').value,user:OS.$('#ai-try-prompt').value})});out.textContent=r.simulated?('SIMULATED — '+r.reason):(r.provider+' ['+(r.model||'')+'] ('+r.tokens+' tok):\n\n'+r.text);}
+/* ================= MEMORY BANK ================= */
+async function vMemory(){
+  const facts = await (await fetch('/api/memory',{headers:authed()})).json();
+  OS.$('#view').innerHTML = `
+  <div class="panel" style="--accent:var(--lime)"><h3>Memory Bank <span class="right">${facts.length} facts · auto-captured + chat recall</span></h3>
+    <div style="display:grid;grid-template-columns:2fr 1fr auto;gap:10px;margin-bottom:16px;align-items:end">
+      <div><label style="display:block;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--text-dim);margin:0 0 7px">New fact</label>
+      <input class="search" id="mem-new" style="width:100%" placeholder="e.g. TestCo prefers morning site visits"></div>
+      <div><label style="display:block;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--text-dim);margin:0 0 7px">Source</label>
+      <input class="search" id="mem-src" style="width:100%" placeholder="manual"></div>
+      <button class="btn" onclick="memAdd()">Add</button>
+    </div>
+    <div id="mem-list">${facts.map(f => `
+      <div style="display:flex;gap:12px;align-items:flex-start;border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:10px">
+        <div style="flex:1;font-size:13px;line-height:1.6">${esc(f.text)}</div>
+        <div style="flex:none;text-align:right">
+          <div style="font-size:11px;color:var(--text-dim)">${esc(f.source)}<br>${new Date(f.learnedAt).toLocaleString()}</div>
+          <button class="btn sm ghost" style="margin-top:6px" onclick="memDel('${f.id}')">Delete</button>
+        </div>
+      </div>`).join('') || '<div class="empty">No memories yet — chat with the assistant ("remember that…") or add one above.</div>'}</div>
+  </div>`;
+}
+async function memAdd(){
+  const text = OS.$('#mem-new').value.trim(); if (!text) return;
+  await fetch('/api/memory',{method:'POST',headers:{...authed(),'Content-Type':'application/json'},body:JSON.stringify({text, source: OS.$('#mem-src').value.trim() || 'manual'})});
+  OS.toast('Fact stored'); render();
+}
+async function memDel(id){
+  await fetch('/api/memory',{method:'DELETE',headers:{...authed(),'Content-Type':'application/json'},body:JSON.stringify({id})});
+  OS.toast('Fact deleted'); render();
+}
+
+/* ================= KIMI CLAW ================= */
+async function vClaw(){
+  const c = await (await fetch('/api/claw',{headers:authed()})).json();
+  OS.$('#view').innerHTML = `
+  <div class="panel" style="--accent:var(--orange)"><h3>Kimi Claw — Coding Agent Console <span class="right">repo: ${esc(c.repo)} @ ${esc(c.branch)}</span></h3>
+    <p style="font-size:13px;color:var(--text-dim);margin-bottom:16px;line-height:1.6">Runs the coding agents that ship updates, new features, patches, doc updates, and GitHub management alongside your existing 31 agents. Queue a job — the Claw executes it with its assigned agent team and reports back.</p>
+    <div class="grid-3">
+      <div><label style="display:block;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--text-dim);margin:0 0 7px">Repository</label>
+        <input class="search" id="claw-repo" style="width:100%" value="${esc(c.repo)}"></div>
+      <div><label style="display:block;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--text-dim);margin:0 0 7px">Branch</label>
+        <input class="search" id="claw-branch" style="width:100%" value="${esc(c.branch)}"></div>
+      <div><label style="display:block;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--text-dim);margin:0 0 7px">Assigned agents (comma-sep)</label>
+        <input class="search" id="claw-agents" style="width:100%" value="${esc(c.agents.join(', '))}" placeholder="docs-agent, patch-agent"></div>
+    </div>
+    <button class="btn" onclick="clawSave()">Save Claw Config</button>
+  </div>
+  <div class="grid-2 eq">
+    <div class="panel"><h3>Queue a Coding Job</h3>
+      <label style="display:block;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--text-dim);margin:0 0 7px">Task</label>
+      <select class="search" id="claw-task" style="width:100%">
+        ${['feature','patch','docs-update','github-management','release-cut','seo-pass','dependency-audit'].map(t=>`<option>${t}</option>`).join('')}
+      </select>
+      <label style="display:block;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--text-dim);margin:14px 0 7px">Brief</label>
+      <textarea class="search" id="claw-brief" rows="3" style="width:100%;border-radius:12px" placeholder="What should the coding agents build or fix?"></textarea>
+      <button class="btn" style="margin-top:12px" onclick="clawRun()">Queue Job</button>
+    </div>
+    <div class="panel flush"><h3 style="padding:22px 22px 0">Job Queue <span class="right">${c.jobs.length} jobs</span></h3>
+      <div style="max-height:360px;overflow-y:auto"><table><thead><tr><th>Task</th><th>Brief</th><th>Agents</th><th>Status</th></tr></thead>
+      <tbody>${c.jobs.slice(0,15).map(j=>`<tr><td><b>${j.task}</b><span class="sub">${new Date(j.createdAt).toLocaleString()}</span></td>
+        <td style="max-width:280px">${esc(j.brief.slice(0,90))}</td><td>${(j.assignedAgents||[]).map(esc).join(', ')||'—'}</td>
+        <td><span class="tag ${j.status==='done'?'t-green':j.status==='failed'?'t-red':'t-yellow'}">${j.status}</span></td></tr>`).join('') || '<tr><td colspan="4" class="empty">No jobs yet — queue your first coding task.</td></tr>'}</tbody></table></div>
+    </div>
+  </div>`;
+}
+async function clawSave(){
+  await fetch('/api/claw/config',{method:'POST',headers:{...authed(),'Content-Type':'application/json'},body:JSON.stringify({repo:OS.$('#claw-repo').value,branch:OS.$('#claw-branch').value,agents:OS.$('#claw-agents').value})});
+  OS.toast('Claw config saved');
+}
+async function clawRun(){
+  const brief = OS.$('#claw-brief').value.trim(); if (!brief){ OS.toast('Describe the job first'); return; }
+  const r = await fetch('/api/claw/run',{method:'POST',headers:{...authed(),'Content-Type':'application/json'},body:JSON.stringify({task:OS.$('#claw-task').value, brief})});
+  if (r.ok){ OS.toast('Coding job queued'); render(); } else { OS.toast('Queue failed'); }
+}
+
+/* ================= GOVERNANCE (Phase 2) ================= */
+const authed = () => ({ Authorization: 'Bearer ' + (localStorage.getItem('ll_token') || '') });
+async function vGovernance(){
+  const [g, audits] = await Promise.all([
+    fetch('/api/agent-governance',{headers:authed()}).then(r=>r.json()),
+    fetch('/api/agent-audits',{headers:authed()}).then(r=>r.json())
+  ]);
+  OS.$('#view').innerHTML = `
+  <div class="panel" style="--accent:var(--volley)"><h3>Agent Governance <span class="right">Phase 2 — governance before broad autonomy</span></h3>
+    <label style="display:flex;gap:10px;align-items:center;font-size:13.5px;margin-bottom:16px;cursor:pointer">
+      <input type="checkbox" ${g.masterEnabled?'checked':''} onchange="govMaster(this)" style="width:17px;height:17px;accent-color:var(--blue)">
+      <b>Master switch</b> <span style="color:var(--text-dim)">— when off, every agent action across the whole system is blocked (423)</span>
+    </label>
+    <div class="table-wrap"><table><thead><tr><th>Agent</th><th>Autonomy tier</th><th>Auto-approve cap ($)</th><th>Kill switch</th><th>Scopes</th><th>Note</th><th></th></tr></thead>
+    <tbody>${g.agents.map(a=>`<tr>
+      <td><b>${esc(a.name)}</b><span class="sub">${a.key}</span></td>
+      <td><select class="search" id="gov-tier-${a.key}" style="width:130px;padding:7px 12px">${g.tiers.map(t=>`<option ${a.tier===t?'selected':''}>${t}</option>`).join('')}</select></td>
+      <td><input class="search" id="gov-cap-${a.key}" type="number" min="0" value="${a.dollarCap}" style="width:110px;padding:7px 12px"></td>
+      <td><input type="checkbox" id="gov-kill-${a.key}" ${a.killSwitch?'checked':''} style="width:17px;height:17px;accent-color:var(--red)"></td>
+      <td><input class="search" id="gov-note-${a.key}" value="${esc((a.scopes||[]).join(', '))}" placeholder="e.g. comms, intake" style="width:150px;padding:7px 12px"></td>
+      <td><input class="search" id="gov-nt2-${a.key}" value="${esc(a.note||'')}" placeholder="Review notes…" style="width:170px;padding:7px 12px"></td>
+      <td><button class="btn sm" onclick="govSave('${a.key}')">Save</button></td>
+    </tr>`).join('')}</tbody></table></div>
+    <p style="font-size:12px;color:var(--text-dim);margin-top:12px">Tiers: <b>recommend</b> = drafts &amp; proposals only (today's default everywhere) · <b>auto-low</b> = auto-execute $0-risk actions under the cap · <b>auto-mid</b> = adds scheduling within cap · <b>human-gate</b> = always requires a human decision. Money-adjacent agents stay human-gated until Phase 3 hardening.</p>
+  </div>
+  <div class="grid-2 eq">
+    <div class="panel"><h3>Evaluation Harness</h3>
+      <p style="font-size:13px;color:var(--text-dim);margin-bottom:14px">Runs canned scenarios through the agent brains and scores grounded answers. Run weekly as part of the agent review.</p>
+      <button class="btn" onclick="govEval()">Run evaluation</button>
+      <div id="gov-eval-out" style="margin-top:14px;font-size:13px;line-height:1.9"></div>
+    </div>
+    <div class="panel flush"><h3 style="padding:22px 22px 0">Audit Trail <span class="right">last ${audits.length}</span></h3>
+      <div class="table-wrap" style="max-height:420px;overflow-y:auto"><table><thead><tr><th>When</th><th>Agent</th><th>Actor</th><th>Status</th></tr></thead>
+      <tbody>${audits.slice(0,40).map(a=>`<tr><td style="white-space:nowrap">${new Date(a.at).toLocaleString()}</td><td><b>${a.agent}</b><span class="sub">${a.path}</span></td><td>${a.actor}</td><td><span class="tag ${a.status==='blocked'?'t-red':a.status==='ran'?'t-green':'t-blue'}">${a.status}</span></td></tr>`).join('') || '<tr><td colspan="4" class="empty">No agent actions recorded yet — every /api/agent/* call lands here.</td></tr>'}</tbody></table></div>
+    </div>
+  </div>`;
+}
+async function govSave(key){
+  await fetch('/api/agent-governance',{method:'POST',headers:{...authed(),'Content-Type':'application/json'},body:JSON.stringify({
+    agent:key, tier:document.getElementById('gov-tier-'+key).value, dollarCap:document.getElementById('gov-cap-'+key).value,
+    killSwitch:document.getElementById('gov-kill-'+key).checked, scopes:document.getElementById('gov-note-'+key).value, note:document.getElementById('gov-nt2-'+key).value })});
+  OS.toast('Governance saved: '+key);
+}
+async function govMaster(cb){
+  await fetch('/api/agent-governance',{method:'POST',headers:{...authed(),'Content-Type':'application/json'},body:JSON.stringify({masterEnabled:cb.checked})});
+  OS.toast('Master switch '+(cb.checked?'ON — agents can run':'OFF — all agent actions blocked'));
+}
+async function govEval(){
+  const out=document.getElementById('gov-eval-out');
+  out.textContent='Running scenarios…';
+  const r=await fetch('/api/agent/eval',{method:'POST',headers:authed()}).then(x=>x.json());
+  out.innerHTML=`<div style="font-size:22px;font-weight:800;margin-bottom:10px">${r.score}% <span style="font-size:12px;color:var(--text-dim)">grounded-answer score</span></div>`+
+    r.results.map(x=>`<div>${x.pass?'✅':'❌'} ${esc(x.scenario)} <span style="color:var(--text-dim);font-size:11.5px">[${x.brain}${x.miss&&x.miss.length?' · missed: '+x.miss.join(','):''}]</span></div>`).join('');
+}
+
+async function loadLocalStatus(){
+  const box = document.getElementById('ai-local'); if (!box) return;
+  try {
+    const r = await fetch('/api/ai/local/status',{headers:authed()}); const d = await r.json();
+    box.innerHTML = '<b style="color:var(--text)">Status:</b> ' + (d.running ? '<span style="color:#158a5e;font-weight:700">RUNNING</span> on 127.0.0.1:'+d.port : '<span>stopped</span>')
+      + ' · binary: ' + (d.binaryPresent?'✓':'✗') + ' · models: ' + (d.models.length ? d.models.map(esc).join(', ') : 'none')
+      + (d.hint ? '<div style="margin-top:8px;color:#a06b00">'+d.hint+'</div>' : '')
+      + '<div style="margin-top:10px;display:flex;gap:8px"><button class="btn sm" onclick="aiLocalStart()">Start</button><button class="btn sm ghost" onclick="aiLocalStop()">Stop</button></div>'
+      + '<div style="margin-top:10px;font-size:11.5px;line-height:1.6">Hostinger guidance: <b>KVM1 (1 vCPU/4GB)</b> → Qwen2.5-3B-Instruct Q4_K_M or Phi-3.5-mini Q4_K_M (~2–2.5GB RAM, ~2–5 tok/s — fine for background agents). <b>KVM2 (2 vCPU/8GB)</b> → Qwen3-4B-Instruct-2507. Shared hosting cannot run local models — auto-routing falls back to OpenRouter free.</div>';
+  } catch(e){ box.innerHTML = 'Local model status unavailable (demo mode).'; }
+}
+async function aiLocalStart(){ await fetch('/api/ai/local/start',{method:'POST',headers:authed()}); setTimeout(loadLocalStatus, 4000); OS.toast('Local model starting…'); }
+async function aiLocalStop(){ await fetch('/api/ai/local/stop',{method:'POST',headers:authed()}); setTimeout(loadLocalStatus, 500); }
+async function saveSettings(){
+  await OS.saveSettings({companyName:OS.field('s-company'),adminEmail:OS.field('s-admin'),fromEmail:OS.field('s-from'),invoiceTermsDays:+OS.field('s-terms')||30});
+  OS.toast('Settings saved');
+}
+function demoOn(){ return localStorage.getItem('ll_demo')==='1'; }
+function toggleDemo(){
+  const on=demoOn();
+  if(on){
+    if(!confirm('Disable demo mode? The normal sign-in gate returns on next load.')) return;
+    localStorage.removeItem('ll_demo');
+  } else {
+    localStorage.setItem('ll_demo','1');
+  }
+  location.reload();
+}
+async function runCron(){await OS.cron('daily');OS.toast('Daily cron ran — brief generated, reminders queued');}
+OS.boot('admin','Agents & Admin',async()=>{await Promise.all([OS.list('approvals'),OS.list('accounts'),OS.list('notifications'),OS.list('followUps')]);renderTabs();await render();});
+</script>
+<script src="assets/pwa.js" defer></script>
+</body>
+</html>

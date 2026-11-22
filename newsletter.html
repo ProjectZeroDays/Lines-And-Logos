@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Newsletter &amp; Visitors — Lines &amp; Logos</title>
+<link rel="icon" type="image/png" href="icons/favicon-32.png?v=2">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;700;800&family=Archivo+Black&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/os.css?v=9">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#04060d">
+<style>
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(125px,1fr));gap:12px;margin-bottom:18px}
+.kpi{background:var(--panel,#0d1526);border:1px solid var(--line,#1c2946);border-radius:12px;padding:13px 15px}
+.kpi b{font-size:20px;display:block}.kpi span{font-size:11.5px;color:var(--mut,#8b95b3)}
+.list-row{display:flex;gap:12px;align-items:center;background:var(--panel,#0d1526);border:1px solid var(--line,#1c2946);border-radius:11px;padding:11px 15px;margin-bottom:8px;font-size:13px;flex-wrap:wrap}
+.list-row small{color:var(--mut,#8b95b3)}
+.bar-row{display:flex;align-items:center;gap:10px;font-size:12.5px;margin:6px 0}
+.bar-row .lbl{width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--mut,#8b95b3)}
+.bar-row .bar{flex:1;height:8px;background:#131d36;border-radius:99px;overflow:hidden}
+.bar-row .bar i{display:block;height:100%;background:linear-gradient(90deg,#4d7dff,#2d5bff)}
+.bar-row .n{width:56px;text-align:right}
+.trend{display:flex;align-items:flex-end;gap:2px;height:70px;margin-top:8px}
+.trend i{flex:1;background:linear-gradient(180deg,#4d7dff,#1c3fd6);border-radius:2px 2px 0 0;min-height:2px}
+.camp-card{background:var(--panel,#0d1526);border:1px solid var(--line,#1c2946);border-radius:14px;padding:16px;margin-bottom:12px}
+.camp-card h4{margin:0 0 4px;font-size:14.5px}
+.pill{font-size:11px;padding:2px 9px;border-radius:99px;font-weight:700;text-transform:uppercase}
+.pill.pending{background:#3a2c10;color:#f5b942}.pill.sent{background:#0f2b1c;color:#43d17c}
+.chip-row{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
+.chip{background:#0a1122;border:1px solid var(--line,#1c2946);border-radius:99px;padding:6px 13px;font-size:12px;cursor:pointer}
+.chip.sel{background:#1c3fd6;border-color:#4d7dff;color:#fff}
+.news-item{background:var(--panel,#0d1526);border:1px solid var(--line,#1c2946);border-radius:11px;padding:12px 15px;margin-bottom:8px;font-size:12.5px}
+.news-item small{color:var(--mut,#8b95b3)}
+.btn-mini{font-size:11px;padding:3px 10px;border-radius:8px}
+</style>
+</head>
+<body data-perms="notifications">
+<main>
+  <div class="topbar">
+    <div><div class="crumb">Business Suite / Newsletter &amp; Visitors</div><h1 class="chrome">Newsletter &amp; Visitors</h1></div>
+    <div class="topbar-right"><button class="btn btn-sm" onclick="newCampaign()">+ New Campaign</button></div>
+  </div>
+  <div class="tabs2" id="tabs"></div>
+  <div id="view"></div>
+</main>
+<script src="assets/os.js?v=9"></script>
+<script>
+const { boot, raw, fmt, ago, esc, openModal, closeModal, onModalSave, field, toast, isLive, $ } = OS;
+let TAB = 'overview';
+const TABS = [['overview','Overview'],['subscribers','Subscribers'],['campaigns','Campaigns'],['news','News Library']];
+
+async function render(){
+  $('#tabs').innerHTML = TABS.map(([k,l])=>`<button class="${k===TAB?'on':''}" onclick="TAB='${k}';render()">${l}</button>`).join('');
+  if (TAB==='overview') renderOverview(); else if (TAB==='subscribers') renderSubs();
+  else if (TAB==='campaigns') renderCamps(); else renderNews();
+}
+
+async function renderOverview(){
+  let v, a;
+  if (isLive()) { [v, a] = await Promise.all([raw('/api/newsletter/stats').catch(()=>null), raw('/api/analytics/summary').catch(()=>null)]); }
+  else { v = { subscribers: 24, campaigns: 3, sent: 2, avgOpenRate: 41, pending: 1 }; a = demoAnalytics(); }
+  if (!v || !a) { $('#view').innerHTML = '<p class="empty">Connect the server for live stats.</p>'; return; }
+  const maxP = Math.max(1, ...a.topPages.map(p=>p.count));
+  const maxR = Math.max(1, ...a.topReferrers.map(r=>r.count));
+  const maxT = Math.max(1, ...a.trend.map(t=>t.pageviews));
+  $('#view').innerHTML = `
+  <div class="section-title" style="font-size:13px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--mut,#8b95b3);margin:0 0 12px">Visitors — last ${a.days} days (privacy-safe: hashed daily uniques, no cookies)</div>
+  <div class="kpis">
+    <div class="kpi"><b>${a.totals.pageviews.toLocaleString()}</b><span>Pageviews</span></div>
+    <div class="kpi"><b>${a.totals.uniques.toLocaleString()}</b><span>Unique visitors</span></div>
+    <div class="kpi"><b>${a.today ? a.today.pageviews : 0}</b><span>Today</span></div>
+    <div class="kpi"><b>${a.yesterday ? a.yesterday.pageviews : 0}</b><span>Yesterday</span></div>
+    <div class="kpi"><b>${Math.round((a.totals.pageviews/Math.max(1,a.days)))}</b><span>Avg/day</span></div>
+  </div>
+  <div class="trend" title="Daily pageviews">${a.trend.map(t=>`<i style="height:${Math.round(t.pageviews/maxT*100)}%" title="${t.date}: ${t.pageviews}"></i>`).join('')}</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:18px;flex-wrap:wrap" class="two-col">
+    <div><div class="section-title" style="font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--mut,#8b95b3)">Top pages</div>
+      ${a.topPages.slice(0,6).map(p=>`<div class="bar-row"><span class="lbl">${esc(p.key)}</span><span class="bar"><i style="width:${Math.round(p.count/maxP*100)}%"></i></span><span class="n">${p.count}</span></div>`).join('') || '<p class="empty">No data yet</p>'}</div>
+    <div><div class="section-title" style="font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--mut,#8b95b3)">Traffic sources</div>
+      ${a.topReferrers.slice(0,6).map(r=>`<div class="bar-row"><span class="lbl">${esc(r.key)}</span><span class="bar"><i style="width:${Math.round(r.count/maxR*100)}%"></i></span><span class="n">${r.count}</span></div>`).join('') || '<p class="empty">No data yet</p>'}</div>
+  </div>
+  <div class="section-title" style="font-size:13px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--mut,#8b95b3);margin:24px 0 12px">Newsletter</div>
+  <div class="kpis">
+    <div class="kpi"><b>${v.subscribers}</b><span>Active subscribers</span></div>
+    <div class="kpi"><b>${v.campaigns}</b><span>Campaigns drafted</span></div>
+    <div class="kpi"><b>${v.sent}</b><span>Sent</span></div>
+    <div class="kpi"><b>${v.avgOpenRate !== null ? v.avgOpenRate + '%' : '—'}</b><span>Avg open rate</span></div>
+    <div class="kpi"><b>${v.pending}</b><span>Awaiting approval</span></div>
+  </div>`;
+}
+function demoAnalytics(){ const t=[]; for(let i=29;i>=0;i--){const d=new Date(Date.now()-i*864e5); const pv=8+Math.round(Math.abs(Math.sin(i*1.3))*28); t.push({date:d.toISOString().slice(0,10),pageviews:pv,uniques:Math.round(pv*.6)});}
+  return { days: 30, totals: { pageviews: t.reduce((s,x)=>s+x.pageviews,0), uniques: t.reduce((s,x)=>s+x.uniques,0) },
+    today: t[29], yesterday: t[28], topPages: [{key:'index.html',count:312},{key:'quotes.html',count:141},{key:'gallery.html',count:98},{key:'careers.html',count:44}],
+    topReferrers: [{key:'search',count:266},{key:'direct',count:201},{key:'facebook.com',count:63}], trend: t }; }
+
+async function renderSubs(){
+  const subs = isLive() ? await raw('/api/newsletter/subscribers').catch(()=>[]) : [
+    {email:'ad@germantownhs.edu',name:'Athletic Director',status:'active',opens:4,subscribedAt:new Date().toISOString()},
+    {email:'pastor@gracechurch.org',name:null,status:'active',opens:1,subscribedAt:new Date().toISOString()},
+    {email:'old@lead.com',name:null,status:'unsubscribed',opens:0,unsubscribedAt:new Date().toISOString()}];
+  if (!subs.length) { $('#view').innerHTML = '<p class="empty">No subscribers yet — the signup form lives on the public site footer.</p>'; return; }
+  $('#view').innerHTML = subs.map(s=>`<div class="list-row">
+    <span style="width:12px;height:12px;border-radius:50%;background:${s.status==='active'?'#43d17c':'#5a6478'};flex:none"></span>
+    <div style="flex:1;min-width:180px"><b>${esc(s.email)}</b>${s.name ? ' — ' + esc(s.name) : ''}<br><small>${s.status==='active' ? 'subscribed ' + ago(s.subscribedAt) + ' · ' + (s.opens||0) + ' opens' : 'unsubscribed ' + ago(s.unsubscribedAt)}</small></div>
+    ${s.status==='active' ? `<button class="btn btn-ghost btn-mini" onclick="removeSub('${esc(s.email)}')">Remove</button>` : ''}
+  </div>`).join('');
+}
+async function removeSub(email){
+  if (!confirm('Remove ' + email + '?')) return;
+  if (isLive()) await raw('/api/newsletter/subscribers/remove', { method:'POST', body: JSON.stringify({ email }) });
+  toast('Removed'); renderSubs();
+}
+
+async function renderCamps(){
+  const camps = isLive() ? await raw('/api/newsletter/campaigns').catch(()=>[]) : [
+    {id:'d1',subject:'Summer refinish season — book before August',status:'sent',recipientCount:24,openCount:11,sentAt:new Date(Date.now()-6*864e5).toISOString()},
+    {id:'d2',subject:'Court care tips + pickleball conversions',status:'pending-approval',recipientCount:0,openCount:0,draftedAt:new Date().toISOString()}];
+  if (!camps.length) { $('#view').innerHTML = '<p class="empty">No campaigns yet — hit "+ New Campaign".</p>'; return; }
+  $('#view').innerHTML = camps.map(c=>`<div class="camp-card">
+    <div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center">
+      <h4>${esc(c.subject)}</h4><span class="pill ${c.status}">${c.status}</span></div>
+    <small style="color:var(--mut)">${c.status==='sent' ? `sent ${ago(c.sentAt)} → ${c.recipientCount} subscriber(s) · ${c.openCount} opens (${c.recipientCount?Math.round(c.openCount/c.recipientCount*100):0}%)` : 'drafted ' + ago(c.draftedAt)}</small>
+    <div style="margin-top:8px;display:flex;gap:8px">
+      <button class="btn btn-ghost btn-mini" onclick="previewCamp('${c.id}')">Preview</button>
+      ${c.status==='pending-approval' ? `<button class="btn btn-sm" onclick="sendCamp('${c.id}')">Approve & send</button>` : ''}
+    </div></div>`).join('');
+}
+async function previewCamp(id){
+  const camps = isLive() ? await raw('/api/newsletter/campaigns') : [];
+  const c = camps.find(x=>x.id===id);
+  if (c) openModal('Preview — ' + c.subject, `<div style="background:#fff;color:#1a2438;border-radius:10px;padding:6px;overflow:auto;max-height:60vh">${c.html}</div>`);
+}
+async function sendCamp(id){
+  if (!confirm('Send to all active subscribers?')) return;
+  try { const r = await raw('/api/newsletter/campaigns/' + id + '/send', { method:'POST' }); toast('Sent to ' + r.recipientCount + ' subscriber(s)'); renderCamps(); }
+  catch (e) { toast(e.error || 'Send failed'); }
+}
+function newCampaign(){
+  openModal('New campaign', `
+    <p class="hint" style="margin-top:0;font-size:12.5px;color:var(--mut)">The agent auto-adds this month's seasonal tip. Pick news items below, add your own announcement, then the draft holds for your approval.</p>
+    ${field('subject','Subject line (blank = auto)','','text')}
+    ${field('announcement','Your announcement (optional)','Now booking fall gym refurbishments','text')}
+    <div id="chipRow" style="font-size:12.5px;color:var(--mut);margin-top:4px">Loading news items…</div>`);
+  if (isLive()) raw('/api/newsletter/news-items').then(items=>{
+    $('#chipRow').innerHTML = 'Include news items:<br>' + items.slice(0,8).map(n=>`<span class="chip" data-id="${esc(n.id)}" data-title="${esc(n.title)}" data-body="${esc(n.body)}" onclick="this.classList.toggle('sel')">${esc(n.title)}</span>`).join('');
+  }).catch(()=>{ $('#chipRow').innerHTML = 'News items unavailable offline.'; });
+  onModalSave(async (vals) => {
+    const newsItems = [...document.querySelectorAll('#chipRow .chip.sel')].map(c => ({ title: c.dataset.title, body: c.dataset.body }));
+    if (vals.announcement) newsItems.unshift({ title: 'From our team', body: vals.announcement });
+    if (isLive()) { await raw('/api/newsletter/draft', { method:'POST', body: JSON.stringify({ subject: vals.subject || undefined, newsItems }) }); toast('Draft created — awaiting approval'); }
+    else toast('Draft created (demo)');
+    closeModal(); TAB='campaigns'; render();
+  });
+}
+
+async function renderNews(){
+  const items = isLive() ? await raw('/api/newsletter/news-items').catch(()=>[]) : [
+    {id:'n1',title:'Pickleball keeps converting gyms',body:'Facilities across the Mid-South are adding pickleball courts — a low-cost programming revenue add.',url:'https://www.usapickleball.org/',addedAt:new Date().toISOString()},
+    {id:'n2',title:'NFHS updates court-marking guidance',body:'State associations periodically update required line dimensions and colors.',url:'https://www.nfhs.org/',addedAt:new Date().toISOString()}];
+  $('#view').innerHTML = `
+    <div style="margin-bottom:12px"><button class="btn btn-sm" onclick="addNews()">+ Add news item</button>
+    <button class="btn btn-ghost btn-sm" onclick="pullNews()">Pull from email alerts</button></div>
+    ${items.map(n=>`<div class="news-item"><b>${esc(n.title)}</b> ${n.url?`<a href="${esc(n.url)}" target="_blank" rel="noopener" style="color:#5bb8ff;font-size:11.5px">source ↗</a>`:''}<br>${esc(n.body||'')}<br><small>${n.currated?'curated':'auto-detected'} · ${ago(n.addedAt)}</small></div>`).join('') || '<p class="empty">No news items — add some or let the email monitor pull them.</p>'}`;
+}
+function addNews(){
+  openModal('Add news item', `${field('title','Title','')}${field('body','Body','','text')}${field('url','Source URL (optional)','','text')}`);
+  onModalSave(async (vals) => {
+    if (isLive()) await raw('/api/newsletter/news-items', { method:'POST', body: JSON.stringify(vals) });
+    toast('Added'); closeModal(); renderNews();
+  });
+}
+async function pullNews(){
+  if (!isLive()) { toast('Connect the server'); return; }
+  const r = await raw('/api/newsletter/scan', { method:'POST' }).catch(()=>({processed:0}));
+  toast(r.processed + ' item(s) pulled from emails'); renderNews();
+}
+
+boot('newsletter', 'Newsletter & Visitors', async () => { await render(); });
+</script>
+</body>
+</html>

@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Forgot Password — Lines &amp; Logos</title>
+<link rel="icon" type="image/png" href="icons/favicon-32.png?v=2">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;700;800&family=Archivo+Black&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#04060d;--navy:#0a1533;--navy-2:#132a63;--blue:#2d5bff;--blue-hi:#4d7dff;--cyan:#57c7ff;--lime:#c6e02c;--red:#ff5a5a;--chrome-1:#eef3fc;--line:rgba(120,145,205,.16);--text:#c6d0e6;--text-dim:#7e8cab}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--ink);color:var(--text);font-family:'Space Grotesk',system-ui,sans-serif;min-height:100vh;display:flex;flex-direction:column;overflow-x:hidden}
+.chrome{background:linear-gradient(180deg,#fff 0%,#dfe7f5 26%,#8ea2c8 50%,#f4f8ff 60%,#7688ad 86%,#ccd8ee 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.orb{position:fixed;border-radius:50%;filter:blur(90px);opacity:.35;pointer-events:none}
+.ob1{width:520px;height:520px;background:var(--blue);top:-16%;right:-8%}
+.ob2{width:340px;height:340px;background:var(--navy-2);bottom:-8%;left:-6%}
+main{flex:1;display:flex;align-items:center;justify-content:center;padding:40px 24px 70px}
+.card{width:100%;max-width:440px;border:1px solid var(--line);border-radius:24px;padding:44px 40px;background:linear-gradient(180deg,rgba(16,31,77,.55),rgba(4,6,13,.85));backdrop-filter:blur(14px);box-shadow:0 40px 100px rgba(0,0,0,.6)}
+.card-logo{width:200px;display:block;margin:0 auto 24px;filter:drop-shadow(0 12px 34px rgba(45,91,255,.45))}
+h1{font-family:'Archivo Black',sans-serif;font-size:24px;text-transform:uppercase;margin-bottom:8px;text-align:center}
+.sub{font-size:14px;color:var(--text-dim);margin-bottom:28px;line-height:1.6;text-align:center}
+label{display:block;font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--text-dim);margin:0 0 8px}
+input{width:100%;padding:14px 16px;border-radius:11px;border:1px solid var(--line);background:rgba(4,6,13,.6);color:#fff;font-family:inherit;font-size:15px;margin-bottom:18px;outline:none;transition:.2s}
+input:focus{border-color:var(--blue-hi);box-shadow:0 0 0 3px rgba(45,91,255,.2)}
+.btn{width:100%;font-family:'Archivo',sans-serif;font-weight:800;font-size:15px;color:#fff;border:none;cursor:pointer;padding:15px;border-radius:12px;background:linear-gradient(180deg,#4d7dff,#2d5bff 45%,#1c3fd6);box-shadow:0 0 0 1px rgba(120,160,255,.5) inset,0 10px 30px rgba(45,91,255,.35);transition:.15s}
+.btn:hover{transform:translateY(-2px)}
+.back{display:inline-block;margin-top:20px;color:var(--text-dim);font-size:13px;text-decoration:none}
+.back:hover{color:#fff}
+.ok{display:none;background:rgba(198,224,44,.08);border:1px solid rgba(198,224,44,.35);border-radius:12px;padding:16px 18px;margin-bottom:18px;font-size:13.5px;line-height:1.6}
+.ok b{color:var(--lime)}
+.ok a{color:var(--cyan);word-break:break-all}
+.err{display:none;background:rgba(255,90,90,.1);border:1px solid rgba(255,90,90,.4);color:#ff9d9d;font-size:13.5px;border-radius:10px;padding:12px 16px;margin-bottom:18px}
+.pw-wrap{position:relative}
+.pw-meter{height:5px;border-radius:100px;background:rgba(120,145,205,.15);overflow:hidden;margin:-8px 0 18px}
+.pw-meter i{display:block;height:100%;width:0;background:var(--red);transition:.3s;border-radius:100px}
+
+/* canonical footer (self-contained) */
+.wrap{max-width:1180px;margin:0 auto;padding:0 32px}
+footer{padding:60px 0 36px;border-top:1px solid var(--line,rgba(255,255,255,.08));background:linear-gradient(180deg,var(--ink,#04060d),var(--navy,#0a1226))}
+.foot-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:44px;margin-bottom:44px;text-align:left}
+.foot-grid h4{font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--chrome-1,#eef3fc);margin:0 0 14px}
+.foot-grid>div:not(.foot-brand) a{display:block;color:var(--text-dim,#8b94a7);text-decoration:none;font-size:14px;margin-bottom:9px}
+.foot-grid>div:not(.foot-brand) a:hover{color:#fff}
+.foot-brand{text-align:left}
+.foot-brand img{height:180px;width:auto;margin-bottom:16px}
+.foot-brand .foot-address{display:block;margin-top:14px;font-style:normal;text-align:left;line-height:1.6;color:var(--text-dim,#8b94a7);font-size:13.5px}
+.foot-bottom{display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;border-top:1px solid var(--line,rgba(255,255,255,.08));padding-top:24px;font-size:12.5px;color:var(--text-dim,#8b94a7)}
+@media(max-width:900px){.foot-grid{grid-template-columns:1fr 1fr;gap:28px}}
+@media(max-width:600px){.wrap{padding:0 20px}}
+@media(max-width:520px){.foot-grid{grid-template-columns:1fr}}
+</style>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#04060d">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Lines & Logos">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+</head>
+<body>
+<div class="orb ob1"></div><div class="orb ob2"></div>
+<main>
+  <div class="card">
+    <img class="card-logo" src="logo-hero.png" alt="Lines &amp; Logos">
+    <!-- STEP 1: request reset -->
+    <div id="step1">
+      <h1 class="chrome">Reset password</h1>
+      <p class="sub">Enter the email on your account and we'll send you a reset link.</p>
+      <div class="err" id="err1"></div>
+      <label>Email</label>
+      <input id="email" type="email" placeholder="you@linesandlogos.com">
+      <button class="btn" onclick="requestReset()">Send Reset Link →</button>
+      <div class="ok" id="ok1"></div>
+    </div>
+
+    <!-- STEP 2: choose new password -->
+    <div id="step2" style="display:none">
+      <h1 class="chrome">New password</h1>
+      <p class="sub">Choose a new password. All enrolled passkeys are revoked when you reset.</p>
+      <div class="err" id="err2"></div>
+      <label>New password</label>
+      <input id="pw1" type="password" placeholder="At least 8 characters" oninput="meter()">
+      <div class="pw-meter"><i id="meterBar"></i></div>
+      <label>Confirm password</label>
+      <input id="pw2" type="password" placeholder="Repeat it">
+      <button class="btn" onclick="doReset()">Update Password →</button>
+      <div class="ok" id="ok2"></div>
+    </div>
+    <a class="back" href="login.html">← Back to login</a>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <img src="logo-hero.png" alt="Lines &amp; Logos">
+        <address class="foot-address">2847 New Broadway St.<br>Memphis, TN 38109</address>
+      </div>
+      <div>
+        <h4>Partners</h4>
+        <a href="careers.html">Become a Contractor</a>
+        <a href="partners.html#apply">Become an Affiliate</a>
+        <a href="partners.html#how">Affiliate Guide</a>
+        <a href="partners.html#tiers">Earnings &amp; Payouts</a>
+      </div>
+      <div>
+        <h4>Support</h4>
+        <a href="index.html#faq">FAQ</a>
+        <a href="mailto:info@linesandlogos.team">Contact Support</a>
+        <a href="gallery.html">Photo Gallery</a>
+        <a href="legal.html#trust">Verification &amp; Trust</a>
+        <a href="legal.html#data-retention">Data Retention</a>
+      </div>
+      <div>
+        <h4>Legal</h4>
+        <a href="legal.html#terms">Terms of Service</a>
+        <a href="legal.html#privacy">Privacy Policy</a>
+        <a href="legal.html#acceptable-use">Acceptable Use Policy</a>
+        <a href="legal.html#provider-terms">Provider Terms</a>
+        <a href="legal.html#refunds">Refund Policy</a>
+        <a href="legal.html#cookies">Cookie Policy</a>
+        <a href="legal.html#legal-notice">Legal Notice</a>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>© 2026 Lines &amp; Logos. All rights reserved.</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+const BASE=(location.protocol==='file:')?'http://localhost:3001':'';
+const qs=new URLSearchParams(location.search);
+if(qs.get('token')){ document.getElementById('step1').style.display='none'; document.getElementById('step2').style.display='block'; }
+function err(id,m){const e=document.getElementById(id);e.style.display=m?'block':'none';e.textContent=m;}
+async function requestReset(){
+  err('err1','');
+  const email=document.getElementById('email').value.trim();
+  try{
+    const r=await fetch(BASE+'/api/forgot',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email})});
+    const j=await r.json();
+    if(j.error) return err('err1',j.error);
+    const ok=document.getElementById('ok1'); ok.style.display='block';
+    ok.innerHTML=`Reset link sent to <b>${email}</b> (also in the server email outbox).<br><a href="${BASE}${j.resetUrl}">${j.resetUrl}</a>`;
+  }catch{ err('err1','Cannot reach server. Start it with: node server.js (port 3001)'); }
+}
+function meter(){
+  const v=document.getElementById('pw1').value;
+  let s=0; if(v.length>=8)s++; if(/[A-Z]/.test(v)&&/[a-z]/.test(v))s++; if(/\d/.test(v))s++; if(/[^A-Za-z0-9]/.test(v))s++;
+  const bar=document.getElementById('meterBar');
+  bar.style.width=(s*25)+'%'; bar.style.background=['var(--red)','#ff9a3c','var(--yellow)','#9acd32','var(--lime)'][s];
+}
+async function doReset(){
+  err('err2','');
+  const p1=document.getElementById('pw1').value, p2=document.getElementById('pw2').value;
+  if(p1.length<8) return err('err2','Password must be at least 8 characters.');
+  if(p1!==p2) return err('err2','Passwords do not match.');
+  try{
+    const r=await fetch(BASE+'/api/reset',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:qs.get('token'),password:p1})});
+    const j=await r.json();
+    if(j.error) return err('err2',j.error);
+    localStorage.removeItem('ll_passkey');
+    const ok=document.getElementById('ok2'); ok.style.display='block';
+    ok.innerHTML='<b>Password updated.</b> You can <a href="login.html">sign in</a> now.';
+    document.getElementById('step2').querySelector('button').style.display='none';
+  }catch{ err('err2','Cannot reach server. Start it with: node server.js (port 3001)'); }
+}
+</script>
+<script src="assets/pwa.js" defer></script>
+</body>
+</html>

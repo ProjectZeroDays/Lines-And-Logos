@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ad Manager — Lines &amp; Logos Business OS</title>
+<link rel="icon" type="image/png" href="icons/favicon-32.png?v=2">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;700;800&family=Archivo+Black&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/os.css?v=9">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#04060d">
+<style>
+.adgrid{display:grid;grid-template-columns:400px 1fr;gap:20px;align-items:start}
+.panel{background:#0a1533;border:1px solid rgba(141,168,255,.14);border-radius:14px;padding:16px;margin-bottom:16px}
+.panel h3{margin:0 0 12px;font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:#8fa8ff}
+.panel label{display:block;font-size:12px;color:#8fa8ff;margin:10px 0 4px}
+.panel input,.panel select,.panel textarea{width:100%;background:#04060d;border:1px solid rgba(141,168,255,.2);border-radius:8px;color:#fff;padding:8px 10px;font-family:inherit;font-size:13px}
+.panel textarea{resize:vertical;min-height:56px}
+.panel input[type=checkbox]{width:auto}
+.panel input[type=range]{padding:0}
+.panel input[type=color]{height:34px;padding:2px}
+.rowf{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.rowf3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.stage{background:#04060d;border:1px solid rgba(141,168,255,.14);border-radius:14px;padding:16px;display:flex;flex-direction:column;align-items:center;gap:12px;position:sticky;top:16px}
+#canvasWrap{max-width:100%;display:flex;justify-content:center}
+canvas{max-width:100%;height:auto;border-radius:8px;box-shadow:0 12px 40px rgba(0,0,0,.5)}
+.checks{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+.chk{font-size:11.5px;padding:5px 10px;border-radius:20px;border:1px solid}
+.chk.ok{color:#3fae5a;border-color:#3fae5a55;background:#3fae5a11}
+.chk.warn{color:#ffc21c;border-color:#ffc21c55;background:#ffc21c11}
+.chk.bad{color:#ff5560;border-color:#ff556055;background:#ff556011}
+.btns{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+.provcard{background:#0a1533;border:1px solid rgba(141,168,255,.14);border-radius:14px;margin-bottom:14px;overflow:hidden}
+.provhead{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;cursor:pointer;user-select:none}
+.provhead b{font-size:15px}
+.provbody{display:none;padding:0 16px 16px;border-top:1px solid rgba(141,168,255,.12)}
+.provcard.open .provbody{display:block}
+.steps{counter-reset:st;list-style:none;padding:0;margin:10px 0}
+.steps li{counter-increment:st;position:relative;padding:8px 0 8px 38px;font-size:13px;color:var(--text);line-height:1.5;border-bottom:1px dashed rgba(141,168,255,.1)}
+.steps li::before{content:counter(st);position:absolute;left:0;top:8px;width:24px;height:24px;border-radius:50%;background:#2d5bff;color:#fff;font-size:12px;display:flex;align-items:center;justify-content:center;font-weight:700}
+.steps.manual li::before{background:#3fae5a}
+.keygrid{display:grid;grid-template-columns:1fr auto;gap:8px;margin:8px 0}
+.keygrid input{background:#04060d;border:1px solid rgba(141,168,255,.2);border-radius:8px;color:#fff;padding:8px 10px;font-family:inherit;font-size:12.5px}
+.cstat{font-size:11.5px;padding:4px 12px;border-radius:20px}
+.cstat.on{color:#3fae5a;background:#3fae5a18;border:1px solid #3fae5a44}
+.cstat.off{color:#8fa8ff;background:#8fa8ff12;border:1px solid #8fa8ff33}
+.spectab{width:100%;border-collapse:collapse;font-size:12.5px}
+.spectab th{text-align:left;color:#8fa8ff;font-weight:600;padding:6px 8px;border-bottom:1px solid rgba(141,168,255,.2)}
+.spectab td{padding:6px 8px;border-bottom:1px solid rgba(141,168,255,.08);color:var(--text)}
+.mini-thumbs{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:6px}
+.mini-thumbs img{width:100%;height:64px;object-fit:cover;border-radius:8px;cursor:pointer;border:2px solid transparent}
+.mini-thumbs img.sel{border-color:#2d5bff}
+.galnote{font-size:12px;color:#8fa8ff;margin-top:6px}
+@media(max-width:980px){.adgrid{grid-template-columns:1fr}.stage{position:static}}
+@media(max-width:640px){.rowf,.rowf3{grid-template-columns:1fr}.mini-thumbs{grid-template-columns:repeat(3,1fr)}}
+</style>
+</head>
+<body>
+<main>
+  <div class="topbar">
+    <div><div class="crumb">Business OS / Ad Manager</div><h1 class="chrome">Ad Manager</h1></div>
+    <div class="topbar-right">
+      <a class="btn btn-sm btn-ghost" href="brand.html" style="text-decoration:none">Brand Kit</a>
+    </div>
+  </div>
+  <div class="tabs2" id="tabs"></div>
+
+  <!-- ================= GENERATE ================= -->
+  <div id="tab-generate">
+    <div class="adgrid">
+      <div>
+        <div class="panel">
+          <h3>1 · Placement</h3>
+          <label>Provider</label>
+          <select id="p-provider" onchange="onProvider()"></select>
+          <label>Ad size</label>
+          <select id="p-size" onchange="onSize()"></select>
+          <div class="galnote" id="specNote"></div>
+        </div>
+
+        <div class="panel">
+          <h3>2 · Background</h3>
+          <label>Source</label>
+          <select id="p-bgsrc" onchange="onBgSrc()">
+            <option value="brand">Brand artwork</option>
+            <option value="gallery">Approved gallery photo</option>
+            <option value="upload">Upload an image</option>
+            <option value="solid">Solid brand color</option>
+          </select>
+          <div id="bgBrand"><div class="mini-thumbs" id="brandThumbs"></div></div>
+          <div id="bgGallery" style="display:none"><div class="mini-thumbs" id="galThumbs"></div><div class="galnote" id="galNote">Only photos with signed consent appear here.</div></div>
+          <div id="bgUpload" style="display:none"><input type="file" id="p-upload" accept="image/*" onchange="onUpload(event)"></div>
+          <div id="bgSolid" style="display:none"><label>Background color</label><input type="color" id="p-bgcolor" value="#0a1533" oninput="draw()"></div>
+          <label><input type="checkbox" id="p-dim" checked onchange="draw()"> Darken photo for readable text</label>
+        </div>
+
+        <div class="panel">
+          <h3>3 · Logo</h3>
+          <label><input type="checkbox" id="p-logo" checked onchange="draw()"> Show logo overlay</label>
+          <div class="rowf">
+            <div><label>Position</label>
+              <select id="p-logopos" onchange="draw()">
+                <option value="tr">Top right</option><option value="tl">Top left</option>
+                <option value="br">Bottom right</option><option value="bl">Bottom left</option>
+                <option value="c">Center</option>
+              </select></div>
+            <div><label>Size <span id="logoScaleLbl">22%</span></label>
+              <input type="range" id="p-logoscale" min="10" max="60" value="22" oninput="OS.$('#logoScaleLbl').textContent=this.value+'%';draw()"></div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h3>4 · Copy</h3>
+          <div class="btns" style="justify-content:flex-start">
+            <button class="btn btn-sm btn-ghost" onclick="pickQuote()">🎲 Quote</button>
+            <button class="btn btn-sm btn-ghost" onclick="agentCopy()">🤖 Agent: write copy</button>
+          </div>
+          <label>Headline <span id="hlCount" class="galnote" style="display:inline"></span></label>
+          <input id="p-headline" maxlength="120" value="Straight Lines. Bold Logos." oninput="draw()">
+          <label>Subtext <span id="subCount" class="galnote" style="display:inline"></span></label>
+          <textarea id="p-sub" maxlength="300" oninput="draw()">Courts, painting, vinyl, graphics & more — book your free walkthrough.</textarea>
+          <label>CTA button</label>
+          <input id="p-cta" maxlength="30" value="Get a Quote" oninput="draw()">
+          <div class="rowf">
+            <div><label>Text color</label><input type="color" id="p-fg" value="#ffffff" onchange="draw()"></div>
+            <div><label>CTA color</label><input type="color" id="p-ctacolor" value="#2d5bff" onchange="draw()"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="stage">
+        <div id="canvasWrap"><canvas id="cv" width="1080" height="1080"></canvas></div>
+        <div class="checks" id="checks"></div>
+        <div class="btns">
+          <button class="btn btn-sm" onclick="exportAd('png')">⬇ Export PNG</button>
+          <button class="btn btn-sm btn-green" onclick="exportAd('jpeg')">⬇ Export JPEG</button>
+          <button class="btn btn-sm btn-ghost" onclick="gifNote()">GIF / MP4?</button>
+        </div>
+        <div class="galnote" id="exportNote"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= SPECS ================= -->
+  <div id="tab-specs" style="display:none">
+    <div class="panel"><h3>Provider ad specs — sizes, file limits, formats, text limits</h3><div id="specList"></div></div>
+  </div>
+
+  <!-- ================= INTEGRATIONS ================= -->
+  <div id="tab-integrations" style="display:none">
+    <div class="panel" style="border-color:#ffc21c44;background:#ffc21c08">
+      <h3 style="color:#ffc21c">How this works</h3>
+      <div style="font-size:13px;color:var(--text);line-height:1.6">
+        Connect each provider by pasting its API keys below (step-by-step retrieval guides included) — the <b>Ad Manager Agent</b> can then draft and post ads and manage campaign budgets for you.
+        No key yet? Every provider card also includes a <b>manual posting walkthrough</b> so you can do it yourself with the exports from the Generate tab.
+        Keys are stored on the server and never shown back in full.
+      </div>
+    </div>
+    <div id="intList"></div>
+  </div>
+
+  <!-- ================= CAMPAIGNS ================= -->
+  <div id="tab-campaigns" style="display:none">
+    <div class="kpis" id="campKpis"></div>
+    <div class="panel">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <h3 style="margin:0">Campaigns &amp; budgets</h3>
+        <button class="btn btn-sm" onclick="addCampaign()">+ New campaign</button>
+      </div>
+      <div class="table-wrap"><table class="spectab" id="campTable"></table></div>
+    </div>
+  </div>
+</main>
+<script src="assets/os.js?v=9"></script>
+<script src="assets/brand.js"></script>
+<script>
+const {esc,fmt}=OS;
+let tab='generate';
+const TABS=[['generate','Generate Ad'],['specs','Provider Specs'],['integrations','Integrations & Setup'],['campaigns','Campaigns & Budget']];
+function go(t){tab=t;renderTabs();['generate','specs','integrations','campaigns'].forEach(k=>OS.$('#tab-'+k).style.display=k===t?'':'none');
+  if(t==='campaigns')renderCampaigns(); if(t==='specs')renderSpecs(); if(t==='integrations')renderIntegrations();}
+function renderTabs(){OS.$('#tabs').innerHTML=TABS.map(([k,l])=>`<button class="${tab===k?'active':''}" onclick="go('${k}')">${l}</button>`).join('');}
+
+/* ---------- state ---------- */
+let galleryPhotos=[];   // approved + has url
+let bgImg=null;         // current background Image
+let logoImg=null;
+let selBrand='assets/brand/banner-dark-1.jpg';
+let lastBlobKB=null;
+
+function provider(){return AD_PROVIDERS.find(p=>p.id===OS.$('#p-provider').value);}
+function sizeSpec(){const p=provider();return p.sizes[+OS.$('#p-size').value];}
+
+/* ---------- init controls ---------- */
+function initProviders(){
+  OS.$('#p-provider').innerHTML=AD_PROVIDERS.map(p=>`<option value="${p.id}">${esc(p.name)}</option>`).join('');
+  onProvider();
+}
+function onProvider(){
+  const p=provider();
+  OS.$('#p-size').innerHTML=p.sizes.map((s,i)=>`<option value="${i}">${esc(s.label)} — ${s.w}×${s.h} (${s.ratio})</option>`).join('');
+  onSize();
+}
+function onSize(){
+  const s=sizeSpec(), cv=OS.$('#cv');
+  cv.width=s.w; cv.height=s.h;
+  OS.$('#specNote').textContent=(s.note?s.note+' · ':'')+`Max ${provider().maxMB.image}MB image · formats: ${provider().formats.join(', ')}`;
+  draw();
+}
+function onBgSrc(){
+  const v=OS.$('#p-bgsrc').value;
+  OS.$('#bgBrand').style.display=v==='brand'?'':'none';
+  OS.$('#bgGallery').style.display=v==='gallery'?'':'none';
+  OS.$('#bgUpload').style.display=v==='upload'?'':'none';
+  OS.$('#bgSolid').style.display=v==='solid'?'':'none';
+  if(v==='brand') loadBg(selBrand);
+  if(v==='gallery'&&galleryPhotos[0]) loadBg(galleryPhotos[0].url);
+  if(v==='solid'){bgImg=null;draw();}
+}
+function loadBg(src){
+  const im=new Image(); im.crossOrigin='anonymous';
+  im.onload=()=>{bgImg=im;draw();}; im.onerror=()=>{bgImg=null;draw();};
+  im.src=src;
+  document.querySelectorAll('.mini-thumbs img').forEach(t=>t.classList.toggle('sel',t.dataset.src===src));
+}
+function onUpload(e){
+  const f=e.target.files[0]; if(!f)return;
+  const r=new FileReader(); r.onload=()=>loadBg(r.result); r.readAsDataURL(f);
+}
+function pickQuote(){
+  const q=BRAND.quotes[Math.floor(Math.random()*BRAND.quotes.length)];
+  OS.$('#p-headline').value=q.text;
+  const p=provider();
+  if(p.text&&p.text.headline&&q.text.length>p.text.headline)OS.$('#p-sub').value=q.text;
+  draw();
+}
+async function agentCopy(){
+  const p=provider(), s=sizeSpec();
+  try{
+    const out=await OS.runAgent('ad-manager',{provider:p.id,label:s.label,limits:p.text});
+    if(out&&out.headline){OS.$('#p-headline').value=out.headline;OS.$('#p-sub').value=out.sub||'';OS.$('#p-cta').value=out.cta||OS.$('#p-cta').value;OS.toast('Agent drafted copy');draw();return;}
+  }catch(e){/* fall through to local */}
+  // offline fallback: local composer
+  const q=BRAND.quotes.filter(x=>x.tag!=='funny')[Math.floor(Math.random()*18)];
+  OS.$('#p-headline').value=q.text.slice(0,(p.text&&p.text.headline)||60);
+  OS.$('#p-sub').value='Courts • Painting • Vinyl • Graphics • More. Free walkthrough & quote.';
+  OS.$('#p-cta').value=BRAND.ctas[Math.floor(Math.random()*BRAND.ctas.length)].slice(0,24);
+  OS.toast('Agent drafted copy (offline mode)');
+  draw();
+}
+function gifNote(){
+  OS.openModal('Animated & video ads',`<div style="font-size:13px;line-height:1.7">
+    <b>For GIF ads:</b> use the animated logos in the Brand Kit (logo-pulse.gif, logo-shine.gif, logo-pop.gif — all 512×512 and under provider GIF limits), or export this design as PNG and animate it in Meta/TikTok's built-in creative tools.<br><br>
+    <b>For video (MP4):</b> export 2–3 frames from this generator (vary headline/photo), drop them into the provider's video builder or any editor, add the logo-pop.gif as an intro. Provider file limits are listed in the Specs tab.<br><br>
+    <b>Logo GIFs:</b><br>${BRAND.assets.filter(a=>a.kind==='gif').map(a=>`<a style="color:#8fa8ff" href="${a.file}" download>${a.label}</a>`).join('<br>')}
+  </div>`);
+}
+</script>
+<script>
+/* ---------- canvas render ---------- */
+function wrapText(ctx,text,maxW){
+  const words=String(text||'').split(/\s+/).filter(Boolean), lines=[]; let cur='';
+  for(const w of words){const t=cur?cur+' '+w:w;
+    if(ctx.measureText(t).width<=maxW)cur=t; else{if(cur)lines.push(cur);cur=w;}}
+  if(cur)lines.push(cur); return lines;
+}
+function drawCover(ctx,im,W,H){
+  const s=Math.max(W/im.width,H/im.height), w=im.width*s, h=im.height*s;
+  ctx.drawImage(im,(W-w)/2,(H-h)/2,w,h);
+}
+async function draw(){
+  const cv=OS.$('#cv'), ctx=cv.getContext('2d'), W=cv.width, H=cv.height;
+  await document.fonts.ready;
+  // bg
+  ctx.clearRect(0,0,W,H);
+  const src=OS.$('#p-bgsrc').value;
+  if(bgImg&&src!=='solid'){drawCover(ctx,bgImg,W,H);}
+  else{ctx.fillStyle=OS.$('#p-bgcolor').value;ctx.fillRect(0,0,W,H);}
+  if(bgImg&&OS.$('#p-dim').checked){
+    const g=ctx.createLinearGradient(0,H*0.25,0,H);
+    g.addColorStop(0,'rgba(4,6,13,0.15)');g.addColorStop(1,'rgba(4,6,13,0.82)');
+    ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+  }
+  const fg=OS.$('#p-fg').value, pad=Math.round(W*0.06);
+  // headline
+  const hl=OS.$('#p-headline').value.trim(), sub=OS.$('#p-sub').value.trim(), cta=OS.$('#p-cta').value.trim();
+  let size=Math.round(W*0.085);
+  ctx.textBaseline='alphabetic';
+  let lines;
+  while(size>16){
+    ctx.font=`900 ${size}px 'Archivo Black',sans-serif`;
+    lines=wrapText(ctx,hl,W-pad*2);
+    if(lines.length<=3&&lines.every(l=>ctx.measureText(l).width<=W-pad*2))break;
+    size-=2;
+  }
+  const lh=size*1.08;
+  let y=H-pad;
+  // CTA
+  if(cta){
+    ctx.font=`700 ${Math.round(size*0.34)}px 'Space Grotesk',sans-serif`;
+    const cw=ctx.measureText(cta).width+size*0.9, ch=size*0.72;
+    const cx=pad, cy=y-ch;
+    ctx.fillStyle=OS.$('#p-ctacolor').value;
+    ctx.beginPath();
+    if(ctx.roundRect)ctx.roundRect(cx,cy,cw,ch,ch/2);else ctx.rect(cx,cy,cw,ch);
+    ctx.fill();
+    ctx.fillStyle='#fff'; ctx.fillText(cta,cx+size*0.45,cy+ch*0.68);
+    y=cy-size*0.4;
+  }
+  // sub (bottom-up)
+  if(sub){
+    const ss=Math.max(14,Math.round(size*0.30));
+    ctx.font=`500 ${ss}px 'Space Grotesk',sans-serif`;
+    const sl=wrapText(ctx,sub,W-pad*2).slice(0,3);
+    y-=sl.length*ss*1.4;
+    ctx.fillStyle=fg; ctx.globalAlpha=0.92;
+    sl.forEach((l,i)=>ctx.fillText(l,pad,y+(i+1)*ss*1.4));
+    ctx.globalAlpha=1; y-=size*0.3;
+  }
+  // headline above sub
+  ctx.font=`900 ${size}px 'Archivo Black',sans-serif`;
+  ctx.fillStyle=fg;
+  ctx.shadowColor='rgba(0,0,0,.55)'; ctx.shadowBlur=size*0.25; ctx.shadowOffsetY=2;
+  y-=lines.length*lh;
+  lines.forEach((l,i)=>ctx.fillText(l,pad,y+(i+1)*lh));
+  ctx.shadowColor='transparent'; ctx.shadowBlur=0; ctx.shadowOffsetY=0;
+  // logo
+  if(OS.$('#p-logo').checked&&logoImg){
+    const sc=+OS.$('#p-logoscale').value/100;
+    const lw=W*sc, lh2=lw*logoImg.height/logoImg.width, m=Math.round(W*0.035);
+    const pos=OS.$('#p-logopos').value;
+    const x=pos.includes('l')?m:pos==='c'?(W-lw)/2:W-lw-m;
+    const yy=pos.includes('b')?H-lh2-m:pos==='c'?(H-lh2)/2:m;
+    ctx.drawImage(logoImg,x,yy,lw,lh2);
+  }
+  validate();
+}
+/* ---------- validation ---------- */
+function validate(){
+  const p=provider(), s=sizeSpec();
+  const hl=OS.$('#p-headline').value, sub=OS.$('#p-sub').value;
+  const out=[];
+  out.push(['ok',`Size ${s.w}×${s.h} ✓`]);
+  if(s.note)out.push(['warn',s.note]);
+  const lim=p.text||{};
+  if(lim.headline){const ok=hl.length<=lim.headline;out.push([ok?'ok':'warn',`Headline ${hl.length}/${lim.headline} chars`]);
+    OS.$('#hlCount').textContent=`${hl.length}/${lim.headline}`;}
+  if(lim.description||lim.primary){const l2=Math.max(lim.description||0,lim.primary||0);const ok=sub.length<=l2;out.push([ok?'ok':'warn',`Subtext ${sub.length}/${l2} chars`]);
+    OS.$('#subCount').textContent=`${sub.length}/${l2}`;}
+  if(p.formats.includes('png')||p.formats.includes('jpg'))out.push(['ok','PNG/JPEG allowed ✓']);
+  if(lastBlobKB!=null){
+    const maxKB=p.maxMB.image*1024;
+    out.push([lastBlobKB<=maxKB?'ok':'bad',`Last export ${lastBlobKB<1024?lastBlobKB+'KB':(lastBlobKB/1024).toFixed(1)+'MB'} / ${p.maxMB.image}MB max`]);
+  }
+  OS.$('#checks').innerHTML=out.map(([c,t])=>`<span class="chk ${c}">${esc(t)}</span>`).join('');
+}
+function exportAd(kind){
+  const cv=OS.$('#cv');
+  cv.toBlob(b=>{
+    lastBlobKB=Math.round(b.size/1024);
+    const p=provider(), s=sizeSpec();
+    const a=document.createElement('a');
+    a.href=URL.createObjectURL(b);
+    a.download=`ll-ad_${p.id}_${s.w}x${s.h}.${kind==='png'?'png':'jpg'}`;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(()=>URL.revokeObjectURL(a.href),4000);
+    const maxKB=p.maxMB.image*1024;
+    OS.$('#exportNote').textContent = b.size/1024<=maxKB
+      ? `✓ ${a.download} — ${(b.size/1024/1024).toFixed(2)}MB, within ${p.name}'s ${p.maxMB.image}MB limit. Upload via the Integrations tab guide.`
+      : `⚠ File is ${(b.size/1024/1024).toFixed(2)}MB — over ${p.name}'s ${p.maxMB.image}MB limit. Try JPEG instead of PNG.`;
+    validate();
+  }, kind==='png'?'image/png':'image/jpeg', kind==='png'?undefined:0.92);
+}
+/* ---------- brand thumbs + gallery ---------- */
+function renderBrandThumbs(){
+  const list=BRAND.assets.filter(a=>a.kind!=='gif');
+  OS.$('#brandThumbs').innerHTML=list.map(a=>`<img src="${a.file}" data-src="${a.file}" title="${esc(a.label)}" onclick="loadBg('${a.file}')" class="${a.file===selBrand?'sel':''}">`).join('');
+}
+async function loadGallery(){
+  try{
+    const g=await OS.raw('/api/gallery');
+    galleryPhotos=(g||[]).filter(x=>x.url&&x.status==='approved');
+  }catch(e){galleryPhotos=[];}
+  if(galleryPhotos.length){
+    OS.$('#galThumbs').innerHTML=galleryPhotos.map((x,i)=>`<img src="${esc(x.url)}" data-src="${esc(x.url)}" title="${esc(x.caption||'Gallery photo')}" onclick="loadBg(this.dataset.src)">`).join('');
+    OS.$('#galNote').textContent=`${galleryPhotos.length} consent-approved photo(s) available.`;
+  }else{
+    OS.$('#galThumbs').innerHTML='';
+    OS.$('#galNote').textContent='No approved gallery photos with image files yet — approve photos in the Photo Gallery, or use brand artwork / upload.';
+  }
+}
+/* ---------- specs tab ---------- */
+function renderSpecs(){
+  OS.$('#specList').innerHTML=AD_PROVIDERS.map(p=>`
+    <h4 style="margin:18px 0 6px;color:#fff">${esc(p.name)}</h4>
+    <table class="spectab">
+      <tr><th>Placement</th><th>Pixels</th><th>Ratio</th><th>Max file</th><th>Formats</th><th>Text limits</th></tr>
+      ${p.sizes.map(s=>`<tr><td>${esc(s.label)}</td><td>${s.w}×${s.h}</td><td>${s.ratio}</td><td>${p.maxMB.image}MB img${p.maxMB.video?' / '+(p.maxMB.video>=1024?(p.maxMB.video/1024)+'GB':p.maxMB.video+'MB')+' vid':''}</td><td>${p.formats.join(', ')}</td><td>${Object.entries(p.text||{}).map(([k,v])=>k+': '+v).join(' · ')}</td></tr>`).join('')}
+    </table>`).join('');
+}
+/* ---------- integrations tab ---------- */
+function keyStore(){
+  try{return JSON.parse(localStorage.getItem('ll_ad_keys')||'{}');}catch(e){return{};}
+}
+function renderIntegrations(){
+  const ks=keyStore();
+  OS.$('#intList').innerHTML=AD_PROVIDERS.map(p=>{
+    const st=ks[p.id];
+    return `<div class="provcard" id="pc-${p.id}">
+      <div class="provhead" onclick="document.getElementById('pc-${p.id}').classList.toggle('open')">
+        <b>${esc(p.name)}</b>
+        <span class="cstat ${st?'on':'off'}">${st?'● Key saved':'○ Not connected'}</span>
+      </div>
+      <div class="provbody">
+        <h4 style="color:#8fa8ff;margin:14px 0 4px">Option A — Connect the API (${esc(p.api.name)})</h4>
+        <ol class="steps">${p.api.steps.map(s=>`<li>${esc(s)}</li>`).join('')}</ol>
+        <div class="keygrid">
+          ${p.api.fields.map(f=>`<input id="k-${p.id}-${f.key}" type="${f.secret?'password':'text'}" placeholder="${esc(f.label)}" value="${st&&st[f.key]&&!f.secret?esc(st[f.key]):''}">`).join('')}
+          <button class="btn btn-sm" onclick="saveKeys('${p.id}')">Save keys</button>
+        </div>
+        <h4 style="color:#8fa8ff;margin:16px 0 4px">Option B — Post it yourself (manual)</h4>
+        <ol class="steps manual">${p.manual.map(s=>`<li>${esc(s)}</li>`).join('')}</ol>
+      </div>
+    </div>`;
+  }).join('');
+}
+async function saveKeys(pid){
+  const p=AD_PROVIDERS.find(x=>x.id===pid), data={};
+  for(const f of p.api.fields){const v=OS.$(`#k-${pid}-${f.key}`).value.trim(); if(v)data[f.key]=v;}
+  if(!Object.keys(data).length)return OS.toast('Paste at least one key first');
+  try{
+    await OS.raw('/api/ads/keys',{method:'POST',body:JSON.stringify({provider:pid,fields:data})});
+    OS.toast('Keys saved on server');
+  }catch(e){
+    const ks=keyStore(); ks[pid]={...(ks[pid]||{}),...data,savedAt:new Date().toISOString()};
+    localStorage.setItem('ll_ad_keys',JSON.stringify(ks));
+    OS.toast('Keys saved locally (demo mode)');
+  }
+  renderIntegrations();
+  document.getElementById('pc-'+pid).classList.add('open');
+}
+/* ---------- campaigns tab ---------- */
+async function renderCampaigns(){
+  let rows=[];
+  try{rows=await OS.list('campaigns');}catch(e){rows=[];}
+  const total=rows.reduce((s,c)=>s+(+c.budget||0),0);
+  const active=rows.filter(c=>c.status==='active').length;
+  OS.$('#campKpis').innerHTML=`
+    <div class="kpi"><div class="val">${rows.length}</div><div class="lbl">Campaigns</div></div>
+    <div class="kpi"><div class="val">${active}</div><div class="lbl">Active</div></div>
+    <div class="kpi"><div class="val">${fmt(total)}</div><div class="lbl">Total budget</div></div>`;
+  OS.$('#campTable').innerHTML=`<tr><th>Name</th><th>Channel</th><th>Status</th><th>Budget</th><th>Start</th><th>Results</th></tr>`+
+    (rows.map(c=>`<tr><td>${esc(c.name)}</td><td>${esc(c.channel||'—')}</td><td><span class="tag t-${c.status==='active'?'green':c.status==='planned'?'yellow':'grey'}">${esc(c.status)}</span></td><td>${fmt(c.budget)}</td><td>${esc(c.start||'—')}</td><td>${esc(c.results||'—')}</td></tr>`).join('')||'<tr><td colspan="6">No campaigns yet.</td></tr>');
+}
+function addCampaign(){
+  OS.openModal('New Ad Campaign',`
+    <label>Name</label><input id="f-name" placeholder="Spring Gym Floor Push">
+    <label>Provider / channel</label><select id="f-ch">${AD_PROVIDERS.map(p=>`<option value="${p.id}">${esc(p.name)}</option>`).join('')}<option value="social">Organic social</option></select>
+    <label>Budget ($)</label><input id="f-budget" type="number" min="0" value="500">
+    <label>Status</label><select id="f-status"><option>planned</option><option>active</option><option>paused</option><option>done</option></select>`);
+  OS.onModalSave(async()=>{
+    await OS.create('campaigns',{name:OS.field('f-name')||'Ad campaign',channel:OS.field('f-ch'),budget:+OS.field('f-budget')||0,status:OS.field('f-status'),start:OS.today(),results:'—'});
+    OS.closeModal();OS.toast('Campaign added');renderCampaigns();
+  });
+}
+/* ---------- boot ---------- */
+OS.boot('ads','Ad Manager',async()=>{
+  renderTabs(); initProviders(); renderBrandThumbs();
+  logoImg=new Image(); logoImg.onload=()=>draw(); logoImg.src='logo.png';
+  await loadGallery();
+  onBgSrc(); draw();
+});
+</script>
+<script src="assets/pwa.js" defer></script>
+</body>
+</html>

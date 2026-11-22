@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Studio — Lines &amp; Logos Business OS</title>
+<link rel="icon" type="image/png" href="icons/favicon-32.png?v=2">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;700;800&family=Archivo+Black&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/os.css?v=9">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#04060d">
+<style>
+.studio-wrap{display:grid;grid-template-columns:250px 1fr 290px;gap:14px;height:calc(100vh - 150px);min-height:520px}
+.panel{background:#0a1533;border:1px solid rgba(141,168,255,.14);border-radius:14px;display:flex;flex-direction:column;overflow:hidden}
+.panel h3{margin:0;padding:12px 14px 10px;font-family:'Archivo Black',sans-serif;font-size:13px;letter-spacing:.04em;border-bottom:1px solid rgba(141,168,255,.12);color:#fff}
+.panel .body{flex:1;overflow-y:auto;padding:10px}
+.lib-item{display:flex;align-items:center;gap:10px;padding:8px;border-radius:10px;cursor:grab;border:1px solid transparent;margin-bottom:6px;background:rgba(255,255,255,.02)}
+.lib-item:hover{border-color:rgba(87,199,255,.4);background:rgba(87,199,255,.06)}
+.lib-item img{width:44px;height:44px;object-fit:contain;border-radius:8px;background:#04060d;flex:none}
+.lib-item .sw{width:44px;height:44px;border-radius:8px;flex:none;border:1px solid rgba(255,255,255,.15)}
+.lib-item .tx{flex:1;min-width:0}
+.lib-item .tx b{display:block;font-size:12px;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lib-item .tx small{font-size:10.5px;color:#8fa8ff}
+.lib-item .add{flex:none;background:#2d5bff;color:#fff;border:none;border-radius:8px;width:26px;height:26px;font-size:16px;cursor:pointer;line-height:1}
+.lib-sec{font-size:10.5px;text-transform:uppercase;letter-spacing:.1em;color:#8fa8ff;margin:12px 4px 6px}
+.canvas-holder{position:relative;border-radius:14px;overflow:hidden;border:1px solid rgba(141,168,255,.14);background:#04060d}
+.canvas-holder canvas{display:block;cursor:grab;touch-action:none}
+.canvas-toolbar{position:absolute;top:10px;left:10px;display:flex;gap:8px;z-index:2;flex-wrap:wrap}
+.canvas-toolbar .btn{backdrop-filter:blur(6px)}
+.zoom-hud{position:absolute;bottom:10px;right:12px;font-size:11px;color:#8fa8ff;font-family:monospace;z-index:2;background:rgba(4,6,13,.7);padding:4px 8px;border-radius:8px}
+.insp-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid rgba(141,168,255,.08);font-size:12px}
+.insp-row label{color:#8fa8ff;flex:none;margin-right:8px}
+.insp-row input[type=number],.insp-row input[type=text]{width:74px;background:#04060d;border:1px solid rgba(141,168,255,.25);color:#fff;border-radius:7px;padding:4px 7px;font-size:12px;font-family:monospace}
+.insp-row input[type=range]{flex:1;accent-color:#2d5bff}
+.insp-empty{color:#8fa8ff;font-size:12.5px;text-align:center;padding:30px 10px;line-height:1.6}
+.san-report{margin-top:10px;font-size:11.5px;border-radius:10px;padding:10px;background:#04060d;border:1px solid rgba(141,168,255,.15)}
+.san-report.ok{border-color:rgba(63,174,90,.5)}
+.san-report.bad{border-color:rgba(255,122,26,.6)}
+.san-report ul{margin:6px 0 0;padding-left:16px;color:#c6d0e6;max-height:130px;overflow-y:auto}
+.san-report li{margin-bottom:3px}
+.san-head{display:flex;justify-content:space-between;align-items:center}
+.san-head b{color:#fff;font-size:12px}
+.san-head .st-ok{color:#3fae5a}.san-head .st-bad{color:#ff7a1a}
+.export-menu{position:absolute;right:0;top:calc(100% + 6px);background:#0a1533;border:1px solid rgba(141,168,255,.3);border-radius:12px;min-width:230px;z-index:50;overflow:hidden;box-shadow:0 12px 32px rgba(0,0,0,.5)}
+.export-menu button{display:flex;width:100%;justify-content:space-between;background:none;border:none;color:#c6d0e6;padding:10px 14px;font-size:12.5px;cursor:pointer;font-family:inherit}
+.export-menu button:hover{background:rgba(45,91,255,.18);color:#fff}
+.export-menu button small{color:#8fa8ff;font-size:10.5px}
+.export-menu .sep{border-top:1px solid rgba(141,168,255,.15);font-size:10px;color:#8fa8ff;padding:7px 14px 3px;text-transform:uppercase;letter-spacing:.08em}
+.rel-wrap{position:relative}
+@media(max-width:1100px){.studio-wrap{grid-template-columns:1fr;height:auto}.canvas-holder{height:60vh}.panel .body{max-height:220px}}
+</style>
+</head>
+<body>
+<main>
+  <div class="topbar">
+    <div><div class="crumb">Business OS / Studio</div><h1 class="chrome">Brand Studio</h1></div>
+    <div class="topbar-right" style="display:flex;gap:8px;align-items:center">
+      <label class="btn btn-sm" style="cursor:pointer;margin:0">Upload SVG<input type="file" id="svgFile" accept=".svg,image/svg+xml" hidden></label>
+      <div class="rel-wrap">
+        <button class="btn btn-sm" id="exportBtn">Export ▾</button>
+        <div class="export-menu" id="exportMenu" hidden></div>
+      </div>
+      <button class="btn btn-sm btn-ghost" id="clearBtn">Clear canvas</button>
+    </div>
+  </div>
+
+  <div class="studio-wrap">
+    <!-- LIBRARY -->
+    <div class="panel">
+      <h3>Asset Library</h3>
+      <div class="body" id="library"></div>
+    </div>
+
+    <!-- CANVAS -->
+    <div class="canvas-holder" id="canvasHolder">
+      <div class="canvas-toolbar">
+        <button class="btn btn-sm btn-ghost" id="zoomOut">−</button>
+        <button class="btn btn-sm btn-ghost" id="zoomIn">+</button>
+        <button class="btn btn-sm btn-ghost" id="zoomReset">Reset view</button>
+        <button class="btn btn-sm btn-ghost" id="gridBtn">Grid: on</button>
+      </div>
+      <canvas id="cv"></canvas>
+      <div class="zoom-hud" id="zoomHud">100%</div>
+    </div>
+
+    <!-- INSPECTOR -->
+    <div class="panel">
+      <h3>Inspector</h3>
+      <div class="body" id="inspector"></div>
+    </div>
+  </div>
+</main>
+
+<script src="assets/os.js?v=9"></script>
+<script src="assets/brand.js"></script>
+<script src="assets/studio.js"></script>
+<script>
+const {esc}=OS;
+let studio;
+
+/* ---------- library ---------- */
+function renderLibrary(){
+  const el=OS.$('#library');
+  let html='<div class="lib-sec">Logos &amp; Artwork</div>';
+  html+=BRAND.assets.filter(a=>a.kind!=='gif').map(a=>`
+    <div class="lib-item" draggable="true" data-kind="image" data-src="${a.file}" data-name="${esc(a.label)}">
+      <img src="${a.file}" alt="" loading="lazy">
+      <div class="tx"><b>${esc(a.label)}</b><small>${a.kind}</small></div>
+      <button class="add" title="Add to canvas">+</button>
+    </div>`).join('');
+  html+='<div class="lib-sec">Animated (GIF)</div>';
+  html+=BRAND.assets.filter(a=>a.kind==='gif').map(a=>`
+    <div class="lib-item" draggable="true" data-kind="image" data-src="${a.file}" data-name="${esc(a.label)}">
+      <img src="${a.file}" alt="" loading="lazy">
+      <div class="tx"><b>${esc(a.label)}</b><small>gif</small></div>
+      <button class="add" title="Add to canvas">+</button>
+    </div>`).join('');
+  html+='<div class="lib-sec">Brand Colors</div>';
+  html+=BRAND.colors.map(c=>`
+    <div class="lib-item" draggable="true" data-kind="color" data-src="${c.hex}" data-name="${esc(c.name)}">
+      <div class="sw" style="background:${c.hex}"></div>
+      <div class="tx"><b>${esc(c.name)}</b><small>${c.hex}</small></div>
+      <button class="add" title="Add to canvas">+</button>
+    </div>`).join('');
+  html+='<div class="lib-sec">Typography &amp; Taglines</div>';
+  html+=BRAND.fonts.map(f=>`
+    <div class="lib-item" draggable="true" data-kind="text" data-src="${esc(f.sample)}" data-name="${esc(f.name)}" data-stack="${esc(f.stack)}" data-color="#ffffff">
+      <div class="sw" style="display:flex;align-items:center;justify-content:center;background:#04060d;color:#fff;font-family:${f.stack};font-size:15px;font-weight:700">Aa</div>
+      <div class="tx"><b>${esc(f.name)}</b><small>${esc(f.role)}</small></div>
+      <button class="add" title="Add to canvas">+</button>
+    </div>`).join('');
+  html+=BRAND.taglines.map(t=>`
+    <div class="lib-item" draggable="true" data-kind="text" data-src="${esc(t)}" data-name="Tagline" data-stack="'Archivo Black',sans-serif" data-color="#C6E02C">
+      <div class="sw" style="display:flex;align-items:center;justify-content:center;background:#04060d;color:#C6E02C;font-size:11px;font-weight:800;text-align:center;padding:2px">“”</div>
+      <div class="tx"><b style="font-size:11px;white-space:normal">${esc(t)}</b><small>tagline</small></div>
+      <button class="add" title="Add to canvas">+</button>
+    </div>`).join('');
+  html+='<div class="lib-sec">Sanitized SVGs</div><div id="svgLib"><div class="insp-empty" style="padding:12px 4px;text-align:left">Upload an SVG above — it is sanitized before it touches the canvas.</div></div>';
+  el.innerHTML=html;
+
+  el.querySelectorAll('.lib-item').forEach(item=>{
+    const add=()=>{
+      const k=item.dataset.kind;
+      if(k==='image') studio.addImage(item.dataset.src,item.dataset.name);
+      else if(k==='color') studio.addColor(item.dataset.src,item.dataset.name);
+      else if(k==='text') studio.addText(item.dataset.src,{stack:item.dataset.stack,color:item.dataset.color,size:28});
+    };
+    item.querySelector('.add').addEventListener('click',add);
+    item.addEventListener('dragstart',ev=>{
+      ev.dataTransfer.setData('text/ll-asset',JSON.stringify({kind:item.dataset.kind,src:item.dataset.src,name:item.dataset.name,stack:item.dataset.stack,color:item.dataset.color}));
+    });
+  });
+}
+
+/* ---------- inspector ---------- */
+function renderInspector(L){
+  const el=OS.$('#inspector');
+  if(!L){ el.innerHTML='<div class="insp-empty">Click a layer on the canvas to inspect it.<br><br>Drag assets from the library, pan with empty-space drag, scroll to zoom, drag the corner handle to resize.</div>'; return; }
+  let html=`<div class="insp-row"><label>Name</label><b style="color:#fff;font-size:12px">${esc(L.name)}</b></div>
+  <div class="insp-row"><label>Type</label><span style="font-family:monospace;font-size:11px;color:#8fa8ff">${L.type}</span></div>
+  <div class="insp-row"><label>X</label><input type="number" id="inX" value="${Math.round(L.x)}"></div>
+  <div class="insp-row"><label>Y</label><input type="number" id="inY" value="${Math.round(L.y)}"></div>
+  <div class="insp-row"><label>Width</label><input type="number" id="inW" value="${Math.round(L.w)}"></div>
+  <div class="insp-row"><label>Height</label><input type="number" id="inH" value="${Math.round(L.h)}"></div>
+  <div class="insp-row"><label>Rotate</label><input type="range" id="inR" min="-180" max="180" value="${L.rot}"><span style="font-family:monospace;width:38px;text-align:right">${L.rot}°</span></div>
+  <div class="insp-row"><label>Opacity</label><input type="range" id="inO" min="5" max="100" value="${Math.round(L.opacity*100)}"><span style="font-family:monospace;width:38px;text-align:right">${Math.round(L.opacity*100)}%</span></div>`;
+  if(L.type==='color'){
+    const [r,g,b]=Studio.hexToRgb(L.src);
+    html+=`<div class="insp-row"><label>Hex</label><span style="font-family:monospace;color:${L.src};font-weight:700">${L.src}</span></div>
+    <div class="insp-row"><label>RGB</label><span style="font-family:monospace;font-size:11px">${r}, ${g}, ${b}</span></div>`;
+  }
+  if(L.type==='text'){
+    html+=`<div class="insp-row"><label>Content</label><input type="text" id="inT" value="${esc(L.src)}" style="width:130px"></div>`;
+  }
+  html+=`<div style="margin-top:14px;display:flex;gap:8px"><button class="btn btn-sm" id="inUp" style="flex:1">Bring forward</button><button class="btn btn-sm btn-ghost" id="inDel" style="flex:1;color:#ff7a1a">Delete layer</button></div>`;
+  if(L.meta && L.meta.sanReport){
+    const r=L.meta.sanReport;
+    html+=`<div class="san-report ${r.ok?'ok':'bad'}"><div class="san-head"><b>Sanitizer report</b><span class="${r.ok?'st-ok':'st-bad'}">${r.ok?'CLEAN':'BLOCKED'}</span></div>
+      ${r.removed.length?`<ul>${r.removed.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`:'<div style="color:#3fae5a;margin-top:6px">No active content found.</div>'}
+      ${r.warnings.length?`<ul style="color:#ff7a1a">${r.warnings.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`:''}
+      <div style="margin-top:8px;font-size:10.5px;color:#8fa8ff">${(r.bytesIn/1024).toFixed(1)} KB → ${((r.bytesOut||0)/1024).toFixed(1)} KB</div></div>`;
+  }
+  el.innerHTML=html;
+
+  const upd=(patch)=>studio.update(L.id,patch);
+  el.querySelector('#inX').onchange=e=>upd({x:+e.target.value});
+  el.querySelector('#inY').onchange=e=>upd({y:+e.target.value});
+  el.querySelector('#inW').onchange=e=>upd({w:+e.target.value});
+  el.querySelector('#inH').onchange=e=>upd({h:+e.target.value});
+  el.querySelector('#inR').oninput=e=>upd({rot:+e.target.value});
+  el.querySelector('#inO').oninput=e=>upd({opacity:+e.target.value/100});
+  const t=el.querySelector('#inT'); if(t) t.onchange=e=>upd({src:e.target.value,w:Math.max(120,e.target.value.length*(L.meta.size||28)*0.62)});
+  el.querySelector('#inDel').onclick=()=>studio.remove(L.id);
+  el.querySelector('#inUp').onclick=()=>{
+    const i=studio.state.layers.indexOf(L);
+    if(i<studio.state.layers.length-1){ studio.state.layers.splice(i,1); studio.state.layers.splice(i+1,0,L); studio.draw(); }
+  };
+}
+
+/* ---------- export menu ---------- */
+function renderExportMenu(){
+  const m=OS.$('#exportMenu');
+  const fileExports=[['json','JSON'],['css','CSS tokens'],['scss','SCSS tokens'],['tailwind','Tailwind config'],['gpl','GIMP/Inkscape palette'],['svgSheet','SVG swatch sheet']];
+  m.innerHTML='<div class="sep">Brand kit files</div>'+fileExports.map(([k,l])=>`<button data-fmt="${k}"><span>${l}</span><small>.${k==='svgSheet'?'svg':k==='tailwind'?'js':k}</small></button>`).join('')
+    +'<div class="sep">Canvas render (1200×800)</div><button data-render="png"><span>Canvas as PNG</span><small>.png</small></button><button data-render="jpg"><span>Canvas as JPEG</span><small>.jpg</small></button>';
+  m.querySelectorAll('[data-fmt]').forEach(b=>b.onclick=()=>{
+    try{ Studio.download(Studio.exportBrand(BRAND,b.dataset.fmt)); OS.toast('Exported '+b.dataset.fmt); }
+    catch(e){ OS.toast('Export failed: '+e.message); }
+    m.hidden=true;
+  });
+  m.querySelectorAll('[data-render]').forEach(b=>b.onclick=async()=>{
+    m.hidden=true;
+    OS.toast('Rendering canvas…');
+    const blob=await studio.render(b.dataset.render);
+    if(!blob){ OS.toast('Render failed'); return; }
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a'); a.href=url; a.download='lines-logos-canvas.'+b.dataset.render;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url),4000);
+    OS.toast('Canvas exported as '+b.dataset.render.toUpperCase());
+  });
+}
+
+/* ---------- svg upload ---------- */
+function wireUpload(){
+  OS.$('#svgFile').addEventListener('change',async e=>{
+    const f=e.target.files[0]; if(!f) return;
+    const text=await f.text();
+    const {svg,report}=Studio.sanitizeSvg(text);
+    const lib=OS.$('#svgLib');
+    if(!lib) return;
+    if(!svg){
+      lib.insertAdjacentHTML('afterbegin',`<div class="san-report bad"><div class="san-head"><b>${esc(f.name)}</b><span class="st-bad">BLOCKED</span></div><ul>${report.warnings.map(w=>`<li>${esc(w)}</li>`).join('')}</ul></div>`);
+      OS.toast('SVG blocked by sanitizer');
+      e.target.value=''; return;
+    }
+    const L=studio.addSvg(svg,f.name);
+    L.meta.sanReport=report;
+    renderInspector(L);
+    lib.insertAdjacentHTML('afterbegin',`<div class="lib-item" data-kind="svgdone"><div class="tx"><b>${esc(f.name)}</b><small>sanitized · ${report.removed.length} item(s) removed</small></div></div>`);
+    OS.toast(report.removed.length?`Sanitized — ${report.removed.length} item(s) removed`:'SVG clean — added to canvas');
+    e.target.value='';
+  });
+}
+
+/* ---------- boot ---------- */
+OS.boot('studio','Brand Studio',async()=>{
+  renderLibrary();
+  renderExportMenu();
+  wireUpload();
+  studio=Studio.createStudio(OS.$('#cv'),{
+    onSelect:renderInspector,
+    onChange:()=>{ if(studio&&studio.state.selected) renderInspector(studio.state.selected); },
+  });
+
+  OS.$('#exportBtn').onclick=e=>{ e.stopPropagation(); OS.$('#exportMenu').hidden=!OS.$('#exportMenu').hidden; };
+  document.addEventListener('click',()=>{ OS.$('#exportMenu').hidden=true; });
+  OS.$('#clearBtn').onclick=()=>{ if(confirm('Clear all layers from the canvas?')) studio.clear(); };
+  OS.$('#zoomIn').onclick=()=>studio.zoom(1.2);
+  OS.$('#zoomOut').onclick=()=>studio.zoom(0.85);
+  OS.$('#zoomReset').onclick=()=>studio.resetView();
+  OS.$('#gridBtn').onclick=e=>{ studio.state.grid=!studio.state.grid; e.target.textContent='Grid: '+(studio.state.grid?'on':'off'); studio.draw(); };
+
+  const hud=OS.$('#zoomHud');
+  setInterval(()=>{ hud.textContent=Math.round(studio.state.zoom*100)+'%'; },150);
+
+  // drag & drop from library onto canvas
+  const cv=OS.$('#cv');
+  cv.addEventListener('dragover',e=>e.preventDefault());
+  cv.addEventListener('drop',e=>{
+    e.preventDefault();
+    const raw=e.dataTransfer.getData('text/ll-asset');
+    if(!raw) return;
+    const a=JSON.parse(raw);
+    const r=cv.getBoundingClientRect();
+    const w={x:(e.clientX-r.left-studio.state.panX)/studio.state.zoom, y:(e.clientY-r.top-studio.state.panY)/studio.state.zoom};
+    let L;
+    if(a.kind==='image') L=studio.addImage(a.src,a.name);
+    else if(a.kind==='color') L=studio.addColor(a.src,a.name);
+    else L=studio.addText(a.src,{stack:a.stack,color:a.color,size:28});
+    L.x=Math.max(0,w.x-L.w/2); L.y=Math.max(0,w.y-L.h/2);
+    studio.draw(); renderInspector(L);
+  });
+});
+</script>
+<script src="assets/pwa.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,36 @@
+# Lines & Logos Business OS — one-command Docker deployment.
+#   docker compose up -d --build
+# Then open http://localhost:3001/login.html — the first person to open it
+# creates the owner account; everything else (Stripe keys, AI keys) is managed
+# in the app at Admin → Keys & Integrations.
+services:
+  lines-logos:
+    build: .
+    image: lines-logos:1.0.0
+    container_name: lines-logos
+    restart: unless-stopped
+    ports:
+      - "3001:3001"
+    volumes:
+      - lines-logos-data:/app/data
+    environment:
+      # Everything is OPTIONAL — set here or in a sibling .env file loaded by compose.
+      # Real environment variables always win over the app's .env loader.
+      # STRIPE_PUBLISHABLE_KEY: pk_live_...
+      # STRIPE_SECRET_KEY: sk_live_...
+      # STRIPE_WEBHOOK_SECRET: whsec_...
+      # OPENROUTER_API_KEY: sk-or-v1-...      (free AI default)
+      # ANTHROPIC_API_KEY: sk-ant-...
+      # OPENAI_API_KEY: sk-...
+      # GEMINI_API_KEY: AIza...
+      # CRON_SECRET: change-me-32-chars-minimum
+      NODE_ENV: production
+      PORT: 3001
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:3001/api/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+volumes:
+  lines-logos-data:

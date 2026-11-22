@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Crew Portal — Lines &amp; Logos</title>
+<link rel="icon" type="image/png" href="icons/favicon-32.png?v=2">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;700;800&family=Archivo+Black&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#04060d;--navy:#0a1533;--navy-2:#132a63;--blue:#2d5bff;--blue-hi:#4d7dff;--cyan:#57c7ff;
+  --orange:#ff7a1a;--lime:#c6e02c;--yellow:#ffc21c;--green:#3fae5a;--volley:#8fa8ff;
+  --chrome-1:#eef3fc;--line:rgba(120,145,205,.16);--text:#c6d0e6;--text-dim:#7e8cab;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--ink);color:var(--text);font-family:'Space Grotesk',system-ui,sans-serif;min-height:100vh;display:flex;flex-direction:column;overflow-x:clip}
+.chrome{background:linear-gradient(180deg,#fff 0%,#dfe7f5 26%,#8ea2c8 50%,#f4f8ff 60%,#7688ad 86%,#ccd8ee 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.top-logo{position:fixed;top:22px;left:50%;transform:translateX(-50%);z-index:10}
+.top-logo img{height:64px;filter:drop-shadow(0 8px 30px rgba(45,91,255,.4))}
+main{flex:1;max-width:880px;width:100%;margin:0 auto;padding:130px 24px 70px}
+.hero-t{text-align:center;margin-bottom:44px}
+.hero-t h1{font-family:'Archivo Black',sans-serif;font-size:clamp(26px,3.6vw,40px);text-transform:uppercase}
+.hero-t p{color:var(--text-dim);margin-top:10px;font-size:15px}
+.progress{height:9px;border-radius:100px;background:rgba(120,145,205,.14);overflow:hidden;margin:28px auto 8px;max-width:480px}
+.progress i{display:block;height:100%;background:linear-gradient(90deg,var(--blue-hi),var(--cyan),var(--lime));border-radius:100px;transition:width .5s cubic-bezier(.2,.8,.2,1)}
+.prog-lbl{text-align:center;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--text-dim);font-weight:700;margin-bottom:36px}
+.doc{border:1px solid var(--line);border-radius:18px;background:linear-gradient(180deg,rgba(16,31,77,.4),rgba(4,6,13,.65));padding:26px 28px;margin-bottom:14px;display:flex;align-items:center;gap:18px;transition:.2s}
+.doc:hover{border-color:rgba(77,125,255,.45)}
+.doc .ico{flex:none;width:46px;height:46px;border-radius:12px;display:flex;align-items:center;justify-content:center;background:rgba(45,91,255,.12);border:1px solid rgba(77,125,255,.35)}
+.doc .ico svg{width:22px;height:22px;stroke:var(--cyan);fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.doc.signed .ico{background:rgba(63,174,90,.12);border-color:rgba(63,174,90,.4)}
+.doc.signed .ico svg{stroke:#7ad892}
+.doc b{display:block;color:#fff;font-size:15.5px}
+.doc small{color:var(--text-dim);font-size:12.5px}
+.doc .st{margin-left:auto;flex:none}
+.tag{display:inline-block;font-size:11px;font-weight:800;letter-spacing:.06em;border-radius:100px;padding:5px 13px;text-transform:uppercase}
+.t-green{background:rgba(63,174,90,.14);color:#7ad892;border:1px solid rgba(63,174,90,.4)}
+.t-yellow{background:rgba(255,194,28,.12);color:var(--yellow);border:1px solid rgba(255,194,28,.4)}
+.t-red{background:rgba(255,90,90,.12);color:#ff9a9a;border:1px solid rgba(255,90,90,.4)}
+.btn{font-family:'Archivo',sans-serif;font-weight:800;font-size:13px;color:#fff;border:none;cursor:pointer;padding:10px 18px;border-radius:10px;background:linear-gradient(180deg,#4d7dff,#2d5bff 45%,#1c3fd6);box-shadow:0 0 0 1px rgba(120,160,255,.5) inset;transition:.15s}
+.btn:hover{transform:translateY(-1px)}
+.btn[disabled]{opacity:.4;cursor:not-allowed;transform:none}
+.btn-ghost{background:transparent;box-shadow:0 0 0 1px var(--line) inset;color:var(--chrome-1)}
+.btn-lime{background:linear-gradient(180deg,#d8f24a,#c6e02c 45%,#9db313);color:#0c1200;box-shadow:0 0 0 1px rgba(220,240,120,.6) inset}
+.btn-red{background:linear-gradient(180deg,#ff7a7a,#e5484d 45%,#b3261e);box-shadow:0 0 0 1px rgba(255,150,150,.5) inset}
+.panel{border:1px solid var(--line);border-radius:18px;background:linear-gradient(180deg,rgba(16,31,77,.35),rgba(4,6,13,.6));padding:26px 28px;margin-top:38px}
+.panel h3{font-family:'Archivo',sans-serif;font-size:13px;letter-spacing:.16em;text-transform:uppercase;color:var(--chrome-1);margin-bottom:20px;font-weight:800;display:flex;align-items:center;gap:10px}
+.panel h3::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--lime);box-shadow:0 0 10px var(--lime)}
+table{width:100%;min-width:420px;border-collapse:collapse;font-size:13.5px}
+th{text-align:left;font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--text-dim);font-weight:700;padding:10px 12px;border-bottom:1px solid var(--line)}
+td{padding:13px 12px;border-bottom:1px solid rgba(120,145,205,.08)}
+td b{color:#fff}
+.t-lime{background:rgba(198,224,44,.12);color:var(--lime);border:1px solid rgba(198,224,44,.4)}
+.t-blue{background:rgba(45,91,255,.14);color:var(--blue-hi);border:1px solid rgba(77,125,255,.4)}
+.t-orange{background:rgba(255,122,26,.14);color:#ffb066;border:1px solid rgba(255,122,26,.4)}
+/* shift & location */
+.shift-hero{display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+.shift-hero .clock-num{font-family:'Archivo Black',sans-serif;font-size:clamp(30px,5vw,44px);color:#fff;letter-spacing:.02em;font-variant-numeric:tabular-nums}
+.shift-hero .sub{color:var(--text-dim);font-size:12.5px}
+.trk{display:flex;align-items:center;gap:10px;border:1px solid var(--line);border-radius:12px;padding:12px 16px;margin-top:16px;font-size:12.5px}
+.trk .dot{width:10px;height:10px;border-radius:50%;flex:none}
+.trk.on{border-color:rgba(63,174,90,.45);background:rgba(63,174,90,.07)}
+.trk.on .dot{background:#7ad892;box-shadow:0 0 10px #7ad892;animation:pulse 2s infinite}
+.trk.off .dot{background:#ff9a9a}
+@keyframes pulse{50%{opacity:.4}}
+.trk small{color:var(--text-dim);display:block;margin-top:2px}
+.privacy-note{font-size:11.5px;color:var(--text-dim);line-height:1.55;margin-top:14px;border-top:1px dashed var(--line);padding-top:12px}
+/* signature modal */
+.modal-bg{position:fixed;inset:0;background:rgba(2,4,10,.78);backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;z-index:200;padding:20px}
+.modal-bg.open{display:flex}
+.modal{width:100%;max-width:520px;border:1px solid var(--line);border-radius:22px;background:linear-gradient(180deg,var(--navy),var(--ink));padding:34px;box-shadow:0 40px 100px rgba(0,0,0,.7);max-height:92vh;overflow:auto}
+.modal h2{font-family:'Archivo Black',sans-serif;font-size:19px;text-transform:uppercase;margin-bottom:6px}
+.modal .docname{color:var(--cyan);font-size:13px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:14px}
+.modal .legal{font-size:11.5px;color:var(--text-dim);line-height:1.6;border:1px dashed var(--line);border-radius:10px;padding:12px 14px;margin-bottom:16px}
+.sig-wrap{border:1.5px dashed rgba(77,125,255,.5);border-radius:14px;background:rgba(4,6,13,.5);touch-action:none;cursor:crosshair}
+canvas{width:100%;height:170px;display:block;border-radius:14px}
+.modal .actions{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}
+.modal input{width:100%;padding:12px 14px;border-radius:10px;border:1px solid var(--line);background:rgba(4,6,13,.6);color:#fff;font-family:inherit;font-size:14px;margin-top:14px;outline:none}
+.modal input:focus{border-color:var(--blue-hi)}
+.toast{position:fixed;bottom:26px;right:26px;background:linear-gradient(180deg,var(--navy-2),var(--navy));border:1px solid rgba(77,125,255,.5);color:#fff;padding:14px 22px;border-radius:13px;font-size:13.5px;font-weight:600;box-shadow:0 20px 50px rgba(0,0,0,.6);transform:translateY(120px);opacity:0;transition:.35s;z-index:300}
+.toast.show{transform:none;opacity:1}
+@media(max-width:560px){.doc{flex-wrap:wrap}.doc .st{margin-left:0;width:100%}.top-logo img{height:48px}main{padding-top:100px}}
+
+/* canonical footer (self-contained) */
+.wrap{max-width:1180px;margin:0 auto;padding:0 32px}
+footer{padding:60px 0 36px;border-top:1px solid var(--line,rgba(255,255,255,.08));background:linear-gradient(180deg,var(--ink,#04060d),var(--navy,#0a1226))}
+.foot-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:44px;margin-bottom:44px;text-align:left}
+.foot-grid h4{font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--chrome-1,#eef3fc);margin:0 0 14px}
+.foot-grid>div:not(.foot-brand) a{display:block;color:var(--text-dim,#8b94a7);text-decoration:none;font-size:14px;margin-bottom:9px}
+.foot-grid>div:not(.foot-brand) a:hover{color:#fff}
+.foot-brand{text-align:left}
+.foot-brand img{height:180px;width:auto;margin-bottom:16px}
+.foot-brand .foot-address{display:block;margin-top:14px;font-style:normal;text-align:left;line-height:1.6;color:var(--text-dim,#8b94a7);font-size:13.5px}
+.foot-bottom{display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;border-top:1px solid var(--line,rgba(255,255,255,.08));padding-top:24px;font-size:12.5px;color:var(--text-dim,#8b94a7)}
+@media(max-width:900px){.foot-grid{grid-template-columns:1fr 1fr;gap:28px}}
+@media(max-width:600px){.wrap{padding:0 20px}}
+@media(max-width:520px){.foot-grid{grid-template-columns:1fr}}
+</style>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#04060d">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Lines &amp; Logos">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+</head>
+<body data-perms="notifications" data-push-role="contractor">
+<a class="top-logo" href="index.html"><img src="logo-hero.png" alt="Lines &amp; Logos"></a>
+
+<main>
+  <div class="hero-t">
+    <h1 class="chrome">Crew Portal</h1>
+    <p>Welcome, <b style="color:#fff" id="pname">Crew Member</b> — sign your onboarding documents to become dispatchable.</p>
+  </div>
+
+  <div class="progress"><i id="bar" style="width:0%"></i></div>
+  <div class="prog-lbl" id="proglbl">0 of 5 documents signed</div>
+
+  <!-- SHIFT & LOCATION -->
+  <div class="panel" id="shiftPanel" style="margin-top:0;margin-bottom:38px">
+    <h3>Shift &amp; Location</h3>
+    <div class="shift-hero">
+      <div>
+        <div class="clock-num" id="clockNum">00:00:00</div>
+        <div class="sub" id="shiftSub">Not clocked in</div>
+      </div>
+      <div style="margin-left:auto;display:flex;gap:10px">
+        <button class="btn btn-lime" id="clockInBtn" onclick="clock('in')">Clock In</button>
+        <button class="btn btn-red" id="clockOutBtn" onclick="clock('out')" disabled>Clock Out</button>
+      </div>
+    </div>
+    <div class="trk off" id="trkBox">
+      <span class="dot"></span>
+      <div style="flex:1" id="trkText">
+        <b style="color:#fff">Location tracking off</b>
+        <small>Tracking runs only while you are clocked in, and only after you sign the consent below.</small>
+      </div>
+      <button class="btn btn-ghost" id="consentBtn" onclick="openConsent()" style="flex:none">Sign Consent</button>
+    </div>
+    <p class="privacy-note">Privacy: your location is recorded <b>only during clocked-in work hours</b>, used to verify job-site time for payroll and dispatch, retained for 90 days, then permanently deleted. It is never tracked off the clock and never sold. You may revoke consent any time by contacting the office — see the <a href="legal.html#privacy" style="color:var(--cyan)">Privacy Policy</a>.</p>
+  </div>
+
+  <div id="docs"></div>
+
+  <div class="panel">
+    <h3>Your Upcoming Assignments</h3>
+    <div style="overflow-x:auto"><table id="assignTable">
+      <tr><th>Job</th><th>Location</th><th>Date</th><th>Status</th></tr>
+      <tr><td><b>MSCS — Gym Refresh (3 gyms)</b></td><td>Memphis, TN</td><td>Nov 26</td><td><span class="tag t-lime">in-progress</span></td></tr>
+      <tr><td><b>DeSoto — Court Restripe x2</b></td><td>Southaven, MS</td><td>Dec 8</td><td><span class="tag t-blue">dispatched</span></td></tr>
+      <tr><td><b>Bellevue — Donors Wall Install</b></td><td>Cordova, TN</td><td>Dec 17</td><td><span class="tag t-orange">pending</span></td></tr>
+    </table></div>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <img src="logo-hero.png" alt="Lines &amp; Logos">
+        <address class="foot-address">2847 New Broadway St.<br>Memphis, TN 38109</address>
+      </div>
+      <div>
+        <h4>Partners</h4>
+        <a href="careers.html">Become a Contractor</a>
+        <a href="partners.html#apply">Become an Affiliate</a>
+        <a href="partners.html#how">Affiliate Guide</a>
+        <a href="partners.html#tiers">Earnings &amp; Payouts</a>
+      </div>
+      <div>
+        <h4>Support</h4>
+        <a href="index.html#faq">FAQ</a>
+        <a href="mailto:info@linesandlogos.team">Contact Support</a>
+        <a href="gallery.html">Photo Gallery</a>
+        <a href="legal.html#trust">Verification &amp; Trust</a>
+        <a href="legal.html#data-retention">Data Retention</a>
+      </div>
+      <div>
+        <h4>Legal</h4>
+        <a href="legal.html#terms">Terms of Service</a>
+        <a href="legal.html#privacy">Privacy Policy</a>
+        <a href="legal.html#acceptable-use">Acceptable Use Policy</a>
+        <a href="legal.html#provider-terms">Provider Terms</a>
+        <a href="legal.html#refunds">Refund Policy</a>
+        <a href="legal.html#cookies">Cookie Policy</a>
+        <a href="legal.html#legal-notice">Legal Notice</a>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>© 2026 Lines &amp; Logos. All rights reserved.</span>
+    </div>
+  </div>
+</footer>
+
+<!-- SIGN MODAL (documents + location consent) -->
+<div class="modal-bg" id="modalBg">
+  <div class="modal">
+    <h2 class="chrome" id="mTitle">Sign Document</h2>
+    <div class="docname" id="mDoc">W-9</div>
+    <div class="legal" id="mLegal" style="display:none"></div>
+    <div class="sig-wrap"><canvas id="sig"></canvas></div>
+    <input id="typed" placeholder="…or type your full legal name">
+    <div class="actions">
+      <button class="btn" id="mSubmit" onclick="submitSign()">Submit Signature</button>
+      <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-ghost" onclick="clearSig()">Clear</button>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const API_BASE=(location.protocol==='file:')?'http://localhost:3001':'';
+const qs=new URLSearchParams(location.search);
+const TOKEN=qs.get('token')||localStorage.getItem('ll_portal')||'demo-crew-token';
+try{localStorage.setItem('ll_portal',TOKEN)}catch(e){}
+document.getElementById('pname').textContent=qs.get('name')||'Crew Member';
+
+const DEMO_DOCS=[
+  {name:'W-9',signed:false},{name:'1099 Acknowledgment',signed:false},{name:'Scope of Work',signed:false},
+  {name:'Safety Agreement',signed:false},{name:'Offer Letter',signed:false}];
+let docs=JSON.parse(JSON.stringify(DEMO_DOCS));
+let LIVE=false, assignments=null;
+let shift={clockedIn:false,clockedInAt:null,consent:false,trackingEnabled:false,intervalMin:5,retentionDays:90};
+let watchId=null,lastPing=0,clockTimer=null,signMode='doc';
+
+async function init(){
+  try{
+    const r=await fetch(API_BASE+'/api/portal/'+TOKEN);
+    if(r.ok){
+      LIVE=true;const d=await r.json();
+      docs=d.docs||docs;assignments=d.assignments||null;
+      if(d.name)document.getElementById('pname').textContent=d.name;
+      if(d.shift)shift.clockedIn=!!d.shift.clockedIn;
+      if(d.tracking){shift.trackingEnabled=!!d.tracking.enabled;shift.consent=!!d.tracking.consent;shift.intervalMin=d.tracking.intervalMin||5;shift.retentionDays=d.tracking.retentionDays||90;}
+      const rs=await fetch(API_BASE+'/api/portal/'+TOKEN+'/shift').catch(()=>null);
+      if(rs&&rs.ok){const sh=await rs.json();shift.clockedIn=!!sh.clockedIn;shift.consent=!!sh.consent;shift.trackingEnabled=!!sh.trackingEnabled;}
+    }
+  }catch(e){}
+  if(shift.clockedIn)startTick(new Date()); // demo/live approximation of elapsed
+  render();renderShift();
+  if(shift.clockedIn&&shift.consent)startTracking();
+}
+
+/* ---------- documents ---------- */
+function render(){
+  const done=docs.filter(d=>d.signed).length;
+  document.getElementById('bar').style.width=(done/docs.length*100)+'%';
+  document.getElementById('proglbl').textContent=done===docs.length?'All documents signed — you are dispatchable.':`${done} of ${docs.length} documents signed`;
+  document.getElementById('docs').innerHTML=docs.map((d,i)=>`
+    <div class="doc ${d.signed?'signed':''}">
+      <div class="ico"><svg viewBox="0 0 24 24">${d.signed?'<path d="M20 6L9 17l-5-5"/>':'<path d="M6 2h12v20l-3-2-3 2-3-2-3 2z"/><path d="M9 7h6M9 11h6"/>'}</svg></div>
+      <div><b>${d.name}</b><small>${d.signed?'Signed '+new Date(d.signedAt).toLocaleString()+(d.signature?' · '+d.signature:''):'Required before your first dispatch'}</small></div>
+      <div class="st">${d.signed?'<span class="tag t-green">signed</span>':`<span class="tag t-yellow" style="margin-right:8px">pending</span><button class="btn" onclick="openSign(${i})">Sign</button>`}</div>
+    </div>`).join('');
+  if(assignments){
+    const ST={'in-progress':'t-lime',quoted:'t-blue',lead:'t-orange',complete:'t-green'};
+    document.getElementById('assignTable').innerHTML='<tr><th>Job</th><th>Location</th><th>Date</th><th>Status</th></tr>'+
+      (assignments.map(a=>`<tr><td><b>${a.title}</b></td><td>${a.account}</td><td>${a.due}</td><td><span class="tag ${ST[a.status]||'t-blue'}">${a.status}</span></td></tr>`).join('')||'<tr><td colspan="4" style="color:var(--text-dim)">No assignments yet — sign your documents to become dispatchable.</td></tr>');
+  }
+}
+
+/* ---------- shift & tracking ---------- */
+function renderShift(){
+  document.getElementById('clockInBtn').disabled=shift.clockedIn;
+  document.getElementById('clockOutBtn').disabled=!shift.clockedIn;
+  document.getElementById('shiftSub').textContent=shift.clockedIn?'Clocked in — shift in progress':'Not clocked in';
+  const box=document.getElementById('trkBox'),txt=document.getElementById('trkText'),btn=document.getElementById('consentBtn');
+  if(!shift.trackingEnabled){
+    box.className='trk off';
+    txt.innerHTML='<b style="color:#fff">Location tracking disabled by office</b><small>Your location is not being recorded.</small>';
+    btn.style.display='none';
+  }else if(!shift.consent){
+    box.className='trk off';
+    txt.innerHTML='<b style="color:#fff">Consent needed</b><small>Sign the location consent to enable work-hours tracking. Required for dispatch.</small>';
+    btn.style.display='';btn.textContent='Sign Consent';
+  }else if(shift.clockedIn){
+    box.className='trk on';
+    txt.innerHTML='<b style="color:#fff">Location tracking ON — work hours only</b><small>Sharing every '+shift.intervalMin+' min until you clock out · deleted after '+shift.retentionDays+' days.</small>';
+    btn.style.display='none';
+  }else{
+    box.className='trk off';
+    txt.innerHTML='<b style="color:#fff">Tracking off — you are not clocked in</b><small>Consent on file. Recording starts automatically when you clock in.</small>';
+    btn.style.display='none';
+  }
+}
+async function clock(action){
+  if(LIVE){
+    try{
+      const r=await fetch(API_BASE+'/api/portal/'+TOKEN+'/clock',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action})});
+      const d=await r.json();
+      if(!r.ok){toast(d.error||'Clock '+action+' failed');return}
+      if(action==='in'){shift.clockedIn=true;startTick(new Date());if(d.job)toast('Clocked in — '+d.job)}
+      else{shift.clockedIn=false;stopTick();stopTracking();toast('Clocked out — '+(d.hours||0)+'h logged')}
+    }catch(e){toast('Network error — try again');return}
+  }else{
+    if(action==='in'){shift.clockedIn=true;startTick(new Date());toast('Clocked in (demo)')}
+    else{shift.clockedIn=false;stopTick();stopTracking();toast('Clocked out (demo)')}
+  }
+  renderShift();
+  if(shift.clockedIn&&shift.consent)startTracking();
+}
+function startTick(from){
+  stopTick();
+  const el=document.getElementById('clockNum');
+  const tick=()=>{const s=Math.max(0,Math.floor((Date.now()-from.getTime())/1000));el.textContent=[s/3600,s/60%60,s%60].map(n=>String(Math.floor(n)).padStart(2,'0')).join(':')};
+  tick();clockTimer=setInterval(tick,1000);
+}
+function stopTick(){if(clockTimer){clearInterval(clockTimer);clockTimer=null}document.getElementById('clockNum').textContent='00:00:00'}
+
+function startTracking(){
+  if(!('geolocation' in navigator)){toast('This device does not support geolocation');return}
+  stopTracking();
+  const ping=(pos)=>{
+    const now=Date.now();
+    if(now-lastPing<shift.intervalMin*60e3-5000)return; // respect server interval
+    lastPing=now;
+    if(LIVE)fetch(API_BASE+'/api/portal/'+TOKEN+'/location',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({lat:pos.coords.latitude,lng:pos.coords.longitude,accuracy:pos.coords.accuracy})})
+      .then(r=>{if(r.status===403)stopTracking()}).catch(()=>{});
+  };
+  lastPing=0;
+  // immediate first fix, then continuous watch (throttled by interval)
+  navigator.geolocation.getCurrentPosition(p=>{lastPing=0;ping(p)},()=>{},{enableHighAccuracy:true,timeout:10000});
+  watchId=navigator.geolocation.watchPosition(ping,
+    err=>{if(err.code===1){toast('Location permission denied — tracking paused');stopTracking()}},
+    {enableHighAccuracy:true,maximumAge:30000});
+}
+function stopTracking(){if(watchId!==null&&'geolocation' in navigator){navigator.geolocation.clearWatch(watchId);watchId=null}}
+
+/* ---------- signature modal (docs + consent) ---------- */
+let cur=0,drawing=false,drew=false;
+const cv=document.getElementById('sig'),ctx=cv.getContext('2d');
+function sizeCv(){const r=cv.getBoundingClientRect(),d=devicePixelRatio||1;cv.width=r.width*d;cv.height=r.height*d;ctx.setTransform(d,0,0,d,0,0);ctx.lineWidth=2.4;ctx.lineCap='round';ctx.strokeStyle='#57c7ff';}
+function pos(e){const r=cv.getBoundingClientRect();return[e.clientX-r.left,e.clientY-r.top];}
+cv.addEventListener('pointerdown',e=>{drawing=true;drew=true;ctx.beginPath();ctx.moveTo(...pos(e));cv.setPointerCapture(e.pointerId)});
+cv.addEventListener('pointermove',e=>{if(drawing){ctx.lineTo(...pos(e));ctx.stroke()}});
+cv.addEventListener('pointerup',()=>drawing=false);
+function openSign(i){
+  signMode='doc';cur=i;
+  document.getElementById('mTitle').textContent='Sign Document';
+  document.getElementById('mDoc').textContent=docs[i].name;
+  document.getElementById('mLegal').style.display='none';
+  document.getElementById('mSubmit').textContent='Submit Signature';
+  document.getElementById('modalBg').classList.add('open');document.getElementById('typed').value='';
+  setTimeout(()=>{sizeCv();clearSig()},50);
+}
+function openConsent(){
+  signMode='consent';
+  document.getElementById('mTitle').textContent='Location Consent';
+  document.getElementById('mDoc').textContent='Work-hours location tracking';
+  const lg=document.getElementById('mLegal');lg.style.display='block';
+  lg.innerHTML='I authorize Lines &amp; Logos to record my device location <b>only while I am clocked in</b>, for job-site time verification, payroll and dispatch. Location is never recorded off the clock, is retained for '+shift.retentionDays+' days and then deleted, and is never sold. I may revoke this consent at any time by contacting the office.';
+  document.getElementById('mSubmit').textContent='Sign &amp; Consent';
+  document.getElementById('modalBg').classList.add('open');document.getElementById('typed').value='';
+  setTimeout(()=>{sizeCv();clearSig()},50);
+}
+function closeModal(){document.getElementById('modalBg').classList.remove('open')}
+function clearSig(){ctx.clearRect(0,0,cv.width,cv.height);drew=false}
+async function submitSign(){
+  const sig=document.getElementById('typed').value.trim()||(drew?'(drawn signature)':'');
+  if(!sig){toast('Draw or type your signature first');return}
+  if(signMode==='consent'){
+    if(LIVE){
+      try{
+        const r=await fetch(API_BASE+'/api/portal/'+TOKEN+'/location-consent',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({granted:true,signature:sig})});
+        const d=await r.json();if(!r.ok){toast(d.error||'Consent failed');return}
+      }catch(e){toast('Network error — try again');return}
+    }
+    shift.consent=true;closeModal();renderShift();
+    toast('Location consent signed');
+    if(shift.clockedIn)startTracking();
+    return;
+  }
+  const name=docs[cur].name;
+  if(LIVE){try{await fetch(API_BASE+'/api/portal/'+TOKEN+'/sign',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({doc:name,signature:sig})})}catch(e){}}
+  docs[cur].signed=true;docs[cur].signature=sig;docs[cur].signedAt=new Date().toISOString();
+  closeModal();render();toast(name+' signed and stored');
+}
+function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2600)}
+init();
+</script>
+<script src="assets/push.js?v=1" defer></script>
+<script src="assets/pwa.js" defer></script>
+</body>
+</html>

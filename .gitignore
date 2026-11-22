@@ -1,0 +1,11 @@
+node_modules/
+.next/
+dist/
+data/uploads/*
+data/backups/
+*.log
+nohup.out
+releases/*.zip
+releases/SHA256SUMS.txt
+.DS_Store
+.env

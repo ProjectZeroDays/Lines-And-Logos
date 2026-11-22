@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Trip Plans — Lines &amp; Logos Business OS</title>
+<link rel="icon" type="image/png" href="icons/favicon-32.png?v=2">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;700;800&family=Archivo+Black&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/os.css?v=9">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#04060d">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Lines & Logos">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<style>
+.tp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:16px}
+.tp-card{background:var(--panel,#0d1526);border:1px solid var(--line,#1c2946);border-radius:14px;padding:18px;display:flex;flex-direction:column;gap:12px}
+.tp-card h3{margin:0;font-size:15px}
+.tp-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.tp-meta{font-size:12.5px;color:var(--mut,#8b95b3);display:flex;flex-direction:column;gap:3px}
+.tp-cost{display:flex;justify-content:space-between;align-items:baseline;border-top:1px dashed var(--line,#1c2946);padding-top:10px;margin-top:auto}
+.tp-cost b{font-size:20px}
+.tp-lines{display:none;font-size:12.5px;color:var(--mut,#8b95b3);flex-direction:column;gap:4px}
+.tp-lines.open{display:flex}
+.tp-lines .row{display:flex;justify-content:space-between;gap:10px}
+.tp-actions{display:flex;gap:8px;flex-wrap:wrap}
+.map-links{display:flex;gap:12px;font-size:12.5px}
+.tp-map{width:100%;border-radius:10px;border:1px solid var(--line,#1c2946)}
+.pill{font-size:11px;padding:2px 9px;border-radius:99px;font-weight:700;text-transform:uppercase;letter-spacing:.04em}
+.pill.pending-approval{background:#3a2c10;color:#f5b942}.pill.approved{background:#0f2b1c;color:#43d17c}
+.pill.rejected{background:#331212;color:#ff7b7b}.pill.emailed{background:#0f2233;color:#5bb8ff}
+.feed{display:flex;flex-direction:column;gap:10px}
+.ev{display:flex;gap:12px;background:var(--panel,#0d1526);border:1px solid var(--line,#1c2946);border-radius:12px;padding:12px 14px;font-size:13px}
+.ev .dot{flex:none;width:9px;height:9px;border-radius:50%;margin-top:5px}
+.ev.sick .dot{background:#ff9d5b}.ev.reschedule .dot{background:#f5d442}.ev.cancel .dot{background:#ff7b7b}
+.ev small{color:var(--mut,#8b95b3)}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:18px}
+.kpi{background:var(--panel,#0d1526);border:1px solid var(--line,#1c2946);border-radius:12px;padding:14px 16px}
+.kpi b{font-size:22px;display:block}.kpi span{font-size:12px;color:var(--mut,#8b95b3)}
+@media(max-width:700px){.tp-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body data-perms="notifications">
+<main>
+  <div class="topbar">
+    <div><div class="crumb">Business OS / Trip Plans</div><h1 class="chrome">Trip Plans</h1></div>
+    <div class="topbar-right">
+      <button class="btn btn-ghost btn-sm" onclick="estimateModal()">Pre-Contract Estimate</button>
+      <button class="btn btn-sm" onclick="newTrip()">+ New Trip Plan</button>
+    </div>
+  </div>
+  <div class="kpis" id="kpis"></div>
+  <div class="tabs2" id="tabs"></div>
+  <div id="view"></div>
+</main>
+<script src="assets/os.js?v=9"></script>
+<script>
+const { boot, list, create, raw, fmt, ago, esc, openModal, closeModal, onModalSave, field, toast, isLive, cur, uid, $, $$ } = OS;
+
+let TAB = 'plans';
+
+async function render(){
+  await renderKpis();
+  renderTabs();
+  if (TAB === 'plans') await renderPlans();
+  else if (TAB === 'events') await renderEvents();
+  else await renderPend();
+}
+
+async function renderKpis(){
+  const plans = (await OS.list('tripPlans')) || [];
+  const pend = plans.filter(p => p.status === 'pending-approval');
+  const appr = plans.filter(p => p.status === 'approved');
+  const spent = appr.reduce((s,p) => s + (p.total || 0), 0);
+  const events = (await OS.list('travelEvents')) || [];
+  $('#kpis').innerHTML = `
+    <div class="kpi"><b>${plans.length}</b><span>Trip plans</span></div>
+    <div class="kpi"><b style="color:#f5b942">${pend.length}</b><span>Awaiting approval</span></div>
+    <div class="kpi"><b style="color:#43d17c">${appr.length}</b><span>Approved</span></div>
+    <div class="kpi"><b>${fmt(spent)}</b><span>Total travel spend</span></div>
+    <div class="kpi"><b>${events.length}</b><span>Change events</span></div>`;
+}
+
+function renderTabs(){
+  const tabs = [['plans','Trip Plans'],['events','Change Events'],['pend','Pending Approval']];
+  $('#tabs').innerHTML = tabs.map(([k,l]) =>
+    `<button class="${k===TAB?'on':''}" onclick="TAB='${k}';render()">${l}</button>`).join('');
+}
+
+function costRows(p){
+  return (p.lineItems || []).map(i =>
+    `<div class="row"><span>${esc(i.label)}</span><span>${fmt(i.amount)}</span></div>`).join('');
+}
+
+async function renderPlans(){
+  const plans = ((await OS.list('tripPlans')) || []).slice().sort((a,b) => (b.createdAt||'').localeCompare(a.createdAt||''));
+  if (!plans.length) { $('#view').innerHTML = '<p class="empty">No trip plans yet. Create one from a signed contract or the “+ New Trip Plan” button.</p>'; return; }
+  $('#view').innerHTML = `<div class="tp-grid">${plans.map(p => `
+    <div class="tp-card">
+      <div class="tp-head">
+        <h3>${esc(p.title || 'Trip plan')}</h3>
+        <span class="pill ${esc(p.status)}">${esc((p.status||'').replace('-',' '))}</span>
+      </div>
+      <div class="tp-meta">
+        <span>→ ${esc(p.destination || '—')}</span>
+        <span>${p.roundMiles || p.miles || 0} mi · ~${p.driveHours || '—'} h drive · ${p.totalDays || '—'} day(s) on site</span>
+        <span>Crew ${p.crew || '—'} · ${p.nights || 0} hotel night(s) × ${p.rooms || 1} room(s)</span>
+        ${p.approvedBy ? `<span>Approved by ${esc(p.approvedBy)} · ${ago(p.approvedAt)}</span>` : ''}
+        ${(p.emailedTo || []).length ? `<span>Emailed to ${p.emailedTo.length} recipient(s) ✓</span>` : ''}
+      </div>
+      ${p.maps && p.maps.staticMap ? `<a href="${esc(p.maps.directions)}" target="_blank" rel="noopener"><img class="tp-map" src="${esc(p.maps.staticMap)}" alt="Map to ${esc(p.destination)}" loading="lazy"></a>` : ''}
+      <div class="map-links">
+        <a href="${esc(p.maps ? p.maps.directions : '#')}" target="_blank" rel="noopener">Directions ↗</a>
+        ${p.maps && p.maps.apple ? `<a href="${esc(p.maps.apple)}" target="_blank" rel="noopener">Apple Maps ↗</a>` : ''}
+        <a href="javascript:void 0" onclick="this.closest('.tp-card').querySelector('.tp-lines').classList.toggle('open');this.textContent=this.closest('.tp-card').querySelector('.tp-lines').classList.contains('open')?'Hide costs':'Cost breakdown'">Cost breakdown</a>
+      </div>
+      <div class="tp-lines">${costRows(p)}</div>
+      ${p.status === 'pending-approval' ? `
+      <div class="tp-actions">
+        <button class="btn btn-sm" onclick="approve('${p.id}')">Approve &amp; send</button>
+        <button class="btn btn-ghost btn-sm" onclick="reject('${p.id}')">Reject</button>
+      </div>` : ''}
+      <div class="tp-cost"><span>Estimated total</span><b>${fmt(p.total || 0)}</b></div>
+    </div>`).join('')}</div>`;
+}
+
+async function renderPend(){ TAB='plans'; await renderPlans(); }
+
+async function renderEvents(){
+  const events = ((await OS.list('travelEvents')) || []).slice().sort((a,b) => (b.at||'').localeCompare(a.at||''));
+  const plans = (await OS.list('tripPlans')) || [];
+  if (!events.length) { $('#view').innerHTML = '<p class="empty">No change events yet. The Logistics Agent watches inbound email for sick / reschedule / cancel signals.</p>'; return; }
+  $('#view').innerHTML = `<div class="feed">${events.map(e => {
+    const plan = plans.find(p => p.id === e.planId);
+    return `<div class="ev ${esc(e.kind)}">
+      <span class="dot"></span>
+      <div style="flex:1">
+        <b>${esc(e.kind || 'event')}</b> — ${esc(e.summary || '')}
+        <div><small>${esc(e.source || '')} · ${ago(e.at)} · ${plan ? 're: ' + esc(plan.title) : ''}</small></div>
+        <div style="margin-top:6px">${badge(e)}</div>
+      </div>
+    </div>`; }).join('')}</div>`;
+}
+
+function badge(e){
+  if (e.action === 'notified-admin-with-replacements' && (e.replacementSuggestions || []).length)
+    return `<small>Replacement(s): ${e.replacementSuggestions.map(r => esc(r.email || r)).join(', ')}</small>`;
+  if (e.action === 'approval-queued-for-delta')
+    return `<small>Cost delta ${fmt(e.deltaCost || 0)} queued for approval${e.requestedDate ? ' · new date: ' + esc(e.requestedDate) : ''}</small>`;
+  if (e.action === 'cancellation-deadlines-checked') return '<small>Cancellation deadlines checked — see plan POs</small>';
+  return `<small>${esc(e.action || '')}</small>`;
+}
+
+async function approve(id){
+  if (!confirm('Approve this trip plan? Customer + techs will be emailed the map & directions, and hotel/per-diem POs will be queued.')) return;
+  if (isLive()) { await raw('/api/trip-plans/' + id + '/approve', { method: 'POST' }); }
+  else { const p = (OS.cur('tripPlans')||[]).find(x=>x.id===id); if(p){ p.status='approved'; p.approvedBy=OS.USER.email||'admin'; p.approvedAt=new Date().toISOString(); p.emailedTo=['customer@demo.com','tech1@linesandlogos.com']; OS.persistDemo(); } }
+  toast('Trip plan approved — emails sent, POs queued'); render();
+}
+async function reject(id){
+  if (!confirm('Reject this trip plan?')) return;
+  if (isLive()) { await raw('/api/trip-plans/' + id + '/reject', { method: 'POST' }); }
+  else { const p = (OS.cur('tripPlans')||[]).find(x=>x.id===id); if(p){ p.status='rejected'; OS.persistDemo(); } }
+  toast('Trip plan rejected'); render();
+}
+
+function newTrip(){
+  openModal('New Trip Plan', `
+    ${field('title','Trip title','Gym resurface — Oxford HS')}
+    ${field('destinationAddress','Destination address','Oxford High School, Oxford, MS')}
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
+      ${field('daysOnSite','Days on site','3','number')}
+      ${field('crew','Crew size','3','number')}
+      ${field('jobValue','Job value $','','number')}
+    </div>
+    ${field('contractId','Contract ID (optional)','','text')}
+    <p class="hint" style="font-size:12px;color:var(--mut)">The Logistics Agent computes route, fuel, hotels, per-diem, equipment and materials — then holds for admin approval.</p>`);
+  onModalSave(async (vals) => {
+    if (!vals.destinationAddress) { toast('Destination required'); return; }
+    if (isLive()) { await raw('/api/trip-plans', { method: 'POST', body: JSON.stringify(vals) }); }
+    else {
+      const plans = OS.cur('tripPlans') || [];
+      plans.unshift({ id: uid('tp'), title: vals.title || 'Trip plan', destination: vals.destinationAddress,
+        miles: 180, roundMiles: 396, driveHours: 3, totalDays: +vals.daysOnSite || 3, nights: (+vals.daysOnSite||3)-1,
+        rooms: Math.max(1, Math.ceil((+vals.crew||3)/2)), crew: +vals.crew || 3, status: 'pending-approval',
+        total: 2400 + (+vals.daysOnSite||3) * 500, createdAt: new Date().toISOString(), lineItems: [
+          {k:'fuel-mileage',label:'Fuel (396 mi ÷ 14 mpg × $3.60)',amount:441},
+          {k:'lodging',label:'Hotels',amount:700},{k:'perdiem',label:'Per-diem meals',amount:480},
+          {k:'tolls',label:'Tolls & parking',amount:62},{k:'equipment',label:'Machinery transport',amount:510},
+          {k:'materials',label:'Materials staging',amount:690},{k:'labor',label:'Crew labor',amount:3150}],
+        maps: { directions: 'https://www.google.com/maps/dir/?api=1&origin=Memphis,+TN&destination=' + encodeURIComponent(vals.destinationAddress) } });
+      OS.persistDemo();
+    }
+    closeModal(); toast('Trip plan created — pending approval'); render();
+  });
+}
+
+async function estimateModal(){
+  openModal('Pre-Contract Estimate', `
+    <p class="hint" style="margin-top:0;font-size:12.5px;color:var(--mut)">See the full logistics picture <b>before</b> a job goes under contract.</p>
+    ${field('destinationAddress','Destination address','Nashville, TN')}
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
+      ${field('daysOnSite','Days on site','3','number')}
+      ${field('crew','Crew size','3','number')}
+      ${field('jobValue','Job value $','15000','number')}
+    </div>
+    <div id="estOut"></div>`);
+  onModalSave(async (vals) => {
+    let out;
+    if (isLive()) out = await raw('/api/trip-plans/estimate', { method: 'POST', body: JSON.stringify(vals) });
+    else out = { totalDays: (+vals.daysOnSite||3)+1, roundMiles: 466, total: 3860, jobValue: +vals.jobValue || 0,
+      logisticsPctOfJob: 26, marginWarning: null, lineItems: [ {k:'fuel-mileage',label:'Fuel',amount:520},{k:'lodging',label:'Hotels',amount:820},{k:'perdiem',label:'Per-diem',amount:540},{k:'labor',label:'Labor',amount:4200} ] };
+    const el = $('#estOut');
+    el.innerHTML = `<div style="margin-top:14px;border-top:1px dashed var(--line);padding-top:12px">
+      <div class="tp-lines open">${out.lineItems.map(i => `<div class="row"><span>${esc(i.label)}</span><span>${fmt(i.amount)}</span></div>`).join('')}</div>
+      <div class="tp-cost"><span>Est. logistics total (${out.totalDays} day(s))</span><b>${fmt(out.total)}</b></div>
+      ${out.jobValue ? `<p class="hint" style="font-size:12px">≈ ${out.logisticsPctOfJob}% of job value ${out.marginWarning ? `<br><b style="color:#f5b942">⚠ ${esc(out.marginWarning)}</b>` : ''}</p>` : ''}
+    </div>`;
+    toast('Estimate ready'); return false; // keep modal open to show result
+  });
+}
+
+boot('trips', 'Trip Plans', async () => { await render(); });
+</script>
+</body>
+</html>

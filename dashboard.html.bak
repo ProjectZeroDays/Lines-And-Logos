@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Overview — Lines &amp; Logos Business OS</title>
+<link rel="icon" type="image/png" href="logo-hero.png">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;700;800&family=Archivo+Black&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/os.css">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#04060d">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Lines & Logos">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+</head>
+<body data-perms="notifications">
+<main>
+  <div class="topbar">
+    <div><div class="crumb">Business OS / Overview</div><h1 class="chrome">Overview</h1></div>
+    <div class="topbar-right">
+      <button class="btn btn-ghost btn-sm" onclick="runDaily()">▶ Daily Ops Brief</button>
+      <button class="btn btn-sm" onclick="newLead()">+ New Lead</button>
+    </div>
+  </div>
+  <div class="tabs2" id="tabs"></div>
+  <div id="view"></div>
+</main>
+<script src="assets/os.js"></script>
+<script>
+const {fmt,ago,esc,TIER,INV,GEN}=OS;
+let view='overview';
+const TABS=[['overview','Overview'],['reports','Reports']];
+function renderTabs(){OS.$('#tabs').innerHTML=TABS.map(([k,l])=>`<button class="${view===k?'active':''}" onclick="go('${k}')">${l}</button>`).join('');}
+function go(v){view=v;renderTabs();render();}
+
+async function render(){
+  const [stats,leads,jobs,invoices,activity,accounts]=await Promise.all(
+    [OS.get('stats',true).catch(()=>null),OS.list('leads'),OS.list('jobs'),OS.list('invoices'),OS.list('activity'),OS.list('accounts')]);
+  const s=stats||computeStats();
+  if(view==='overview') vOverview(s,leads,jobs,invoices,activity);
+  else vReports(s,accounts,jobs,invoices);
+}
+function computeStats(){
+  const jobs=OS.cur('jobs'),inv=OS.cur('invoices');
+  return {pipeline:jobs.filter(j=>j.status!=='complete').reduce((s,j)=>s+j.value,0),
+    outstanding:inv.filter(i=>i.status!=='paid').reduce((s,i)=>s+i.amount,0),
+    overdueCount:inv.filter(i=>i.status==='overdue').length,
+    hotLeads:OS.cur('leads').filter(l=>l.tier==='hot').length,
+    activeJobs:jobs.filter(j=>j.status==='in-progress').length,
+    collected:inv.filter(i=>i.status==='paid').reduce((s,i)=>s+i.amount,0),
+    expensesTotal:OS.cur('expenses').reduce((s,x)=>s+x.amount,0),
+    openQuotes:OS.cur('quotes').filter(q=>q.status==='sent').length,
+    pendingApprovals:OS.cur('approvals').filter(a=>a.status==='pending').length,
+    openTickets:OS.cur('tickets').filter(t=>t.status!=='resolved').length,
+    crew:OS.cur('employees').length,accounts:OS.cur('accounts').length};
+}
+function vOverview(s,leads,jobs,invoices,activity){
+  OS.$('#view').innerHTML=`
+  <div class="kpis">
+    <div class="kpi" style="--accent:var(--blue-hi)"><div class="lbl">Pipeline Value</div><div class="val">${fmt(s.pipeline)}</div><div class="delta" style="--c:var(--green)">▲ open quotes & jobs</div></div>
+    <div class="kpi" style="--accent:var(--yellow)"><div class="lbl">Outstanding</div><div class="val">${fmt(s.outstanding)}</div><div class="delta" style="--c:var(--yellow)">${s.overdueCount} overdue</div></div>
+    <div class="kpi" style="--accent:var(--orange)"><div class="lbl">Hot Leads</div><div class="val">${s.hotLeads}</div><div class="delta" style="--c:var(--orange)">▲ scored by AI agent</div></div>
+    <div class="kpi" style="--accent:var(--lime)"><div class="lbl">Active Jobs</div><div class="val">${s.activeJobs}</div><div class="delta" style="--c:var(--green)">${s.crew} crew ready</div></div>
+  </div>
+  <div class="grid-2">
+    <div class="panel" style="--accent:var(--blue-hi)"><h3>Pipeline by Job</h3><canvas class="chart" id="pipe"></canvas></div>
+    <div class="panel" style="--accent:var(--cyan)"><h3>Agent Activity <span class="right"><a href="admin.html">agents console →</a></span></h3><div class="activity">
+      ${activity.slice(0,12).map(a=>`<div class="act"><span class="dot"></span><span class="t">${ago(a.t)}</span><span>${esc(a.msg)}</span></div>`).join('')||'<div class="empty">No agent activity yet</div>'}
+    </div></div>
+  </div>
+  <div class="grid-2 eq">
+    <div class="panel" style="--accent:var(--orange)"><h3>Top Leads <span class="right"><a href="sales.html">all leads →</a></span></h3><div class="table-wrap"><table>
+      <tr><th>Name</th><th>Score</th><th>Tier</th><th>Stage</th></tr>
+      ${leads.slice(0,4).map(l=>`<tr><td><b>${esc(l.name)}</b><span class="sub">${esc(l.company)}</span></td><td><b style="color:var(--cyan)">${l.score}</b></td><td><span class="tag ${TIER(l.tier)}">${l.tier}</span></td><td>${l.stage}</td></tr>`).join('')}
+    </table></div></div>
+    <div class="panel" style="--accent:var(--yellow)"><h3>Invoice Aging <span class="right"><a href="finance.html">finance →</a></span></h3><div class="table-wrap"><table>
+      <tr><th>Number</th><th>Account</th><th>Amount</th><th>Status</th></tr>
+      ${invoices.map(i=>`<tr><td><b>${esc(i.number)}</b></td><td>${esc(i.account)}</td><td>${fmt(i.amount)}</td><td><span class="tag ${INV(i.status)}">${i.status}</span></td></tr>`).join('')}
+    </table></div></div>
+  </div>`;
+  drawPipe(jobs);
+}
+function drawPipe(jobs){
+  const c=OS.$('#pipe');if(!c)return;
+  const dpr=devicePixelRatio||1,W=c.clientWidth,H=c.clientHeight;
+  c.width=W*dpr;c.height=H*dpr;const x=c.getContext('2d');x.scale(dpr,dpr);
+  const list=jobs.slice(0,5);if(!list.length)return;
+  const max=Math.max(...list.map(j=>j.value));
+  list.forEach((j,i)=>{
+    const y=18+i*((H-36)/Math.max(1,list.length-1||1));
+    const w=Math.max(24,(j.value/max)*(W-190));
+    x.font='600 12px Space Grotesk';x.fillStyle='#7e8cab';x.fillText((j.title||'').slice(0,22),4,y+4);
+    const g=x.createLinearGradient(130,0,130+w,0);g.addColorStop(0,'#4d7dff');g.addColorStop(1,'#57c7ff');
+    x.fillStyle='rgba(120,145,205,.1)';rr(x,130,y-6,W-140,12,6);x.fill();
+    x.fillStyle=g;rr(x,130,y-6,w,12,6);x.fill();
+    x.fillStyle='#eef3fc';x.font='700 12px Space Grotesk';x.fillText(fmt(j.value),138+w,y+4);
+  });
+  function rr(x,a,b,w,h,r){x.beginPath();x.roundRect?x.roundRect(a,b,w,h,r):x.rect(a,b,w,h)}
+}
+async function vReports(s,accounts,jobs,invoices){
+  const brief=await OS.cron('daily');
+  const gross=(s.collected||0)+s.outstanding, net=(s.collected||0)-(s.expensesTotal||0);
+  OS.$('#view').innerHTML=`
+  <div class="kpis k3">
+    <div class="kpi" style="--accent:var(--green)"><div class="lbl">Collected (all time)</div><div class="val">${fmt(s.collected||0)}</div><div class="delta" style="--c:var(--green)">cash in</div></div>
+    <div class="kpi" style="--accent:var(--red)"><div class="lbl">Expenses</div><div class="val">${fmt(s.expensesTotal||0)}</div><div class="delta" style="--c:var(--red)">materials · equipment · travel</div></div>
+    <div class="kpi" style="--accent:var(--cyan)"><div class="lbl">Net Position</div><div class="val">${fmt(net)}</div><div class="delta" style="--c:${net>=0?'var(--green)':'var(--red)'}">${net>=0?'▲ profitable':'▼ at risk'}</div></div>
+  </div>
+  <div class="grid-2 eq">
+    <div class="panel" style="--accent:var(--lime)"><h3>Daily Ops Brief <span class="right">Daily Ops Agent · ${brief.date||''}</span></h3>
+      <div class="bar-row"><span class="n">Jobs in progress</span><div class="bar-track"><div class="bar-fill" style="width:${Math.min(100,(brief.jobsToday||[]).length*34)}%"></div></div><span class="amt">${(brief.jobsToday||[]).length}</span></div>
+      <div class="bar-row"><span class="n">Open quotes</span><div class="bar-track"><div class="bar-fill" style="width:${Math.min(100,(brief.openQuotes||[]).length*34)}%"></div></div><span class="amt">${(brief.openQuotes||[]).length}</span></div>
+      <div class="bar-row"><span class="n">Overdue invoices</span><div class="bar-track"><div class="bar-fill" style="width:${Math.min(100,(brief.overdueInvoices||[]).length*34)}%;background:linear-gradient(90deg,#ff7a1a,#ff5a5a)"></div></div><span class="amt">${(brief.overdueInvoices||[]).length}</span></div>
+      <div class="bar-row"><span class="n">Hot leads</span><div class="bar-track"><div class="bar-fill" style="width:${Math.min(100,(brief.hotLeads||[]).length*34)}%;background:linear-gradient(90deg,#ff7a1a,#ffc21c)"></div></div><span class="amt">${(brief.hotLeads||[]).length}</span></div>
+      <div class="bar-row"><span class="n">Pending approvals</span><div class="bar-track"><div class="bar-fill" style="width:${Math.min(100,(brief.pendingApprovals||0)*34)}%"></div></div><span class="amt">${brief.pendingApprovals||0}</span></div>
+    </div>
+    <div class="panel" style="--accent:var(--volley)"><h3>Account Health <span class="right">Health Score Agent</span></h3><div class="table-wrap"><table>
+      <tr><th>Account</th><th>Tier</th><th>Health</th></tr>
+      ${accounts.map(a=>`<tr><td><b>${esc(a.name)}</b><span class="sub">${esc((a.healthNotes||[])[0]||'')}</span></td><td><span class="tag t-blue">${a.tier}</span></td><td><span class="hdot h-${a.health}">${a.health}</span></td></tr>`).join('')}
+    </table></div></div>
+  </div>
+  <div class="panel" style="--accent:var(--yellow)"><h3>Weekly KPI Snapshot <span class="right">runs Mondays via /api/cron/weekly</span></h3><div class="table-wrap"><table>
+    <tr><th>Metric</th><th>Value</th><th>Metric</th><th>Value</th></tr>
+    <tr><td>Total leads</td><td><b>${OS.cur('leads').length}</b></td><td>Pipeline value</td><td><b>${fmt(s.pipeline)}</b></td></tr>
+    <tr><td>Gross invoiced</td><td><b>${fmt(gross)}</b></td><td>Outstanding</td><td><b>${fmt(s.outstanding)}</b></td></tr>
+    <tr><td>Open quotes</td><td><b>${s.openQuotes||0}</b></td><td>Open tickets</td><td><b>${s.openTickets||0}</b></td></tr>
+    <tr><td>Active jobs</td><td><b>${s.activeJobs}</b></td><td>Crew (1099)</td><td><b>${s.crew}</b></td></tr>
+  </table></div></div>`;
+}
+async function runDaily(){
+  const brief=await OS.cron('daily');
+  OS.toast('Daily Ops Agent brief generated — see Reports tab');
+  if(view!=='reports')go('reports');else render();
+}
+function newLead(){
+  OS.openModal('New Lead',`
+    <label>Contact Name</label><input id="f-name" placeholder="Jane Doe">
+    <label>Company / Facility</label><input id="f-company" placeholder="DeSoto County Schools">
+    <label>Service Needed</label><select id="f-service"><option>Full Facility</option><option>Gym Refresh</option><option>Court Restripe</option><option>Wall Wraps</option><option>Donors Wall</option><option>Signage & Striping</option><option>Playground Surfacing</option></select>
+    <label>Source</label><select id="f-source"><option>Website</option><option>Referral</option><option>Outbound</option><option>Cold call</option></select>`);
+  OS.onModalSave(async()=>{
+    const r=await OS.create('leads',{name:OS.field('f-name')||'Unknown',company:OS.field('f-company')||'Unknown',service:OS.field('f-service'),source:OS.field('f-source'),stage:'new'});
+    OS.closeModal();OS.toast(`Lead created — AI scored ${r.score} (${r.tier})`);render();
+  });
+}
+OS.boot('overview','Overview',async()=>{renderTabs();await render();});
+</script>
+<script src="assets/pwa.js" defer></script>
+<!-- Lines & Logos Business OS -->
+</body>
+</html>

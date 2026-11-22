@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Partner Dashboard — Lines &amp; Logos</title>
+<meta name="robots" content="noindex">
+<link rel="icon" type="image/png" href="icons/favicon-32.png">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;700;800&family=Archivo+Black&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#050f2b;--surface:#0a1c44;--surface2:#0d2354;--text:#c9d6f5;--dim:#93a5d4;--line:rgba(88,124,255,.30);--blue:#4d84ff;--cyan:#38bdf8;--green:#4ade80;--yellow:#fbbf24;--red:#f87171;--chrome:#eef3fc;--radius:16px;--shadow:0 1px 3px rgba(0,0,0,.45),0 1px 0 rgba(88,124,255,.14) inset,0 16px 40px -16px rgba(0,0,0,.65)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:radial-gradient(900px 400px at 70% -10%,rgba(77,125,255,.12),transparent),var(--bg);color:var(--text);font-family:'Space Grotesk',system-ui,sans-serif;font-size:14.5px;line-height:1.6;min-height:100dvh}
+.wrap{max-width:1120px;margin:0 auto;padding:0 24px}
+h1,h2{font-family:'Archivo Black';color:var(--chrome)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;font-family:'Archivo',sans-serif;font-weight:800;font-size:13px;color:#fff;border:none;cursor:pointer;padding:11px 20px;border-radius:100px;background:linear-gradient(135deg,#2f7bff,#1b69ff 55%,#0033a0);box-shadow:0 6px 18px rgba(27,105,255,.40),inset 0 1px 0 rgba(255,255,255,.22);transition:.18s;text-decoration:none}
+.btn:hover{transform:translateY(-1px);box-shadow:0 10px 24px rgba(27,105,255,.48),inset 0 1px 0 rgba(255,255,255,.22)}
+.btn-ghost{background:var(--surface2);box-shadow:inset 0 0 0 1.5px rgba(88,124,255,.42);color:var(--text)}
+.btn[disabled]{opacity:.45;cursor:not-allowed;transform:none}
+.topbar{position:sticky;top:0;z-index:90;display:flex;align-items:center;gap:14px;padding:13px 0;background:rgba(7,11,22,.85);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+.topbar img{height:34px}
+.topbar b{font-family:'Archivo Black';font-size:12px;letter-spacing:.06em}
+.badge{font-family:'Archivo',sans-serif;font-size:10.5px;font-weight:800;letter-spacing:.12em;background:rgba(77,125,255,.15);color:var(--cyan);border:1px solid rgba(87,199,255,.4);border-radius:100px;padding:4px 12px}
+.demo-banner{margin:16px 0 0;background:rgba(217,119,6,.12);border:1px solid rgba(251,191,36,.4);color:var(--yellow);border-radius:12px;padding:11px 16px;font-size:12.5px;font-weight:600;display:none}
+.demo-banner.show{display:block}
+.subnav{display:flex;gap:8px;flex-wrap:wrap;margin:18px 0}
+.subnav a{font-size:12px;font-weight:700;color:var(--dim);background:var(--surface2);border:1px solid var(--line);border-radius:100px;padding:7px 14px;text-decoration:none;transition:.15s}
+.subnav a:hover{color:#fff;border-color:rgba(87,199,255,.5)}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px}
+.kpi{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:20px 22px;position:relative;overflow:hidden;box-shadow:var(--shadow)}
+.kpi::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:var(--accent,var(--blue))}
+.kpi .lbl{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);font-weight:700;margin-bottom:8px}
+.kpi .val{font-family:'Archivo Black';font-size:28px;color:var(--chrome)}
+.kpi .sub{font-size:11.5px;color:var(--dim);margin-top:6px}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:24px 26px;margin-bottom:20px;scroll-margin-top:90px}
+.panel h2{font-size:14px;letter-spacing:.1em;margin-bottom:6px}
+.panel .sub{font-size:12.5px;color:var(--dim);margin-bottom:16px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.inp{width:100%;padding:11px 14px;border-radius:11px;border:1px solid rgba(88,124,255,.35);background:var(--surface2);color:var(--chrome);font-family:inherit;font-size:13.5px;outline:none}
+.inp:focus{border-color:#4d84ff;box-shadow:0 0 0 3px rgba(77,132,255,.20)}
+.inp.has-error{border-color:var(--red);box-shadow:0 0 0 1px rgba(248,113,113,.35)}
+.lbl2{display:block;font-size:10.5px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);margin:0 0 6px}
+.field{margin-bottom:13px}
+.err{font-size:11.5px;color:var(--red);margin-top:5px;line-height:1.4}
+.err[hidden]{display:none}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);padding:8px 10px;border-bottom:1px solid var(--line)}
+td{padding:12px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+tr:last-child td{border-bottom:none}
+.tag{display:inline-block;font-size:10px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;border-radius:100px;padding:3px 10px;white-space:nowrap}
+.t-pend{background:rgba(251,191,36,.12);color:var(--yellow);border:1px solid rgba(251,191,36,.4)}
+.t-paid{background:rgba(74,222,128,.12);color:var(--green);border:1px solid rgba(74,222,128,.4)}
+.t-new{background:rgba(87,199,255,.12);color:var(--cyan);border:1px solid rgba(87,199,255,.4)}
+.t-contact{background:rgba(77,125,255,.12);color:var(--blue);border:1px solid rgba(77,125,255,.4)}
+.score{display:inline-flex;align-items:center;gap:7px;font-weight:800;color:var(--chrome)}
+.score .bar{width:56px;height:6px;border-radius:100px;background:var(--surface2);overflow:hidden}
+.score .bar i{display:block;height:100%;background:linear-gradient(90deg,var(--blue),var(--cyan));border-radius:100px}
+#status{margin:14px 0;padding:12px 16px;border-radius:12px;font-size:13px;line-height:1.5;background:rgba(30,58,138,.4);border:1px solid rgba(96,165,250,.45);color:#dbeafe;display:none}
+#status.err{background:rgba(127,29,29,.45);border-color:rgba(248,113,113,.55);color:#fecaca}
+.linkbox{display:flex;gap:10px;flex-wrap:wrap;align-items:center;background:var(--surface2);border:1px solid var(--line);border-radius:12px;padding:13px 16px;margin-bottom:12px;font-size:12.5px}
+.linkbox code{color:var(--cyan);font-weight:700;user-select:all}
+.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:var(--chrome);color:#0b0f1d;padding:11px 22px;border-radius:100px;font-size:13px;font-weight:700;z-index:200;opacity:0;transition:.3s}
+.toast.show{opacity:1}
+@media(max-width:900px){.kpis{grid-template-columns:repeat(2,1fr)}.grid2{grid-template-columns:1fr}}
+@media(max-width:520px){.kpis{grid-template-columns:1fr 1fr}.kpi .val{font-size:22px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar" style="margin:0 -24px;padding:13px 24px">
+    <img src="logo-hero.png" alt="Lines &amp; Logos">
+    <b>PARTNER DASHBOARD</b>
+    <span class="badge" id="codeBadge">…</span>
+    <span style="flex:1"></span>
+    <button class="btn btn-ghost" style="padding:8px 16px;font-size:12px" onclick="signOut()">Sign out</button>
+  </div>
+
+  <div class="demo-banner" id="demoBanner">Preview mode — viewing demo data. Actions are disabled and nothing is saved.</div>
+
+  <nav class="subnav" aria-label="Dashboard sections">
+    <a href="#link">Referral Link</a><a href="#add-lead">Add Lead</a><a href="#pipeline">Pipeline</a><a href="#commissions">Commissions</a><a href="#payout">Payouts</a>
+  </nav>
+
+  <div id="status" role="status" aria-live="polite"></div>
+
+  <div class="kpis">
+    <div class="kpi" style="--accent:var(--yellow)"><div class="lbl">Pending commission</div><div class="val" id="kPending">$0</div><div class="sub">earned, awaiting payout</div></div>
+    <div class="kpi" style="--accent:var(--green)"><div class="lbl">Paid to you</div><div class="val" id="kPaid">$0</div><div class="sub">payouts run 1st &amp; 15th</div></div>
+    <div class="kpi" style="--accent:var(--cyan)"><div class="lbl">Your rate</div><div class="val" id="kRate">10%</div><div class="sub">of first completed job</div></div>
+    <div class="kpi" style="--accent:var(--blue)"><div class="lbl">Referrals</div><div class="val" id="kRefs">0</div><div class="sub" id="kRefsSub">—</div></div>
+  </div>
+
+  <div class="panel" id="link">
+    <h2>YOUR REFERRAL LINK</h2>
+    <div class="linkbox">Link <code id="refLink">https://linesandlogosteam.com/?ref=…</code> <button class="btn btn-ghost btn-sm" style="padding:7px 14px;font-size:11.5px" data-copy="link">Copy link</button></div>
+    <div class="linkbox">Code <code id="refCode">…</code> <button class="btn btn-ghost btn-sm" style="padding:7px 14px;font-size:11.5px" data-copy="code">Copy code</button></div>
+    <p class="sub" style="margin:0">30-day attribution window · you earn when the referred account completes its first job.</p>
+  </div>
+
+  <div class="panel" id="add-lead">
+    <h2>ADD A LEAD TO YOUR CRM</h2>
+    <p class="sub">Log a facility contact — we score lead readiness right away, sales follows up, and you earn 10% when the first job completes.</p>
+    <div class="grid2">
+      <div class="field"><label class="lbl2" for="fContact">Contact name *</label><input class="inp" id="fContact" placeholder="e.g. Dana Cole" autocomplete="off"><p class="err" id="eContact" role="alert" hidden></p></div>
+      <div class="field"><label class="lbl2" for="fFacility">Facility / company *</label><input class="inp" id="fFacility" placeholder="e.g. Nashville Christian Academy" autocomplete="off"><p class="err" id="eFacility" role="alert" hidden></p></div>
+      <div class="field"><label class="lbl2" for="fEmail">Email *</label><input class="inp" id="fEmail" type="email" placeholder="dcole@school.org" autocomplete="off"><p class="err" id="eEmail" role="alert" hidden></p></div>
+      <div class="field"><label class="lbl2" for="fPhone">Phone *</label><input class="inp" id="fPhone" type="tel" placeholder="615-555-0142" autocomplete="off"><p class="err" id="ePhone" role="alert" hidden></p></div>
+      <div class="field"><label class="lbl2" for="fCity">City *</label><input class="inp" id="fCity" placeholder="Nashville, TN" autocomplete="off"><p class="err" id="eCity" role="alert" hidden></p></div>
+      <div class="field"><label class="lbl2" for="fInterest">Service interest</label>
+        <select class="inp" id="fInterest"><option>General inquiry</option><option>Gym Floor Refinish</option><option>Court Restripe</option><option>Wall Wrap / Graphics</option><option>Donor Wall</option><option>Signage &amp; Parking Striping</option><option>Playground Surfacing</option><option>Full Facility</option></select></div>
+    </div>
+    <div class="field"><label class="lbl2" for="fNotes">Notes (relationship, timing, budget hints)</label><textarea class="inp" id="fNotes" rows="3" placeholder="e.g. AD is my cousin — budget approved for May…"></textarea><p class="err" id="eNotes" role="alert" hidden></p></div>
+    <button class="btn" id="addLeadBtn">Add Lead →</button>
+  </div>
+
+  <div class="panel" id="pipeline">
+    <h2>YOUR PIPELINE</h2>
+    <div style="overflow-x:auto"><table><thead><tr><th>Facility</th><th>Contact</th><th>Interest</th><th>Readiness</th><th>Stage</th></tr></thead><tbody id="pipeBody"></tbody></table></div>
+  </div>
+
+  <div class="panel" id="commissions">
+    <h2>COMMISSIONS</h2>
+    <p class="sub">Commissions post when a referred job completes. Payouts run on the 1st &amp; 15th — minimum $50.</p>
+    <div style="overflow-x:auto"><table><thead><tr><th>Job</th><th>Basis</th><th>Rate</th><th>Earned</th><th>Status</th><th>Date</th></tr></thead><tbody id="commBody"></tbody>
+    <tfoot><tr><td style="font-weight:800;color:var(--chrome)">Totals</td><td></td><td></td><td style="font-weight:800;color:var(--chrome)" id="commTotals">—</td><td colspan="2" class="muted" id="commSplit">—</td></tr></tfoot></table></div>
+  </div>
+
+  <div class="panel" id="payout">
+    <h2>PAYOUT SETTINGS</h2>
+    <div class="grid2">
+      <div>
+        <label class="lbl2" for="pMethod">Payout method</label>
+        <input class="inp" id="pMethod" value="ACH •••• 4471">
+        <button class="btn btn-ghost btn-sm" id="saveMethodBtn">Save method</button>
+      </div>
+      <div>
+        <label class="lbl2">Next payout run</label>
+        <p style="font-size:20px;font-weight:800;color:var(--chrome);margin-bottom:8px" id="nextRun">—</p>
+        <button class="btn" id="payoutBtn">Request payout</button>
+        <p class="sub" style="margin:10px 0 0" id="payoutHint">—</p>
+      </div>
+    </div>
+  </div>
+
+  <p style="text-align:center;color:var(--dim);font-size:11.5px;padding:26px 0 60px">© 2026 Lines &amp; Logos · Partner support: <a href="mailto:partners@linesandlogos.team" style="color:var(--cyan)">partners@linesandlogos.team</a></p>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* Single source of truth — KPIs, pipeline and commissions derive from these arrays */
+const RATE = 0.10, MIN_PAYOUT = 50;
+const qs = new URLSearchParams(location.search);
+let TOKEN = qs.get('token') || sessionStorage.getItem('ll_partner') || '';
+if (qs.get('token')){ sessionStorage.setItem('ll_partner', TOKEN); history.replaceState({}, document.title, location.pathname); }  /* never leave tokens in the URL */
+const DEMO = {
+  code:'RAMSEY10', name:'Coach Mike Ramsey', method:'ACH •••• 4471', offline:true,
+  pipeline:[{contact:'Marcus Bell',facility:'Bellevue Baptist Church',email:'mbell@bellevue.org',interest:'Donor Wall + Wraps',score:74,stage:'Contacted'}],
+  jobs:[{job:'MSCS — Gym Refresh (3 gyms)',basis:86500,status:'Pending',at:'today'},{job:'U of M — Parking Lot Striping',basis:12750,status:'Paid',at:'2026-10-15'}]
+};
+let D = null, payoutRequested = false;
+const $ = id => document.getElementById(id);
+const money = n => '$' + Math.round(n).toLocaleString();
+const esc = s => String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function toast(m){const t=$('toast');t.textContent=m;t.classList.add('show');clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove('show'),2400)}
+function status(m,err){const s=$('status');s.textContent=m;s.style.display='block';s.classList.toggle('err',!!err)}
+
+async function boot(){
+  let data = null;
+  if (TOKEN && TOKEN !== 'demo-partner-token'){
+    try{ const r = await fetch('/api/referrals/'+encodeURIComponent(TOKEN)); if (r.ok) data = await r.json(); }catch(e){}
+  }
+  if (data && data.data){   /* real engine summary */
+    const p = data.data.partner;
+    D = { code:p.refCode, name:p.handle, method:'ACH •••• '+(p.lastFour||'••••'), offline:false,
+      pipeline:(data.data.attributions||[]).slice(0,10).map(a=>({contact:a.referredName||'—',facility:a.landingPath||'—',email:a.email||'',interest:'Referred visit',score:null,stage:'New'})),
+      jobs:(data.data.ledger||[]).map(l=>({job:l.invoiceId,basis:l.grossAmountCents/100,status:l.status==='PAID'?'Paid':'Pending',at:l.createdAt.slice(0,10)})) };
+  } else {
+    D = DEMO;
+    $('demoBanner').classList.add('show');
+  }
+  $('codeBadge').textContent = D.code.toUpperCase();
+  $('refLink').textContent = 'https://linesandlogosteam.com/?ref=' + D.code;
+  $('refCode').textContent = D.code;
+  $('pMethod').value = D.method;
+  render();
+  if (D.offline) ['addLeadBtn','payoutBtn','saveMethodBtn'].forEach(id=>$(id).disabled = true);
+}
+function render(){
+  const earned = j => Math.round(j.basis * RATE);
+  const pend = D.jobs.filter(j=>j.status!=='Paid').reduce((s,j)=>s+earned(j),0);
+  const paid = D.jobs.filter(j=>j.status==='Paid').reduce((s,j)=>s+earned(j),0);
+  /* reconciled KPIs: referrals = pipeline + converted jobs */
+  $('kPending').textContent = money(pend);
+  $('kPaid').textContent = money(paid);
+  $('kRefs').textContent = D.pipeline.length + D.jobs.length;
+  $('kRefsSub').textContent = `${D.jobs.length} became jobs · ${D.pipeline.length} active in pipeline`;
+  $('pipeBody').innerHTML = D.pipeline.map(l=>`<tr><td><b>${esc(l.facility)}</b></td><td>${esc(l.contact)}<span style="display:block;font-size:11px;color:var(--dim)">${esc(l.email)}</span></td><td>${esc(l.interest)}</td>
+    <td>${l.score==null?'<span class="muted">—</span>':`<span class="score"><span class="bar"><i style="width:${l.score}%"></i></span>${l.score}</span>`}</td>
+    <td><span class="tag ${l.stage==='Contacted'?'t-contact':'t-new'}">${esc(l.stage)}</span></td></tr>`).join('') || '<tr><td colspan="5" class="muted">No active leads — add your first above.</td></tr>';
+  $('commBody').innerHTML = D.jobs.map(j=>`<tr><td><b>${esc(j.job)}</b></td><td>${money(j.basis)}</td><td>${RATE*100}%</td><td style="font-weight:700;color:var(--chrome)">${money(earned(j))}</td>
+    <td><span class="tag ${j.status==='Paid'?'t-paid':'t-pend'}">${j.status}</span></td><td class="muted">${esc(j.at)}</td></tr>`).join('');
+  $('commTotals').textContent = money(pend + paid);
+  $('commSplit').textContent = `Pending ${money(pend)} · Paid ${money(paid)}`;
+  const next = nextRun();
+  $('nextRun').textContent = next.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+  updatePayoutHint(pend);
+}
+function nextRun(){ const n=new Date(); return n.getDate()<15 ? new Date(n.getFullYear(),n.getMonth(),15) : new Date(n.getFullYear(),n.getMonth()+1,1); }
+function updatePayoutHint(pend){
+  const h=$('payoutHint');
+  if (payoutRequested) h.textContent = `Request for ${money(pend)} is awaiting owner approval for the ${nextRun().toLocaleDateString('en-US',{month:'short',day:'numeric'})} run.`;
+  else if (pend < MIN_PAYOUT) h.textContent = `Minimum payout is $${MIN_PAYOUT} — ${money(MIN_PAYOUT-pend)} more in commissions needed.`;
+  else h.textContent = `${money(pend)} eligible — requests close the day before each run.`;
+}
+/* copy buttons */
+document.querySelectorAll('[data-copy]').forEach(b=>b.addEventListener('click',async()=>{
+  const v = b.dataset.copy==='link' ? $('refLink').textContent : $('refCode').textContent;
+  try{ await navigator.clipboard.writeText(v); toast('Copied: '+v); status('Copied to clipboard: '+v); }
+  catch(e){ toast('Copy manually: '+v); }
+}));
+/* lead form */
+function setErr(inp,errEl,msg){ $(inp).classList.toggle('has-error',!!msg); const e=$(errEl); e.hidden=!msg; e.textContent=msg||''; if(msg)$(inp).setAttribute('aria-invalid','true'); else $(inp).removeAttribute('aria-invalid'); }
+['fContact','fFacility','fEmail','fPhone','fCity'].forEach(id=>$(id).addEventListener('input',()=>setErr(id,'e'+id.slice(1),'')));
+function fmtPhone(raw){ const d=String(raw).replace(/\D/g,''); const t=d.length===11&&d.startsWith('1')?d.slice(1):d; return t.length===10?`(${t.slice(0,3)}) ${t.slice(3,6)}-${t.slice(6)}`:null; }
+function readiness(o){ let s=0; const why=[];
+  if(o.contact&&o.facility){s+=20;why.push('named contact & facility +20')}
+  if(o.email||o.phone){s+=15;why.push('direct channel +15')}
+  if(o.city.length>=3){s+=15;why.push('location +15')}
+  s += o.interest!=='General inquiry' ? 20 : 5; why.push(o.interest!=='General inquiry'?`specific scope +20`:'general inquiry +5');
+  if(o.notes.length>=12){s+=15;why.push('context notes +15')}
+  if(/(budget|approved|q[1-4]|may|june|july|summer|break|ad|athletic|pastor|facilities)/i.test(o.notes)){s+=15;why.push('budget/timing signal +15')}
+  return {score:Math.min(100,s),why}; }
+$('addLeadBtn').addEventListener('click',()=>{
+  if (D.offline){ status('Preview mode is read-only — connect the live server to add leads.', true); return; }
+  const o={contact:$('fContact').value.trim(),facility:$('fFacility').value.trim(),email:$('fEmail').value.trim(),phone:$('fPhone').value.trim(),city:$('fCity').value.trim(),interest:$('fInterest').value,notes:$('fNotes').value.trim()};
+  let first=null;
+  const fail=(inp,err,m)=>{setErr(inp,err,m);first=first||inp;};
+  if(o.contact.length<2) fail('fContact','eContact','Contact name is required.');
+  if(o.facility.length<2) fail('fFacility','eFacility','Facility or company is required.');
+  if(!/^[^@\s]+@[^@\s]+\.[^@\s]{2,}$/.test(o.email)) fail('fEmail','eEmail','Enter a valid email address.');
+  if(!fmtPhone(o.phone)) fail('fPhone','ePhone','Enter a 10-digit phone number.');
+  if(o.city.length<2) fail('fCity','eCity','Enter city and state (e.g., Nashville, TN).');
+  if(D.pipeline.some(l=>l.email.toLowerCase()===o.email.toLowerCase()||(l.facility.toLowerCase()===o.facility.toLowerCase()&&l.contact.toLowerCase()===o.contact.toLowerCase())))
+    fail('fFacility','eFacility',`A lead for ${o.facility} (${o.contact}) is already in your pipeline.`);
+  if(first){ $(first).focus(); status('Please fix the highlighted fields.', true); return; }
+  const r=readiness(o);
+  D.pipeline.push({contact:o.contact,facility:o.facility,email:o.email,interest:o.interest,score:r.score,stage:'New Lead'});
+  render();
+  ['fContact','fFacility','fEmail','fPhone','fCity','fNotes'].forEach(id=>$(id).value='');
+  status(`Added ${o.facility} — readiness ${r.score}/100 (${r.why.join(', ')}). Sales takes it from here.`);
+});
+/* payout */
+$('payoutBtn').addEventListener('click',()=>{
+  if (D.offline){ status('Preview mode is read-only.', true); return; }
+  const pend = D.jobs.filter(j=>j.status!=='Paid').reduce((s,j)=>s+Math.round(j.basis*RATE),0);
+  if (payoutRequested) return status(`A request for ${money(pend)} is already awaiting owner approval.`, true);
+  if (!$('pMethod').value.trim()) return status('Add a payout method first.', true);
+  if (pend < MIN_PAYOUT) return status(`Minimum payout is $${MIN_PAYOUT} — ${money(MIN_PAYOUT-pend)} more needed.`, true);
+  payoutRequested = true; render();
+  status(`Payout request for ${money(pend)} submitted for owner approval — next run ${nextRun().toLocaleDateString('en-US',{month:'short',day:'numeric'})}.`);
+});
+$('saveMethodBtn').addEventListener('click',()=>{
+  if (D.offline){ status('Preview mode is read-only — method not saved.', true); return; }
+  if($('pMethod').value.trim().length<4) return status('Enter a valid payout method (e.g., ACH •••• 4471).', true);
+  status('Payout method saved: '+$('pMethod').value.trim());
+});
+function signOut(){ sessionStorage.removeItem('ll_partner'); location.href='login.html'; }
+if(!TOKEN){ location.href='login.html'; } else { boot(); }
+</script>
+</body>
+</html>

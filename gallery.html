@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Photo Gallery — Lines &amp; Logos</title>
+<meta name="description" content="Real Lines & Logos jobs — gym floors, courts, wall wraps, and donor walls photographed at completion. Every photo approved before publishing.">
+<link rel="icon" type="image/png" href="icons/favicon-32.png">
+<link rel="canonical" href="https://linesandlogosteam.com/gallery.html">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;700;800&family=Archivo+Black&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/theme.css">
+<style>
+:root{--ink:#f6f7fb;--blue:#3b5bff;--cyan:#0ea5e9;--chrome-1:#1c2440;--line:rgba(38,54,96,.10);--text:#3d4a68;--text-dim:#5f6f95;--radius:18px;--shadow:0 1px 3px rgba(28,42,90,.06),0 16px 40px -18px rgba(28,42,90,.18)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--ink);color:var(--text);font-family:'Space Grotesk',system-ui,sans-serif;font-size:15px;line-height:1.6}
+.wrap{max-width:1180px;margin:0 auto;padding:0 28px}
+h1,h2{font-family:'Archivo Black';color:var(--chrome-1);line-height:1.1;text-transform:uppercase;letter-spacing:-.01em}
+nav{position:sticky;top:0;z-index:100;background:rgba(255,255,255,.88);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+.nav-inner{max-width:1180px;margin:0 auto;padding:22px 28px;display:flex;align-items:center;gap:26px}
+.nav-logo{display:flex;align-items:center;gap:11px;text-decoration:none}
+.nav-logo img{height:50px;filter:drop-shadow(0 4px 10px rgba(59,91,255,.25))}
+.nav-logo b{font-family:'Archivo Black';font-size:13px;letter-spacing:.06em;color:var(--chrome-1);line-height:1.15;display:block}
+.nav-logo small{display:block;font-size:9px;letter-spacing:.24em;color:var(--text-dim);font-weight:700}
+.nav-links{display:flex;gap:4px;margin-left:auto;align-items:center}
+.nav-links a{color:var(--text);text-decoration:none;font-size:14px;font-weight:600;padding:9px 15px;border-radius:100px;transition:.15s}
+.nav-links a:hover{color:var(--blue);background:rgba(59,91,255,.07)}
+.nav-links a.btn{color:#fff;padding:11px 22px}
+.hero{padding:60px 0 34px;text-align:center;background:radial-gradient(800px 300px at 50% -10%,rgba(59,91,255,.10),transparent)}
+.hero h1{font-size:clamp(30px,4.4vw,48px)}
+.hero h1 .grad{background:linear-gradient(115deg,#3b5bff,#0ea5e9);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.hero p{color:var(--text-dim);font-size:15.5px;max-width:620px;margin:12px auto 0}
+section{padding:36px 0 80px}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.card{background:#fff;border:1px solid var(--line);border-radius:16px;overflow:hidden;box-shadow:var(--shadow);transition:.2s}
+.card:hover{transform:translateY(-4px);box-shadow:0 2px 6px rgba(28,42,90,.06),0 26px 50px -20px rgba(28,42,90,.25)}
+.card img{width:100%;height:230px;object-fit:cover;display:block;background:linear-gradient(135deg,#e8edf9,#dbe4f5)}
+.card .body{padding:16px 18px}
+.card b{color:var(--chrome-1);font-size:14px}
+.card p{font-size:12.5px;color:var(--text-dim);margin-top:4px}
+.empty{border:2px dashed rgba(59,91,255,.3);border-radius:20px;padding:60px 30px;text-align:center;background:rgba(59,91,255,.03)}
+.empty b{display:block;font-family:'Archivo Black';font-size:19px;color:var(--chrome-1);text-transform:uppercase;margin-bottom:10px}
+.empty p{color:var(--text-dim);font-size:14px;max-width:520px;margin:0 auto 20px;line-height:1.7}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;font-family:'Archivo',sans-serif;font-weight:800;font-size:14px;color:#fff;border:none;cursor:pointer;padding:13px 24px;border-radius:100px;background:linear-gradient(135deg,#2f7bff,#1b69ff 55%,#0033a0);box-shadow:0 8px 22px rgba(27,105,255,.35);transition:.18s;text-decoration:none}
+.btn:hover{transform:translateY(-2px)}
+label{display:block;font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--text-dim);margin:0 0 7px}
+input{width:100%;padding:12px 15px;border-radius:12px;border:1px solid rgba(27,105,255,.22);background:#f8faff;color:var(--chrome-1);font-family:inherit;font-size:14px;outline:none;margin-bottom:14px}
+input:focus{border-color:#3b5bff;box-shadow:0 0 0 3px rgba(59,91,255,.14)}
+.panel{background:#fff;border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:28px}
+@media(max-width:960px){.grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:640px){.grid{grid-template-columns:1fr}.nav-links a:not(.btn){display:none}}
+
+/* footer */
+footer{background:#0b1020;border-top:1px solid rgba(255,255,255,0.06);padding:64px 0 32px}
+.foot-grid{max-width:1100px;margin:0 auto;padding:0 24px;display:grid;grid-template-columns:260px repeat(4,1fr);gap:28px;align-items:start}
+.foot-brand{display:flex;flex-direction:column;gap:0}
+.foot-brand img{width:90px;height:auto;margin-bottom:38px}
+.foot-brand .brand-name{font-weight:700;font-size:18px;color:#fff;margin:0;padding-top:0}
+.foot-address{font-style:normal;color:var(--text-dim);font-size:13px;line-height:1.6;margin-top:8px;text-align:left}
+.foot-address a{color:var(--text-dim);text-decoration:none}
+.foot-address a:hover{color:#fff}
+.foot-social{display:flex;gap:14px;margin-top:16px}
+.foot-social a{width:34px;height:34px;border-radius:8px;background:rgba(255,255,255,0.06);display:grid;place-items:center;color:#d4d8e8;text-decoration:none;font-size:15px;transition:background .2s,color .2s}
+.foot-social a:hover{background:rgba(255,255,255,0.12);color:#fff}
+.foot-col{padding-top:118px}
+.foot-col h4{font-size:12px;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-dim);margin:0 0 14px;font-weight:600}
+.foot-col a{display:block;color:#d4d8e8;text-decoration:none;font-size:13.5px;padding:3.5px 0;opacity:.85;transition:opacity .2s,color .2s}
+.foot-col a:hover{opacity:1;color:#fff}
+.foot-bottom{max-width:1100px;margin:48px auto 0;padding:20px 24px 0;border-top:1px solid rgba(255,255,255,0.06);display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--text-dim)}
+.foot-bottom a{color:var(--text-dim);text-decoration:none}
+.foot-bottom a:hover{color:#fff}
+@media(max-width:960px){.foot-grid{grid-template-columns:repeat(2,1fr);gap:36px 28px}.foot-brand{grid-column:1 / -1}}
+@media(max-width:620px){.foot-grid{grid-template-columns:1fr}.foot-bottom{flex-direction:column;gap:8px;text-align:center}}
+</style>
+</head>
+<body>
+<nav>
+  <div class="nav-inner">
+    <a class="nav-logo" href="index.html"><img src="logo-hero.png" alt="Lines &amp; Logos"><span><b>LINES &amp; LOGOS</b><small>COURTS&ensp;·&ensp;PAINTING&ensp;·&ensp;VINYL&ensp;·&ensp;GRAPHICS</small></span></a>
+        <div class="nav-links">
+      <a class="btn" href="quotes.html">Get Quote</a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="wrap">
+    <h1>Real jobs.<br><span class="grad">Real floors.</span></h1>
+    <p>Every photo on this page is a Lines &amp; Logos project, approved by the client before it was published. No stock photos, ever.</p>
+  </div>
+</header>
+
+<main class="wrap">
+  <section style="padding-top:10px">
+    <div id="galleryGrid" class="grid"></div>
+    <div class="empty" id="emptyState">
+      <b>First photos land with the next completed job</b>
+      <p>Every job is photo-documented from walkthrough to closeout, and each image is approved by the client before it appears here. When your project wraps, this is where it shows up.</p>
+      <a class="btn" href="quotes.html">Start your project →</a>
+    </div>
+  </section>
+
+  <section style="padding-top:0">
+    <div class="panel" style="max-width:640px;margin:0 auto">
+      <h2 style="font-size:18px;margin-bottom:8px">Was your facility in our lens?</h2>
+      <p style="color:var(--text-dim);font-size:13.5px;margin-bottom:18px">If we've worked for you and you'd like your photos published (or removed), tell us below — or opt out anytime from the <a href="customer.html" style="color:var(--blue)">customer portal</a>.</p>
+      <label>Your email</label>
+      <input id="gEmail" type="email" placeholder="you@school.org">
+      <label>Facility</label>
+      <input id="gFacility" placeholder="Which project?">
+      <button class="btn" onclick="submitReq()">Send request</button>
+      <p id="gOut" style="margin-top:12px;font-size:13px"></p>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="foot-grid">
+    <div class="foot-brand">
+      <img src="logo-hero.png" alt="Lines &amp; Logos">
+      <div class="brand-name">Lines &amp; Logos</div>
+      <address class="foot-address">
+        2847 New Broadway St.<br>
+        Memphis, TN 38109<br>
+        <a href="tel:+19015551234">(901) 555-1234</a><br>
+        <a href="mailto:info@linesandlogos.team">info@linesandlogos.team</a>
+      </address>
+      <div class="foot-social">
+        <a href="#" aria-label="Facebook">f</a>
+        <a href="#" aria-label="Instagram">in</a>
+        <a href="#" aria-label="LinkedIn">li</a>
+      </div>
+    </div>
+    <div class="foot-col">
+      <h4>Process</h4>
+      <a href="index.html#process">Our Process</a>
+      <a href="legal.html#warranty">Warranty &amp; Process</a>
+      <a href="index.html#faq">FAQ</a>
+      <a href="legal.html#legal-notice">Legal Notice</a>
+    </div>
+    <div class="foot-col">
+      <h4>Our Work</h4>
+      <a href="index.html#services">Gym Floors &amp; Courts</a>
+      <a href="index.html#services">Wall Wraps &amp; Graphics</a>
+      <a href="index.html#services">Donor Walls</a>
+      <a href="index.html#services">Signage &amp; Surfacing</a>
+      <a href="gallery.html">Photo Gallery</a>
+      <a href="service-area.html">Service Area</a>
+      <a href="case-studies.html">Case Studies</a>
+    </div>
+    <div class="foot-col">
+      <h4>Earn with us</h4>
+      <a href="careers.html">Careers</a>
+      <a href="careers.html">Become a Contractor</a>
+      <a href="partners.html">Earn With Us</a>
+      <a href="partners.html">Partner With Us</a>
+      <a href="affiliate.html">Affiliate Program</a>
+    </div>
+    <div class="foot-col">
+      <h4>Preview</h4>
+      <a href="studio.html">Studio</a>
+      <a href="brand.html">Brand</a>
+      <a href="customer.html">Customer Portal</a>
+      <a href="quotes.html">Get Quote</a>
+      <a href="portal.html">Project Portal</a>
+    </div>
+  </div>
+  <div class="foot-bottom">
+    <span>© 2026 Lines &amp; Logos. All rights reserved.</span>
+    <span>Purchase orders · W-9s · Additional-Insured COIs · Off-hours campus scheduling</span>
+  </div>
+</footer>
+
+<script>
+async function loadGallery(){
+  try{
+    const r=await fetch('/api/gallery');
+    const items=await r.json();
+    const grid=document.getElementById('galleryGrid');
+    const approved=(items||[]).filter(g=>g.status==='approved');
+    if(!approved.length){document.getElementById('emptyState').style.display='block';return;}
+    document.getElementById('emptyState').style.display='none';
+    grid.innerHTML=approved.map(g=>`<div class="card">
+      <img src="${g.url}" alt="${g.caption||'Lines & Logos project'}" loading="lazy">
+      <div class="body"><b>${g.caption||'Project photo'}</b><p>Approved for publication</p></div>
+    </div>`).join('');
+  }catch{document.getElementById('emptyState').style.display='block';}
+}
+async function submitReq(){
+  const email=document.getElementById('gEmail').value.trim(), facility=document.getElementById('gFacility').value.trim();
+  const out=document.getElementById('gOut');
+  if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){out.innerHTML='<span style="color:#dc2626">Enter a valid email.</span>';return;}
+  if(!facility){out.innerHTML='<span style="color:#dc2626">Tell us which project.</span>';return;}
+  try{
+    const r=await fetch('/api/photo-requests',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,facility})});
+    out.innerHTML= r.ok?'<span style="color:#15803d;font-weight:700">✓ Received — our team will follow up within one business day.</span>':'<span style="color:#dc2626">Could not send — email info@linesandlogos.team.</span>';
+  }catch{out.innerHTML='<span style="color:#dc2626">Could not reach the server — email info@linesandlogos.team.</span>';}
+}
+loadGallery();
+</script>
+<script defer src="assets/consent.js"></script>
+<script defer src="assets/chat.js?v=11"></script>
+</body>
+</html>

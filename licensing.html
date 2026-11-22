@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>License &amp; Insurance — Lines &amp; Logos</title>
+<link rel="icon" type="image/png" href="icons/favicon-32.png?v=2">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;700;800&family=Archivo+Black&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/os.css?v=9">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#04060d">
+<style>
+.lic-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px}
+.lic-card{background:var(--panel,#0d1526);border:1px solid var(--line,#1c2946);border-radius:14px;padding:18px;display:flex;flex-direction:column;gap:10px}
+.lic-card h3{margin:0;font-size:15px}
+.lic-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.lic-meta{font-size:12.5px;color:var(--mut,#8b95b3);display:flex;flex-direction:column;gap:3px}
+.pill{font-size:11px;padding:2px 9px;border-radius:99px;font-weight:700;text-transform:uppercase;letter-spacing:.04em}
+.pill.active{background:#0f2b1c;color:#43d17c}.pill.expired{background:#3a1212;color:#ff8a8a}
+.pill.soon{background:#3a2c10;color:#f5b942}.pill.gap{background:#2a2038;color:#c9a6ff}
+.req-row{display:flex;gap:14px;align-items:flex-start;background:var(--panel,#0d1526);border:1px solid var(--line,#1c2946);border-radius:12px;padding:14px 16px;font-size:13px}
+.req-row .ic{flex:none;width:34px;height:34px;border-radius:10px;display:grid;place-items:center;font-size:16px}
+.req-row .ic.need{background:#0f2b1c}.req-row .ic.cond{background:#3a2c10}.req-row .ic.opt{background:#1a2438}
+.req-row h4{margin:0 0 3px;font-size:13.5px}
+.req-row small{color:var(--mut,#8b95b3)}
+.req-row .cost{color:#43d17c;font-weight:700}
+.req-row .where{margin-top:6px;font-size:12px}
+.req-row .where a{color:#5bb8ff;text-decoration:none}
+.best-chip{display:inline-block;background:#0f2233;color:#5bb8ff;font-size:11px;padding:2px 8px;border-radius:99px;margin-right:5px}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;margin-bottom:18px}
+.kpi{background:var(--panel,#0d1526);border:1px solid var(--line,#1c2946);border-radius:12px;padding:14px 16px}
+.kpi b{font-size:22px;display:block}.kpi span{font-size:12px;color:var(--mut,#8b95b3)}
+.kpi.warn b{color:#ff8a8a}.kpi.note b{color:#f5b942}
+.section-title{font-size:13px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--mut,#8b95b3);margin:26px 0 12px}
+@media(max-width:640px){.lic-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body data-perms="notifications">
+<main>
+  <div class="topbar">
+    <div><div class="crumb">Business Suite / License &amp; Insurance</div><h1 class="chrome">License &amp; Insurance</h1></div>
+    <div class="topbar-right"><button class="btn btn-sm" onclick="addModal()">+ Add Policy / License</button></div>
+  </div>
+  <div class="kpis" id="kpis"></div>
+  <div class="tabs2" id="tabs"></div>
+  <div id="view"></div>
+</main>
+<script src="assets/os.js?v=9"></script>
+<script>
+const { boot, list, raw, create, del, fmt, esc, ago, openModal, closeModal, onModalSave, field, toast, isLive, $ } = OS;
+let TAB = 'tracker';
+
+async function render(){ renderTabs(); await renderKpis(); TAB==='tracker' ? await renderTracker() : await renderGuide(); }
+function renderTabs(){
+  $('#tabs').innerHTML = [['tracker','My Coverage'],['guide','What You Need & Where It\'s Cheapest']].map(([k,l]) =>
+    `<button class="${k===TAB?'on':''}" onclick="TAB='${k}';render()">${l}</button>`).join('');
+}
+async function renderKpis(){
+  let s;
+  if (isLive()) s = await raw('/api/licensing/summary').catch(()=>null);
+  else { const items = OS.cur('licenses')||[]; const act = items.filter(i=>i.status==='active');
+    s = { total: items.length, active: act.length, expiringSoon: act.filter(i=>i.expiresAt && (new Date(i.expiresAt)-Date.now())/864e5<=30).length,
+      expired: act.filter(i=>i.expiresAt && new Date(i.expiresAt)<new Date()).length, estAnnualCost: act.reduce((n,i)=>n+(parseFloat(i.cost)||0),0), gapCount: (OS.demoGaps||[]).length }; }
+  if (!s) return;
+  $('#kpis').innerHTML = `
+    <div class="kpi"><b>${s.active}</b><span>Active policies/licenses</span></div>
+    <div class="kpi ${s.expired?'warn':''}"><b>${s.expired}</b><span>Expired</span></div>
+    <div class="kpi ${s.expiringSoon?'note':''}"><b>${s.expiringSoon}</b><span>Expiring ≤30 days</span></div>
+    <div class="kpi ${s.gapCount?'warn':''}"><b>${s.gapCount}</b><span>Coverage gaps</span></div>
+    <div class="kpi"><b>${fmt(s.estAnnualCost||0)}</b><span>Est. annual cost</span></div>`;
+}
+
+function statusOf(it){
+  if (it.status !== 'active') return ['inactive','inactive'];
+  if (!it.expiresAt) return ['active','no expiry set'];
+  const d = Math.ceil((new Date(it.expiresAt) - Date.now())/864e5);
+  if (d < 0) return ['expired', `expired ${it.expiresAt.slice(0,10)}`];
+  if (d <= 30) return ['soon', `${d} day(s) left`];
+  return ['active', `expires ${it.expiresAt.slice(0,10)}`];
+}
+
+async function renderTracker(){
+  const items = ((await list('licenses')) || []).slice().sort((a,b)=>(a.expiresAt||'9')<(b.expiresAt||'9')?-1:1);
+  if (!items.length) { $('#view').innerHTML = `<div class="panel"><p style="color:var(--mut)">No licenses or insurance tracked yet. Add your business license, GL policy, workers' comp and any permits — the agent watches expiry dates and nags you at T-30/T-7/expired.</p><p><button class="btn" onclick="addModal()">Add your first policy →</button></p></div>`; return; }
+  $('#view').innerHTML = `<div class="lic-grid">${items.map(it => {
+    const [cls, label] = statusOf(it);
+    return `<div class="lic-card">
+    <div class="lic-head"><h3>${esc(it.name)}</h3><span class="pill ${cls}">${label}</span></div>
+    <div class="lic-meta">
+      <span>${esc(it.type === 'insurance' ? '🛡 Insurance' : '📋 License / Permit')}${it.provider ? ' · ' + esc(it.provider) : ''}</span>
+      ${it.policyNumber ? `<span>Policy/License # ${esc(it.policyNumber)}</span>` : ''}
+      ${it.cost ? `<span>Cost ${fmt(parseFloat(it.cost)||0)}${it.renewsEveryMonths ? ' / ' + it.renewsEveryMonths + ' mo' : ''}</span>` : ''}
+      ${it.notes ? `<span>${esc(it.notes)}</span>` : ''}
+    </div>
+    <div style="display:flex;gap:8px;margin-top:auto">
+      <button class="btn btn-ghost btn-sm" onclick="editModal('${it.id}')">Edit</button>
+      <button class="btn btn-ghost btn-sm" style="color:#ff8a8a" onclick="remove('${it.id}')">Remove</button>
+    </div></div>`; }).join('')}</div>`;
+}
+
+async function renderGuide(){
+  let reqs;
+  if (isLive()) reqs = await raw('/api/licensing/requirements').catch(()=>[]);
+  else reqs = OS.demoRequirements || [];
+  if (!reqs.length) { $('#view').innerHTML = '<p class="empty">Requirements guide loads from the server.</p>'; return; }
+  const grouped = { need: reqs.filter(r=>r.needed===true), cond: reqs.filter(r=>r.needed==='conditional'), opt: reqs.filter(r=>r.needed===false) };
+  const row = (r, kind, icon) => `<div class="req-row">
+    <div class="ic ${kind}">${icon}</div>
+    <div style="flex:1">
+      <h4>${esc(r.name)} ${r.needed==='conditional'?'<span class="pill gap" style="margin-left:6px">conditional</span>':r.needed===false?'<span class="pill" style="margin-left:6px;background:#1a2438;color:#8b95b3">optional</span>':''}</h4>
+      <small>${esc(r.authority)} — ${esc(r.note)}</small>
+      <div class="where"><span class="cost">${esc(r.cost)}</span>
+        ${r.cheapest ? `<div style="margin-top:4px"><span class="best-chip">Best value: ${esc(r.cheapest.best)}</span>
+        ${(r.cheapest.options||[]).map(o=>`<span style="color:var(--mut);font-size:11.5px">${esc(o)}</span>`).join(' · ')}</div>` : ''}
+        ${r.applyUrl ? ` <a href="${esc(r.applyUrl)}" target="_blank" rel="noopener">Apply ↗</a>` : ''}
+      </div>
+    </div></div>`;
+  $('#view').innerHTML = `
+    <p style="font-size:12.5px;color:var(--mut);margin-top:0">Prices are estimates — verify current fees at the source before buying. Requirements are specific to a Tennessee facility-services business; other states differ.</p>
+    <div class="section-title">Required</div>
+    <div style="display:flex;flex-direction:column;gap:10px">${grouped.need.map(r=>row(r,'need','✅')).join('') || '<p class="empty">None</p>'}</div>
+    <div class="section-title">Required when applicable</div>
+    <div style="display:flex;flex-direction:column;gap:10px">${grouped.cond.map(r=>row(r,'cond','⚠️')).join('') || '<p class="empty">None</p>'}</div>
+    <div class="section-title">Optional but recommended</div>
+    <div style="display:flex;flex-direction:column;gap:10px">${grouped.opt.map(r=>row(r,'opt','💡')).join('') || '<p class="empty">None</p>'}</div>`;
+}
+
+function addModal(){ editModal(null); }
+async function editModal(id){
+  const it = id ? ((await list('licenses'))||[]).find(x=>x.id===id) : {};
+  openModal(id ? 'Edit policy / license' : 'Add policy / license', `
+    ${field('name','Name','General Liability Insurance', 'text', it.name)}
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <div class="field"><label>Type</label><select id="f_type" style="width:100%;padding:10px;border-radius:10px;background:#0a1122;border:1px solid var(--line,#1c2946);color:var(--tx,#e8ecf6)">
+        <option value="insurance" ${it.type==='insurance'?'selected':''}>Insurance</option>
+        <option value="license" ${it.type!=='insurance'?'selected':''}>License / Permit</option></select></div>
+      ${field('provider','Provider','Hiscox','text', it.provider)}
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      ${field('policyNumber','Policy / license #','','text', it.policyNumber)}
+      ${field('cost','Annual cost ($)','650','number', it.cost)}
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      ${field('expiresAt','Expiry date','','date', it.expiresAt ? it.expiresAt.slice(0,10) : '')}
+      ${field('renewsEveryMonths','Renews every N months','12','number', it.renewsEveryMonths)}
+    </div>
+    ${field('notes','Notes','COIs required by schools','text', it.notes)}`);
+  onModalSave(async (vals) => {
+    vals.type = document.getElementById('f_type').value;
+    vals.expiresAt = vals.expiresAt || null;
+    if (isLive()) {
+      if (id) { await raw('/api/licensing/' + id, { method:'PATCH', body: JSON.stringify(vals) }).catch(()=>{}); }
+      else await raw('/api/licensing', { method:'POST', body: JSON.stringify(vals) });
+    } else {
+      const items = OS.cur('licenses') || [];
+      if (id) { const t = items.find(x=>x.id===id); if (t) Object.assign(t, vals, { reminded: t.reminded||{} }); }
+      else items.unshift({ id: 'lic' + Date.now(), status:'active', createdAt: new Date().toISOString(), reminded:{}, ...vals });
+      OS.persistDemo();
+    }
+    closeModal(); toast('Saved'); render();
+  });
+}
+async function remove(id){
+  if (!confirm('Remove this item?')) return;
+  if (isLive()) await raw('/api/licensing/' + id, { method:'DELETE' });
+  else { const items = OS.cur('licenses')||[]; const i = items.findIndex(x=>x.id===id); if (i>=0) items.splice(i,1); OS.persistDemo(); }
+  toast('Removed'); render();
+}
+
+boot('licensing', 'License & Insurance', async () => { await render(); });
+</script>
+</body>
+</html>

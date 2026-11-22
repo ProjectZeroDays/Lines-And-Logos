@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Customer Dashboard — Lines &amp; Logos</title>
+<meta name="robots" content="noindex">
+<link rel="icon" type="image/png" href="icons/favicon-32.png">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;700;800&family=Archivo+Black&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f3f6fd;--surface:#ffffff;--surface2:#f5f8ff;--text:#26335c;--dim:#5f6f95;--line:rgba(27,105,255,.18);--blue:#1b69ff;--cyan:#0ea5e9;--green:#16a34a;--yellow:#b45309;--red:#dc2626;--chrome:#0b1c4e;--radius:16px;--shadow:0 1px 2px rgba(11,28,78,.05),0 1px 0 rgba(27,105,255,.10) inset,0 14px 36px -18px rgba(11,28,78,.20);--shadow-lg:0 2px 6px rgba(11,28,78,.08),0 28px 56px -22px rgba(11,28,78,.30)}
+[data-theme="dark"]{--bg:#050f2b;--surface:#0a1c44;--surface2:#0d2354;--text:#c9d6f5;--dim:#93a5d4;--line:rgba(88,124,255,.30);--blue:#4d84ff;--cyan:#38bdf8;--chrome:#eef2ff;--shadow:0 1px 3px rgba(0,0,0,.45),0 1px 0 rgba(88,124,255,.14) inset,0 18px 44px -16px rgba(0,0,0,.65);--shadow-lg:0 2px 8px rgba(0,0,0,.55),0 30px 60px -20px rgba(0,0,0,.75)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'Space Grotesk',system-ui,sans-serif;font-size:14.5px;line-height:1.6;transition:background .25s}
+h1,h2,h3{font-family:'Archivo Black';color:var(--chrome);letter-spacing:-.01em}
+a{color:var(--blue);text-decoration:none}
+button{font-family:inherit}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;font-family:'Archivo',sans-serif;font-weight:800;font-size:13px;color:#fff;border:none;cursor:pointer;padding:11px 20px;border-radius:100px;background:linear-gradient(135deg,#2f7bff,#1b69ff 55%,#0033a0);box-shadow:0 6px 18px rgba(27,105,255,.35),inset 0 1px 0 rgba(255,255,255,.22);transition:.18s;text-decoration:none}
+.btn:hover{transform:translateY(-1px);box-shadow:0 10px 24px rgba(27,105,255,.42),inset 0 1px 0 rgba(255,255,255,.22)}
+.btn-sm{padding:8px 15px;font-size:12px}
+.btn-ghost{background:var(--surface);color:var(--blue);box-shadow:inset 0 0 0 1.5px rgba(27,105,255,.42)}
+.btn-red{background:linear-gradient(180deg,#f26d6d,#dc2626);box-shadow:0 6px 18px rgba(220,38,38,.3)}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:24px;margin-bottom:20px}
+.panel h2{font-size:15px;margin-bottom:16px;display:flex;align-items:center;gap:10px}
+.panel h2::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--blue)}
+.inp{width:100%;padding:12px 15px;border-radius:12px;border:1px solid rgba(27,105,255,.24);background:var(--surface2);color:var(--chrome);font-family:inherit;font-size:13.5px;outline:none;margin-bottom:12px;box-shadow:inset 0 1px 0 rgba(27,105,255,.05)}
+.inp:focus{border-color:#1b69ff;box-shadow:0 0 0 3px rgba(27,105,255,.16)}
+label.lbl{display:block;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);margin:0 0 7px}
+.tag{display:inline-block;font-size:10.5px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;border-radius:100px;padding:4px 11px;white-space:nowrap}
+.t-sched{background:rgba(14,165,233,.13);color:#0284c7;border:1px solid rgba(14,165,233,.35)}
+[data-theme="dark"] .t-sched{color:#7dd3fc}
+.t-quote{background:rgba(217,119,6,.13);color:#b45309;border:1px solid rgba(217,119,6,.35)}
+[data-theme="dark"] .t-quote{color:#fbbf24}
+.t-done{background:rgba(22,163,74,.13);color:#15803d;border:1px solid rgba(22,163,74,.32)}
+[data-theme="dark"] .t-done{color:#4ade80}
+.t-red{background:rgba(220,38,38,.12);color:#b91c1c;border:1px solid rgba(220,38,38,.32)}
+[data-theme="dark"] .t-red{color:#f87171}
+.t-blue{background:rgba(59,91,255,.12);color:#3b5bff;border:1px solid rgba(59,91,255,.32)}
+.auth{max-width:420px;margin:8vh auto 40px;background:var(--surface);border:1px solid var(--line);border-radius:22px;box-shadow:var(--shadow);padding:36px}
+.auth img{height:56px;display:block;margin:0 auto 16px}
+.auth h1{font-size:21px;text-align:center;margin-bottom:6px}
+.auth p{font-size:13px;color:var(--dim);text-align:center;margin-bottom:22px}
+.auth .swap{text-align:center;font-size:12.5px;margin-top:14px}
+.pw-meter{height:6px;border-radius:100px;background:var(--line);margin:-4px 0 12px;overflow:hidden}
+.pw-meter i{display:block;height:100%;width:0;border-radius:100px;background:var(--red);transition:.2s}
+.shell{display:none;min-height:100dvh}
+.topbar{position:sticky;top:0;z-index:90;display:flex;align-items:center;gap:16px;padding:12px 22px;background:var(--surface);border-bottom:1px solid var(--line);backdrop-filter:blur(10px)}
+.topbar img{height:34px}
+.topbar b{font-family:'Archivo Black';font-size:12px;color:var(--chrome);letter-spacing:.06em}
+.topbar .spacer{flex:1}
+.icon-btn{width:38px;height:38px;border-radius:11px;border:1px solid var(--line);background:var(--surface);color:var(--dim);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;transition:.15s;position:relative}
+.icon-btn:hover{color:var(--blue);border-color:rgba(59,91,255,.4)}
+.icon-btn svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.icon-btn .dot{position:absolute;top:7px;right:7px;width:8px;height:8px;border-radius:50%;background:var(--red);border:2px solid var(--surface)}
+.bell-panel{position:absolute;right:0;top:48px;width:320px;background:var(--surface);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow-lg);padding:8px;display:none;z-index:95}
+.bell-panel.open{display:block}
+.bell-panel .ntf{padding:11px 13px;border-radius:10px;font-size:12.5px;line-height:1.5}
+.bell-panel .ntf:hover{background:var(--surface2)}
+.bell-panel .ntf small{color:var(--dim);display:block;font-size:11px;margin-top:3px}
+.layout{display:grid;grid-template-columns:232px 1fr 300px;gap:20px;max-width:1460px;margin:0 auto;padding:22px}
+aside.side{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:14px;height:fit-content;position:sticky;top:76px}
+.side button{display:flex;align-items:center;gap:11px;width:100%;text-align:left;padding:11px 14px;border:none;background:none;color:var(--dim);font-weight:700;font-size:13.5px;border-radius:11px;cursor:pointer;transition:.14s}
+.side button svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.side button:hover{color:var(--blue);background:rgba(59,91,255,.07)}
+.side button.active{color:#fff;background:linear-gradient(135deg,#2f7bff,#1b69ff 55%,#0033a0);box-shadow:0 6px 16px rgba(27,105,255,.35)}
+.side .sep{height:1px;background:var(--line);margin:10px 6px}
+.rail{display:flex;flex-direction:column;gap:16px;position:sticky;top:76px;height:fit-content;max-height:calc(100dvh - 100px);overflow-y:auto}
+.rail .panel{padding:18px}
+.rail h2{font-size:12px}
+.post{border-top:1px solid var(--line);padding:12px 0}
+.post:first-of-type{border-top:none}
+.post b{font-size:13px;color:var(--chrome);display:block;margin-bottom:4px}
+.post p{font-size:12px;color:var(--dim);line-height:1.6}
+.post small{color:var(--dim);font-size:10.5px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.card{border:1px solid var(--line);border-radius:14px;padding:16px 18px;background:var(--surface2);margin-bottom:12px}
+.card b{color:var(--chrome)}
+.muted{color:var(--dim);font-size:12.5px}
+.rowline{display:flex;gap:14px;flex-wrap:wrap;font-size:12.5px;color:var(--dim);margin-top:8px}
+.rowline i{color:var(--text);font-style:normal;font-weight:600}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.cal .dh{font-size:10.5px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--dim);text-align:center;padding:6px 0}
+.cal .d{min-height:64px;border:1px solid var(--line);border-radius:10px;padding:6px;font-size:12px;background:var(--surface2);cursor:default}
+.cal .d.has{cursor:pointer;border-color:rgba(59,91,255,.45);background:rgba(59,91,255,.07)}
+.cal .d.has:hover{background:rgba(59,91,255,.14)}
+.cal .d .ev{margin-top:4px;font-size:10px;font-weight:700;background:var(--blue);color:#fff;border-radius:6px;padding:3px 6px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.avatar{width:56px;height:56px;border-radius:14px;background:var(--surface2);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;overflow:hidden;font-family:'Archivo Black';color:var(--blue);font-size:20px}
+.avatar img{width:100%;height:100%;object-fit:cover}
+.banner{height:90px;border-radius:12px;background:linear-gradient(120deg,#3b5bff,#0ea5e9);margin-bottom:14px;overflow:hidden;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:13px;letter-spacing:.1em;text-transform:uppercase}
+.banner img{width:100%;height:100%;object-fit:cover}
+#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:#1c2440;color:#fff;padding:12px 22px;border-radius:100px;font-size:13px;font-weight:600;z-index:300;opacity:0;transition:.3s;max-width:88vw;text-align:center}
+[data-theme="dark"] #toast{background:#eef2ff;color:#0b0f1d}
+#toast.show{opacity:1;transform:translateX(-50%)}
+.modal-bg{position:fixed;inset:0;background:rgba(10,16,34,.5);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;z-index:200;padding:18px}
+.modal-bg.open{display:flex}
+.modal{background:var(--surface);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow-lg);padding:28px;max-width:480px;width:100%;max-height:88dvh;overflow-y:auto}
+.modal h2{font-size:18px;margin-bottom:14px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);padding:8px 10px;border-bottom:1px solid var(--line)}
+td{padding:11px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+@media(max-width:1100px){.layout{grid-template-columns:210px 1fr}.rail{display:none}}
+@media(max-width:760px){.layout{grid-template-columns:1fr;padding:14px}aside.side{position:static;display:flex;flex-wrap:wrap;gap:6px}.side button{width:auto}.side .sep{display:none}.grid2{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<div class="panel auth" id="authCard">
+  <img src="logo-hero.png" alt="Lines &amp; Logos">
+  <h1 id="authTitle">Customer sign in</h1>
+  <p id="authSub">Access your dashboard, invoices, contracts, and job photos.</p>
+  <div id="authForm">
+    <label class="lbl">Username</label><input class="inp" id="aUser" autocomplete="username">
+    <div id="regOnly" style="display:none">
+      <label class="lbl">Email</label><input class="inp" id="aEmail" type="email">
+      <label class="lbl">Phone (for SMS 2-step)</label><input class="inp" id="aPhone" placeholder="(901) 234-5678">
+    </div>
+    <label class="lbl">Password <span id="pwRule" style="text-transform:none;letter-spacing:0">— minimum 12 characters</span></label>
+    <input class="inp" id="aPass" type="password" autocomplete="current-password">
+    <div class="pw-meter" id="regOnly2" style="display:none"><i id="pwBar"></i></div>
+    <div class="err" id="aErr" style="color:var(--red);font-size:12.5px;font-weight:600;margin:-4px 0 12px;display:none"></div>
+    <button class="btn" style="width:100%" id="authBtn" onclick="doAuth()">Sign in</button>
+    <div class="swap"><a href="#" id="swapLink" onclick="toggleMode();return false">Need an account? Register</a></div>
+  </div>
+  <div id="twoFA" style="display:none">
+    <label class="lbl">Two-step verification</label>
+    <select class="inp" id="faMethod"><option value="totp">Authenticator app (TOTP)</option><option value="sms">Text message (SMS)</option></select>
+    <input class="inp" id="faCode" placeholder="6-digit code" inputmode="numeric">
+    <div class="err" id="faErr" style="color:var(--red);font-size:12.5px;font-weight:600;margin:-4px 0 12px;display:none"></div>
+    <button class="btn" style="width:100%" onclick="do2FA()">Verify &amp; continue</button>
+    <div class="swap"><a href="#" onclick="document.getElementById('twoFA').style.display='none';document.getElementById('authForm').style.display='block';return false">← Back</a></div>
+  </div>
+</div>
+
+<div class="shell" id="shell">
+  <div class="topbar">
+    <a href="index.html" style="display:flex;align-items:center;gap:10px"><img src="logo-hero.png" alt=""><b>CUSTOMER DASHBOARD</b></a>
+    <nav style="display:flex;gap:2px;margin-left:14px">
+      <a href="index.html" style="color:var(--dim);font-size:13px;font-weight:600;padding:8px 12px;border-radius:100px">Website</a>
+      <a href="quotes.html" style="color:var(--dim);font-size:13px;font-weight:600;padding:8px 12px;border-radius:100px">Quotes</a>
+      <a href="gallery.html" style="color:var(--dim);font-size:13px;font-weight:600;padding:8px 12px;border-radius:100px">Gallery</a>
+      <a href="careers.html" style="color:var(--dim);font-size:13px;font-weight:600;padding:8px 12px;border-radius:100px">Careers</a>
+      <a href="legal.html" style="color:var(--dim);font-size:13px;font-weight:600;padding:8px 12px;border-radius:100px">Legal</a>
+    </nav>
+    <div class="spacer"></div>
+    <button class="icon-btn" onclick="requestPush()" title="Enable job reminders" id="pushBtn"><svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9M13.7 21a2 2 0 0 1-3.4 0"/></svg></button>
+    <button class="icon-btn" onclick="toggleTheme()" title="Toggle light / dark"><svg viewBox="0 0 24 24" id="themeIcon"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg></button>
+    <div style="position:relative">
+      <button class="icon-btn" onclick="toggleBell(event)" title="Notifications"><svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9M13.7 21a2 2 0 0 1-3.4 0"/></svg><span class="dot" id="bellDot" style="display:none"></span></button>
+      <div class="bell-panel" id="bellPanel"></div>
+    </div>
+    <button class="icon-btn" onclick="logout()" title="Sign out"><svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg></button>
+  </div>
+
+  <div class="layout">
+    <aside class="side">
+      <button class="active" data-v="overview" onclick="showView('overview')"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>Overview</button>
+      <button data-v="jobs" onclick="showView('jobs')"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>Jobs &amp; Photos</button>
+      <button data-v="invoices" onclick="showView('invoices')"><svg viewBox="0 0 24 24"><path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1z"/><path d="M8 8h8M8 12h8"/></svg>Invoices &amp; Pay</button>
+      <button data-v="quotes" onclick="showView('quotes')"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Quotes</button>
+      <button data-v="contracts" onclick="showView('contracts')"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M9 15l2 2 4-4"/></svg>Contracts</button>
+      <button data-v="calendar" onclick="showView('calendar')"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>Calendar</button>
+      <button data-v="video" onclick="showView('video')"><svg viewBox="0 0 24 24"><path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>Video Calls</button>
+      <button data-v="profile" onclick="showView('profile')"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Company Profile</button>
+      <button data-v="settings" onclick="showView('settings')"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.2 4.2l2.8 2.8M17 17l2.8 2.8M1 12h4M19 12h4M4.2 19.8L7 17M17 7l2.8-2.8"/></svg>Settings &amp; Security</button>
+      <div class="sep"></div>
+      <button onclick="downloadApps()"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>Get the Apps</button>
+    </aside>
+    <main id="views"></main>
+    <div class="rail">
+      <div class="panel">
+        <h2>From the crew</h2>
+        <div id="blogPosts"><p class="muted">Loading…</p></div>
+      </div>
+      <div class="panel">
+        <h2>Quick actions</h2>
+        <div style="display:flex;flex-direction:column;gap:9px;margin-top:6px">
+          <button class="btn btn-ghost btn-sm" onclick="openVideoModal()">Book a video walkthrough</button>
+          <button class="btn btn-ghost btn-sm" onclick="showView('invoices')">Pay an invoice</button>
+          <button class="btn btn-ghost btn-sm" onclick="showView('jobs')">Upload job photos</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-bg" id="modalBg"><div class="modal" id="modalBox"></div></div>
+<div id="toast"></div>
+
+<script>
+const BASE='';
+let CTOKEN=localStorage.getItem('ll_cust_token')||'';
+let ME=null, REGISTER=false, PENDING=null, JOBS=[], INVOICES=[], QUOTES=[], CONTRACTS=[], BLOG=[];
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmt$=n=>'$'+(+n).toLocaleString();
+function toast(m){const t=$('toast');t.textContent=m;t.classList.add('show');clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove('show'),3200)}
+async function api(path, opts={}){
+  const headers={'Content-Type':'application/json',...(opts.headers||{})};
+  if(CTOKEN) headers['Authorization']='Bearer '+CTOKEN;
+  const r=await fetch(BASE+path,{...opts,headers,body:opts.body?JSON.stringify(opts.body):undefined});
+  const j=await r.json().catch(()=>({}));
+  if(r.status===401){logout();throw new Error(j.error||'Session expired')}
+  return j;
+}
+function toggleMode(){REGISTER=!REGISTER;
+  $('regOnly').style.display=REGISTER?'block':'none';
+  $('regOnly2').style.display=REGISTER?'block':'none';
+  $('authTitle').textContent=REGISTER?'Create your account':'Customer sign in';
+  $('authSub').textContent=REGISTER?'12+ character password required — 2-step verification comes next.':'Access your dashboard, invoices, contracts, and job photos.';
+  $('authBtn').textContent=REGISTER?'Create account':'Sign in';
+  $('swapLink').textContent=REGISTER?'Already registered? Sign in':'Need an account? Register';
+  $('aErr').style.display='none';
+}
+$('aPass').addEventListener('input',()=>{
+  if(!REGISTER)return;const v=$('aPass').value;const s=Math.min(1,(v.length/12)*0.7+((/[A-Z]/.test(v))+(/[0-9]/.test(v))+(/[^A-Za-z0-9]/.test(v)))/3*0.3);
+  $('pwBar').style.width=(s*100)+'%';$('pwBar').style.background=s>0.85?'var(--green)':s>0.55?'var(--yellow)':'var(--red)';
+});
+async function doAuth(){
+  $('aErr').style.display='none';
+  const body={username:$('aUser').value.trim(),password:$('aPass').value};
+  if(REGISTER){
+    if(body.password.length<12){$('aErr').textContent='Password must be at least 12 characters.';$('aErr').style.display='block';return}
+    body.email=$('aEmail').value.trim();body.phone=$('aPhone').value.trim();
+    const r=await api('/api/auth/register',{method:'POST',body});
+    if(r.error){$('aErr').textContent=r.error;$('aErr').style.display='block';return}
+    CTOKEN=r.token;localStorage.setItem('ll_cust_token',CTOKEN);
+    await boot();
+    toast('Account created — set up 2-step verification in Settings');
+    openSetup2FA();
+  } else {
+    const r=await api('/api/auth/login',{method:'POST',body});
+    if(r.error){$('aErr').textContent=r.error;$('aErr').style.display='block';return}
+    if(r.twoFactorRequired){PENDING=r;open2FA();return}
+    CTOKEN=r.token;localStorage.setItem('ll_cust_token',CTOKEN);
+    await boot();
+  }
+}
+function open2FA(){$('authForm').style.display='none';$('twoFA').style.display='block';$('faErr').style.display='none'}
+async function do2FA(){
+  $('faErr').style.display='none';
+  const r=await api('/api/auth/2fa',{method:'POST',body:{_aId:PENDING._a,method:$('faMethod').value,code:$('faCode').value}});
+  if(r.error){$('faErr').textContent=r.error;$('faErr').style.display='block';return}
+  CTOKEN=r.token;localStorage.setItem('ll_cust_token',CTOKEN);
+  await boot();
+}
+function logout(){localStorage.removeItem('ll_cust_token');CTOKEN='';location.reload()}
+async function boot(){
+  ME=await api('/api/account');
+  if(ME.error)return;
+  $('authCard').style.display='none';$('shell').style.display='block';
+  applyTheme(localStorage.getItem('ll_theme')||'light');
+  loadAll();showView('overview');
+  requestPush(false);
+}
+function toggleTheme(){applyTheme(document.documentElement.dataset.theme==='dark'?'light':'dark')}
+function applyTheme(t){document.documentElement.dataset.theme=t;localStorage.setItem('ll_theme',t);
+  $('themeIcon').innerHTML=t==='dark'
+    ?'<path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8z"/>'
+    :'<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>';}
+function toggleBell(e){e.stopPropagation();$('bellPanel').classList.toggle('open');renderBell()}
+document.addEventListener('click',e=>{if(!e.target.closest('.bell-panel')&&!e.target.closest('.icon-btn'))$('bellPanel').classList.remove('open')});
+/* capture the install prompt so the per-OS buttons can use it (the auto pill stays suppressed) */
+window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); window.__deferredInstall = e; });
+</script>
+<script defer src="assets/portal-views.js"></script>
+<script defer src="assets/chat.js?v=11"></script>
+</body>
+</html>

@@ -1,0 +1,114 @@
+#!/bin/sh
+set -e
+. /usr/share/debconf/confmodule
+
+APP_USER=lines-logos
+APP_DIR=/opt/lines-logos
+
+db_get lines-logos/port; PORT="${RET:-3001}"
+db_get lines-logos/domain; DOMAIN="$RET"
+db_get lines-logos/stripe-pk; PK="$RET"
+db_get lines-logos/stripe-sk; SK="$RET"
+db_get lines-logos/stripe-wh; WH="$RET"
+db_get lines-logos/openrouter; ORK="$RET"
+db_get lines-logos/anthropic; ANK="$RET"
+db_get lines-logos/openai; OAK="$RET"
+db_get lines-logos/gemini; GMK="$RET"
+db_stop
+
+if ! id "$APP_USER" >/dev/null 2>&1; then
+  adduser --system --group --home "$APP_DIR" --no-create-home --disabled-login "$APP_USER" >/dev/null
+fi
+
+touch "$APP_DIR/data/.keep"
+chown -R "$APP_USER:$APP_USER" "$APP_DIR"
+# app code is world-readable (so the CLI shim can run it); data and .env stay private
+chmod 755 "$APP_DIR"
+chmod 750 "$APP_DIR/data"
+
+if [ ! -f "$APP_DIR/.env" ]; then
+  CRON_SEC="$(head -c 24 /dev/urandom | base64 | tr -dc 'a-zA-Z0-9' | head -c 32)"
+  ( umask 077
+    {
+      printf '# Lines & Logos Business OS\n'
+      printf '# Manage keys anytime in the app: Admin → Keys & Integrations\n'
+      printf 'PORT=%s\n' "$PORT"
+      [ -n "$DOMAIN" ] && printf 'PUBLIC_DOMAIN=%s\n' "$DOMAIN"
+      [ -n "$PK" ] && printf 'STRIPE_PUBLISHABLE_KEY=%s\n' "$PK"
+      [ -n "$SK" ] && printf 'STRIPE_SECRET_KEY=%s\n' "$SK"
+      [ -n "$WH" ] && printf 'STRIPE_WEBHOOK_SECRET=%s\n' "$WH"
+      [ -n "$ORK" ] && printf 'OPENROUTER_API_KEY=%s\n' "$ORK"
+      [ -n "$ANK" ] && printf 'ANTHROPIC_API_KEY=%s\n' "$ANK"
+      [ -n "$OAK" ] && printf 'OPENAI_API_KEY=%s\n' "$OAK"
+      [ -n "$GMK" ] && printf 'GEMINI_API_KEY=%s\n' "$GMK"
+      printf 'CRON_SECRET=%s\n' "$CRON_SEC"
+    } > "$APP_DIR/.env"
+  )
+  chown "$APP_USER:$APP_USER" "$APP_DIR/.env"
+  chmod 600 "$APP_DIR/.env"
+fi
+
+# --- CLI alias: autodropshipstore -------------------------------------------
+# /usr/local/bin is on the default PATH, so typing `autodropshipstore` in any
+# terminal launches (or opens) the Business OS.
+cat > /usr/local/bin/autodropshipstore <<'EOF'
+#!/bin/sh
+# autodropshipstore — Lines & Logos Business OS
+# Usage: autodropshipstore          starts/opens the app in your browser
+#        autodropshipstore --shell  runs the server in this terminal instead
+APP_DIR=/opt/lines-logos
+PORT="$(sed -n 's/^PORT=\([0-9][0-9]*\).*/\1/p' "$APP_DIR/.env" 2>/dev/null)"
+PORT="${PORT:-3001}"
+URL="http://localhost:${PORT}/login.html"
+
+if [ "$1" = "--shell" ]; then
+  cd "$APP_DIR" || exit 1
+  echo "autodropshipstore: starting Lines & Logos Business OS on port $PORT"
+  echo "Open $URL in your browser (Ctrl+C to stop)."
+  exec node server.js
+fi
+
+if [ -d /run/systemd/system ] && command -v systemctl >/dev/null 2>&1; then
+  if ! systemctl is-active --quiet lines-logos.service 2>/dev/null; then
+    sudo systemctl start lines-logos.service 2>/dev/null \
+      || echo "autodropshipstore: could not start the service — run: sudo systemctl start lines-logos"
+  fi
+  # wait (max ~10s) for the server to answer
+  i=0
+  while [ "$i" -lt 20 ]; do
+    node -e "require('http').get('http://localhost:${PORT}/api/health',r=>process.exit(r.statusCode===200?0:1)).on('error',()=>process.exit(1))" 2>/dev/null && break
+    i=$((i+1)); sleep 0.5
+  done
+  exec xdg-open "$URL" 2>/dev/null || echo "Open $URL in your browser."
+fi
+
+# no systemd: run the server directly in this terminal
+cd "$APP_DIR" || exit 1
+echo "autodropshipstore: starting Lines & Logos Business OS on port $PORT"
+echo "Open $URL in your browser (Ctrl+C to stop)."
+exec node server.js
+EOF
+chmod 755 /usr/local/bin/autodropshipstore
+
+# desktop integration
+if command -v update-desktop-database >/dev/null 2>&1; then
+  update-desktop-database /usr/share/applications || true
+fi
+if command -v update-icon-caches >/dev/null 2>&1; then
+  update-icon-caches /usr/share/icons/hicolor || true
+fi
+
+systemctl daemon-reload 2>/dev/null || true
+systemctl enable --now lines-logos.service 2>/dev/null || true
+
+IP="$(hostname -I 2>/dev/null | awk '{print $1}')"
+URL="http://$IP:$PORT"
+[ -n "$DOMAIN" ] && URL="https://$DOMAIN"
+printf '\n'
+printf '%s\n' "Lines & Logos Business OS is installed and running."
+printf '%s\n' "Open ${URL}/login.html — the FIRST person to open it creates the owner account."
+printf '%s\n' "CLI: type 'autodropshipstore' in any terminal (or Alt+F2 / Run) to open the app."
+printf '%s\n' "Skipped or need more keys? Admin → Keys & Integrations has every key with signup links."
+printf '%s\n' "Skipped Stripe? The go-live checklist inside the app handles live keys, Tax, and webhooks."
+printf '%s\n' "Service: systemctl status lines-logos   Logs: journalctl -u lines-logos -f"
+printf '\n'

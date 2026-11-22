@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Lines &amp; Logos — Business OS</title>
+<style>
+:root{--ink:#04060d;--blue:#2d5bff;--cyan:#57c7ff;--text:#c6d0e6;--dim:#7e8cab}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--ink);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:26px 20px}
+.logo{width:170px;margin-bottom:26px}
+.card{width:100%;max-width:420px;background:linear-gradient(180deg,rgba(16,31,77,.55),rgba(4,6,13,.9));border:1px solid rgba(120,145,205,.16);border-radius:20px;padding:30px 26px;backdrop-filter:blur(12px)}
+h1{font-size:20px;color:#fff;margin-bottom:6px}
+p.sub{font-size:13.5px;color:var(--dim);line-height:1.6;margin-bottom:20px}
+label{display:block;font-size:11.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);margin:0 0 8px}
+input{width:100%;padding:14px 15px;border-radius:11px;border:1px solid rgba(120,145,205,.2);background:rgba(4,6,13,.6);color:#fff;font-size:15px;margin-bottom:16px;outline:none}
+input:focus{border-color:#4d7dff;box-shadow:0 0 0 3px rgba(45,91,255,.2)}
+button{width:100%;padding:15px;border:none;border-radius:12px;font-weight:800;font-size:15px;color:#fff;background:linear-gradient(180deg,#4d7dff,#2d5bff);cursor:pointer}
+button:disabled{opacity:.5}
+.err{display:none;color:#ff9d9d;font-size:13px;margin-bottom:14px}
+.note{margin-top:18px;font-size:12px;color:var(--dim);line-height:1.7;text-align:center}
+</style>
+</head>
+<body>
+<img class="logo" src="logo-hero.png" alt="Lines & Logos" onerror="this.style.display='none'">
+<div class="card" id="setup" style="display:none">
+  <h1>Connect to your server</h1>
+  <p class="sub">This app opens on your Business OS login page. Point it at your server once — it remembers.</p>
+  <div class="err" id="err"></div>
+  <label>Server address</label>
+  <input id="url" type="url" placeholder="https://os.yourcompany.com" autocapitalize="off" autocorrect="off">
+  <button id="go" onclick="connect()">Connect →</button>
+  <p class="note">Example: the address you use in the browser, without <code>/login.html</code>.<br>Running the server on this phone? Use <code>http://localhost:3001</code>.</p>
+</div>
+<div class="card" id="loading" style="display:none">
+  <h1>Opening login…</h1>
+  <p class="sub" id="loadingMsg">Contacting your server.</p>
+  <p class="note"><button style="padding:10px;font-weight:600" onclick="resetServer()">Use a different server</button></p>
+</div>
+<script>
+/* Landing: if a server URL is saved, verify it and load the server's LOGIN page.
+   Otherwise show the one-time server setup. */
+const KEY = 'll_mobile_server_url';
+const saved = localStorage.getItem(KEY) || '';
+function show(id){ document.getElementById('setup').style.display = id==='setup'?'block':'none';
+  document.getElementById('loading').style.display = id==='loading'?'block':'none'; }
+function fail(msg){ const e = document.getElementById('err'); e.textContent = msg; e.style.display='block'; }
+async function probe(base){
+  const r = await fetch(base + '/api/health', { cache:'no-store' });
+  return r.ok;
+}
+function openLogin(base){ window.location.replace(base + '/login.html'); }
+async function connect(){
+  const raw = document.getElementById('url').value.trim().replace(/\/+$/,'');
+  const base = /^https?:\/\//.test(raw) ? raw : (raw ? 'https://' + raw : '');
+  if (!base) return fail('Enter your server address, e.g. https://os.yourcompany.com');
+  document.getElementById('go').disabled = true;
+  try {
+    if (await probe(base)) { localStorage.setItem(KEY, base); openLogin(base); }
+    else fail('No Business OS found at that address — check the URL and that the server is running.');
+  } catch { fail('Could not reach that address — check the URL and your connection.'); }
+  document.getElementById('go').disabled = false;
+}
+function resetServer(){ localStorage.removeItem(KEY); show('setup'); }
+(async () => {
+  if (!saved) { show('setup'); document.getElementById('url').focus(); return; }
+  show('loading');
+  document.getElementById('loadingMsg').textContent = 'Contacting ' + saved;
+  try { if (await probe(saved)) openLogin(saved); else { show('setup'); fail('Saved server did not respond — update the address or check the server.'); document.getElementById('url').value = saved; } }
+  catch { show('setup'); document.getElementById('url').value = saved; }
+})();
+</script>
+</body>
+</html>

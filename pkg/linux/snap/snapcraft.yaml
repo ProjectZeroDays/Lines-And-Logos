@@ -1,0 +1,43 @@
+name: lines-and-logos-os
+base: core22
+version: '1.0.0'
+summary: Lines & Logos Business OS
+description: |
+  All-in-one Business OS for Lines & Logos: marketing site, internal
+  dashboards, client / crew / partner portals, quotes + CRM, calendar,
+  finance, chat, and automation agents.
+
+grade: stable
+confinement: strict
+
+apps:
+  lines-and-logos:
+    command: bin/run.sh
+    daemon: simple
+    restart-condition: on-abnormal
+    plugs:
+      - network
+      - network-bind
+      - home
+
+parts:
+  app:
+    plugin: nil
+    source: .
+    stage-packages:
+      - nodejs
+    override-build: |
+      cp -r $SNAPCRAFT_PART_SRC/server.js $SNAPCRAFT_PART_SRC/lib \
+            $SNAPCRAFT_PART_SRC/app $SNAPCRAFT_PART_SRC/data \
+            $SNAPCRAFT_PART_INSTALL/
+      mkdir -p $SNAPCRAFT_PART_INSTALL/bin
+      cat > $SNAPCRAFT_PART_INSTALL/bin/run.sh <<'EOF'
+      #!/bin/sh
+      cd $SNAP
+      exec /usr/bin/node server.js --port ${PORT:-8080} --data $SNAP_COMMON/data
+      EOF
+      chmod +x $SNAPCRAFT_PART_INSTALL/bin/run.sh
+      # icon
+      mkdir -p $SNAPCRAFT_PART_INSTALL/meta/gui
+      cp $SNAPCRAFT_PART_SRC/pkg/icons/dist/linux/hicolor/512x512/apps/lines-and-logos.png \
+         $SNAPCRAFT_PART_INSTALL/meta/gui/icon.png

@@ -1,0 +1,15 @@
+{$DOMAIN} {
+    reverse_proxy app:3001
+    encode zstd gzip
+    header {
+        X-Content-Type-Options nosniff
+        X-Frame-Options DENY
+        Referrer-Policy strict-origin-when-cross-origin
+        -Server
+    }
+    tls {$EMAIL}
+}
+
+www.{$DOMAIN} {
+    redir https://{$DOMAIN}{uri} permanent
+}

@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Operations — Lines &amp; Logos Business OS</title>
+<link rel="icon" type="image/png" href="icons/favicon-32.png?v=2">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;700;800&family=Archivo+Black&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/os.css?v=9">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#04060d">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Lines & Logos">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+</head>
+<body data-perms="notifications">
+<main>
+  <div class="topbar">
+    <div><div class="crumb">Business OS / Operations</div><h1 class="chrome">Operations</h1></div>
+    <div class="topbar-right">
+      <input class="search" id="q" placeholder="Search…" oninput="render()">
+      <button class="btn btn-sm" onclick="addItem()">+ New Job</button>
+    </div>
+  </div>
+  <div class="tabs2" id="tabs"></div>
+  <div id="view"></div>
+</main>
+<script src="assets/os.js?v=9"></script>
+<script>
+const {fmt,esc,JOBS,GEN}=OS;
+let view='jobs';
+const TABS=[['jobs','Jobs'],['schedule','Schedule'],['time','Time Tracking'],['checklists','Checklists']];
+function renderTabs(){OS.$('#tabs').innerHTML=TABS.map(([k,l])=>`<button class="${view===k?'active':''}" onclick="go('${k}')">${l}</button>`).join('');}
+function go(v){view=v;renderTabs();render();}
+const q=()=>OS.$('#q').value.toLowerCase();
+const match=(...xs)=>xs.join(' ').toLowerCase().includes(q());
+
+async function render(){
+  await ({jobs:vJobs,schedule:vSchedule,time:vTime,checklists:vChecklists})[view]();
+  renderTabs();
+}
+async function vJobs(){
+  const rows=await OS.list('jobs');
+  OS.$('#view').innerHTML=`<div class="panel flush" style="--accent:var(--lime)"><h3 style="padding:24px 24px 0">Jobs — dispatch &amp; status <span class="right">Job Dispatch Agent · Job Status Update Agent</span></h3><div class="table-wrap"><table>
+    <tr><th>Job</th><th>Account</th><th>Status</th><th>Progress</th><th>Crew</th><th>Due</th><th>Value</th><th>Actions</th></tr>
+    ${rows.filter(j=>match(j.title,j.account,j.crew||'')).map(j=>`<tr>
+      <td><b>${esc(j.title)}</b><span class="sub">${esc(j.notes||'')}</span></td>
+      <td>${esc(j.account)}</td>
+      <td><span class="tag ${JOBS(j.status)}">${j.status}</span></td>
+      <td><div class="pbar-row"><div class="progressbar"><i style="width:${j.progress||0}%"></i></div><span>${j.progress||0}%</span></div></td>
+      <td>${esc(j.crew||'—')}</td><td>${j.due}</td><td><b>${fmt(j.value)}</b></td>
+      <td style="white-space:nowrap">
+        <button class="btn btn-sm btn-ghost" onclick="dispatch('${j.id}')">Dispatch</button>
+        <button class="btn btn-sm btn-ghost" onclick="statusEmail('${j.id}')">Update Client</button>
+        ${j.status!=='complete'?`<button class="btn btn-sm btn-green" onclick="advanceJob('${j.id}','${j.status}')">Next ▸</button>`:''}
+      </td>
+    </tr>`).join('')}
+  </table></div></div>`;
+}
+const JFLOW=['lead','quoted','in-progress','complete'];
+async function advanceJob(id,status){
+  const next=JFLOW[JFLOW.indexOf(status)+1];if(!next)return;
+  await OS.patch('jobs',id,{status:next,progress:next==='complete'?100:next==='in-progress'?50:0});
+  OS.toast(`Job moved to ${next}`);render();
+}
+async function dispatch(id){
+  const r=await OS.dispatchJob(id);
+  OS.toast(r.match?`Dispatch Agent → ${r.match.name} (${r.match.role})`:r.rationale);render();
+}
+async function statusEmail(id){
+  const jobs=await OS.list('jobs');const j=jobs.find(x=>x.id===id);
+  let r;
+  if(OS.isLive()){r=await OS.runAgent('status-email',{jobId:id});r=r.result;}
+  else r=OS.demoAgents.jobStatusEmail(j);
+  OS.openModal('Drafted Client Update — Job Status Update Agent',
+    `<label>To</label><input value="${esc(r.to)}" readonly>
+     <label>Subject</label><input value="${esc(r.subject)}" readonly>
+     <label>Body</label><textarea readonly style="min-height:150px">${esc(r.body)}</textarea>`);
+  OS.$('#modalSave').textContent='Send (simulated)';
+  OS.onModalSave(async()=>{OS.closeModal();OS.logActivity?OS.logActivity(`Job Status Update Agent sent update for ${j.title}`):0;OS.toast('Progress update sent to '+r.to);});
+}
+async function vSchedule(){
+  const jobs=await OS.list('jobs');
+  const days=[...Array(14)].map((_,i)=>OS.addDays(i));
+  OS.$('#view').innerHTML=`<div class="panel" style="--accent:var(--cyan)"><h3>Schedule — next 14 days</h3>
+  <div class="sched">${days.map(d=>{
+    const due=jobs.filter(j=>j.due===d);
+    const wd=new Date(d+'T12:00').toLocaleDateString('en-US',{weekday:'short'});
+    const today=d===OS.today();
+    return `<div class="sched-day ${today?'today':''}"><div class="dh">${wd} ${d.slice(5)}</div>
+      ${due.map(j=>`<div class="sched-ev ${j.status==='complete'?'grey':j.status==='in-progress'?'lime':''}"><b>${esc(j.title.slice(0,26))}</b><br>${esc(j.crew||'unassigned')}</div>`).join('')||'<div style="font-size:11px;color:var(--text-dim)">—</div>'}
+    </div>`;}).join('')}</div></div>
+  <div class="panel flush" style="--accent:var(--volley)"><h3 style="padding:24px 24px 0">Crew Allocation</h3><div class="table-wrap"><table>
+    <tr><th>Crew Member</th><th>Role</th><th>Availability</th><th>Hours (logged)</th><th>Assigned Jobs</th></tr>
+    ${(await OS.list('employees')).map(e=>{
+      const hrs=OS.cur('timeEntries').filter(t=>t.employeeId===e.id).reduce((s,t)=>s+t.hours,0);
+      const assigned=OS.cur('jobs').filter(j=>j.status!=='complete'&&(j.crew===e.name||(j.crew||'').includes(e.name.split(' ')[0]))).map(j=>j.title);
+      return `<tr><td><b>${esc(e.name)}</b></td><td>${esc(e.role)}</td><td><span class="tag ${e.availability==='full-time'?'t-lime':'t-yellow'}">${e.availability}</span></td><td>${hrs}h</td><td>${assigned.map(esc).join('<br>')||'—'}</td></tr>`;}).join('')}
+  </table></div></div>`;
+}
+async function vTime(){
+  const rows=await OS.list('timeEntries');
+  const total=rows.reduce((s,t)=>s+t.hours,0);
+  OS.$('#view').innerHTML=`<div class="kpis k3">
+    <div class="kpi" style="--accent:var(--cyan)"><div class="lbl">Hours Logged</div><div class="val">${total}</div><div class="delta" style="--c:var(--cyan)">all jobs</div></div>
+    <div class="kpi" style="--accent:var(--lime)"><div class="lbl">Active Timers</div><div class="val">${OS.cur('jobs').filter(j=>j.status==='in-progress').length}</div><div class="delta" style="--c:var(--green)">jobs in progress</div></div>
+    <div class="kpi" style="--accent:var(--volley)"><div class="lbl">Crew Logging</div><div class="val">${new Set(rows.map(t=>t.employeeId)).size}</div><div class="delta" style="--c:var(--volley)">of ${OS.cur('employees').length} contractors</div></div>
+  </div>
+  <div class="panel flush" style="--accent:var(--cyan)"><h3 style="padding:24px 24px 0">Time Entries <span class="right"><button class="btn btn-sm btn-ghost" onclick="logTime()">+ Log Time</button></span></h3><div class="table-wrap"><table>
+    <tr><th>Date</th><th>Employee</th><th>Job</th><th>Hours</th><th>Note</th></tr>
+    ${rows.filter(t=>match(t.employee,t.job,t.note)).map(t=>`<tr><td>${t.date}</td><td><b>${esc(t.employee)}</b></td><td>${esc(t.job)}</td><td><b>${t.hours}h</b></td><td>${esc(t.note||'')}</td></tr>`).join('')}
+  </table></div></div>`;
+}
+function logTime(){
+  OS.openModal('Log Time',`
+    <label>Job</label><select id="f-job">${OS.cur('jobs').map(j=>`<option value="${j.id}">${esc(j.title)}</option>`).join('')}</select>
+    <label>Crew Member</label><select id="f-emp">${OS.cur('employees').map(e=>`<option value="${e.id}">${esc(e.name)}</option>`).join('')}</select>
+    <label>Hours</label><input id="f-hours" type="number" step="0.5" min="0.5" value="8">
+    <label>Note</label><input id="f-note" placeholder="What got done?">`);
+  OS.onModalSave(async()=>{await OS.create('timeEntries',{jobId:OS.field('f-job'),employeeId:OS.field('f-emp'),date:OS.today(),hours:+OS.field('f-hours')||1,note:OS.field('f-note')});OS.closeModal();OS.toast('Time logged');render();});
+}
+async function vChecklists(){
+  const [cls,runs]=await Promise.all([OS.list('checklists'),OS.list('checklistRuns')]);
+  OS.$('#view').innerHTML=`<div class="grid-2 eq">
+    <div class="panel" style="--accent:var(--lime)"><h3>Checklist Library</h3>
+      ${cls.map(k=>`<div style="border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:12px">
+        <b style="color:#fff">${esc(k.name)}</b> <span class="tag ${k.type==='safety'?'t-red':'t-blue'}" style="margin-left:6px">${k.type}</span>
+        <div style="margin:10px 0 14px;font-size:12.5px;color:var(--text-dim);line-height:1.7">${k.items.map((i,n)=>`${n+1}. ${esc(i)}`).join('<br>')}</div>
+        <button class="btn btn-sm" onclick="startRun('${k.id}')">▶ Run Checklist</button>
+      </div>`).join('')}
+    </div>
+    <div class="panel" style="--accent:var(--volley)"><h3>Run History — audit trail</h3><div class="table-wrap"><table>
+      <tr><th>Date</th><th>Checklist</th><th>Job</th><th>By</th><th>Items</th></tr>
+      ${runs.map(r=>{const k=OS.cur('checklists').find(k=>k.id===r.checklistId);const done=(r.completed||[]).filter(Boolean).length;
+        return `<tr><td>${r.date}</td><td><b>${esc(r.checklist)}</b></td><td>${esc(r.job)}</td><td>${esc(r.employee)}</td><td><span class="tag ${done===(k?k.items.length:0)?'t-green':'t-yellow'}">${done}/${k?k.items.length:'?'}</span></td></tr>`;}).join('')||'<tr><td colspan="5" class="empty">No runs yet</td></tr>'}
+    </table></div></div>
+  </div>`;
+}
+async function startRun(id){
+  const jobs=OS.cur('jobs').filter(j=>j.status!=='complete');
+  OS.openModal('Run Checklist',`<label>Attach to Job</label><select id="f-job">${jobs.map(j=>`<option value="${j.id}">${esc(j.title)}</option>`).join('')}</select><label>Note</label><input id="f-note" placeholder="All items verified on site">`);
+  OS.onModalSave(async()=>{await OS.runChecklist(id,OS.field('f-job'));OS.closeModal();OS.toast('Checklist run logged to audit trail');render();});
+}
+function addItem(){
+  OS.openModal('New Job',`
+    <label>Title</label><input id="f-title" placeholder="School — Service">
+    <label>Account</label><select id="f-acct">${OS.cur('accounts').map(a=>`<option value="${a.id}">${esc(a.name)}</option>`).join('')}</select>
+    <div class="row"><div><label>Value ($)</label><input id="f-value" type="number" min="0"></div><div><label>Due</label><input id="f-due" type="date" value="${OS.addDays(30)}"></div></div>`);
+  OS.onModalSave(async()=>{await OS.create('jobs',{title:OS.field('f-title')||'New job',accountId:OS.field('f-acct'),value:+OS.field('f-value')||0,due:OS.field('f-due'),status:'lead',progress:0});OS.closeModal();OS.toast('Job created');render();});
+}
+OS.boot('ops','Operations',async()=>{await Promise.all([OS.list('accounts'),OS.list('jobs'),OS.list('employees'),OS.list('timeEntries'),OS.list('checklists')]);renderTabs();await render();});
+</script>
+<script src="assets/pwa.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,12 @@
+Package: lines-logos
+Version: 1.0.0
+Architecture: all
+Maintainer: Trey Smith <trey@linesandlogos.team>
+Depends: nodejs (>= 18), adduser
+Section: web
+Priority: optional
+Homepage: https://linesandlogos.team
+Description: Lines & Logos Business OS — marketing site + business operating system
+ (sales/ops/finance agents, crew portal, customer portal, invoicing, careers/ATS)
+ in one zero-dependency Node.js server. First person to open the app creates
+ the owner account; the built-in go-live wizard handles Stripe live keys.

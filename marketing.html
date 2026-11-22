@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Marketing — Lines &amp; Logos Business OS</title>
+<link rel="icon" type="image/png" href="icons/favicon-32.png?v=2">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;700;800&family=Archivo+Black&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/os.css?v=9">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#04060d">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Lines & Logos">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+</head>
+<body data-perms="notifications">
+<main>
+  <div class="topbar">
+    <div><div class="crumb">Business OS / Marketing</div><h1 class="chrome">Marketing</h1></div>
+    <div class="topbar-right">
+      <input class="search" id="q" placeholder="Search…" oninput="render()">
+      <button class="btn btn-sm" id="addBtn" onclick="addItem()">+ New Content</button>
+    </div>
+  </div>
+  <div class="tabs2" id="tabs"></div>
+  <div id="view"></div>
+</main>
+<script src="assets/os.js?v=9"></script>
+<script>
+const {fmt,esc,GEN}=OS;
+let view='content';
+const TABS=[['content','Content Queue'],['campaigns','Campaigns'],['social','Social Calendar']];
+const ADD={content:'+ New Content',campaigns:'+ New Campaign',social:''};
+function renderTabs(){OS.$('#tabs').innerHTML=TABS.map(([k,l])=>`<button class="${view===k?'active':''}" onclick="go('${k}')">${l}</button>`).join('');
+  const b=OS.$('#addBtn');b.textContent=ADD[view]||'';b.style.display=ADD[view]?'inline-block':'none';}
+function go(v){view=v;renderTabs();render();}
+const q=()=>OS.$('#q').value.toLowerCase();
+const match=(...xs)=>xs.join(' ').toLowerCase().includes(q());
+const CFLOW=['draft','scheduled','published'];
+
+async function render(){
+  await ({content:vContent,campaigns:vCampaigns,social:vSocial})[view]();
+  renderTabs();
+}
+async function vContent(){
+  const rows=await OS.list('content');
+  OS.$('#view').innerHTML=`<div class="grid-3">
+    ${rows.filter(c=>match(c.title,c.body)).map(c=>`
+    <div class="panel" style="--accent:var(--cyan)">
+      <h3>${esc(c.title)}</h3>
+      <div style="display:flex;gap:8px;margin-bottom:12px"><span class="tag ${GEN(c.status)}">${c.status}</span><span class="tag t-grey">${esc(c.type)}</span></div>
+      <p style="font-size:12.5px;color:var(--text-dim);line-height:1.65;margin-bottom:16px">${esc((c.body||'').slice(0,150))}…</p>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn btn-sm" onclick="repurpose('${c.id}')">⚡ Repurpose → Social</button>
+        ${c.status!=='published'?`<button class="btn btn-sm btn-ghost" onclick="advanceContent('${c.id}','${c.status}')">${c.status==='draft'?'Schedule':'Publish'}</button>`:''}
+      </div>
+    </div>`).join('')||'<div class="panel empty">No content yet</div>'}
+  </div>
+  <div class="banner info" style="display:block">Content Repurposing Agent turns any blog or case study into LinkedIn, Instagram, Facebook, and X posts in one click.</div>`;
+}
+async function advanceContent(id,status){
+  const next=CFLOW[CFLOW.indexOf(status)+1];if(!next)return;
+  await OS.patch('content',id,{status:next,date:OS.today()});OS.toast(`Content ${next}`);render();
+}
+async function repurpose(id){
+  const r=await OS.repurposeContent(id);
+  OS.openModal('Repurposed — Content Repurposing Agent',
+    r.posts.map(p=>`<label>${esc(p.channel)}</label><textarea readonly style="min-height:${p.channel==='LinkedIn'?110:70}px">${esc(p.text)}</textarea>`).join(''));
+  OS.$('#modalSave').textContent='Queue All Posts';
+  OS.onModalSave(()=>{OS.closeModal();OS.toast(r.posts.length+' posts queued to Social Calendar');render();});
+}
+async function vCampaigns(){
+  const rows=await OS.list('campaigns');
+  OS.$('#view').innerHTML=`<div class="panel flush" style="--accent:var(--orange)"><h3 style="padding:24px 24px 0">Campaigns</h3><div class="table-wrap"><table>
+    <tr><th>Campaign</th><th>Channel</th><th>Status</th><th>Start</th><th>Budget</th><th>Results</th><th></th></tr>
+    ${rows.filter(c=>match(c.name,c.channel)).map(c=>`<tr>
+      <td><b>${esc(c.name)}</b></td><td><span class="tag t-blue">${esc(c.channel)}</span></td>
+      <td><span class="tag ${GEN(c.status)}">${c.status}</span></td><td>${c.start}</td><td><b>${fmt(c.budget)}</b></td>
+      <td><span class="sub" style="color:var(--text)">${esc(c.results||'—')}</span></td>
+      <td>${c.status==='planned'?`<button class="btn btn-sm btn-green" onclick="launchCamp('${c.id}')">Launch</button>`:c.status==='active'?`<button class="btn btn-sm btn-ghost" onclick="pauseCamp('${c.id}')">Pause</button>`:''}</td>
+    </tr>`).join('')}
+  </table></div></div>`;
+}
+async function launchCamp(id){await OS.patch('campaigns',id,{status:'active',start:OS.today()});OS.toast('Campaign launched');render();}
+async function pauseCamp(id){await OS.patch('campaigns',id,{status:'paused'});OS.toast('Campaign paused');render();}
+async function vSocial(){
+  const rows=(await OS.list('content')).filter(c=>c.status!=='draft');
+  const days=[...Array(7)].map((_,i)=>OS.addDays(i));
+  OS.$('#view').innerHTML=`<div class="panel" style="--accent:var(--volley)"><h3>Social Calendar — this week</h3>
+  <div class="sched">${days.map(d=>{
+    const posts=rows.filter(c=>c.date===d);
+    const wd=new Date(d+'T12:00').toLocaleDateString('en-US',{weekday:'short'});
+    return `<div class="sched-day ${d===OS.today()?'today':''}"><div class="dh">${wd} ${d.slice(5)}</div>
+      ${posts.map(c=>`<div class="sched-ev"><b>${esc(c.title.slice(0,28))}</b><br><span class="tag ${GEN(c.status)}" style="font-size:9px;padding:2px 7px">${c.status}</span></div>`).join('')||'<div style="font-size:11px;color:var(--text-dim)">—</div>'}
+    </div>`;}).join('')}</div></div>
+  <div class="panel flush" style="--accent:var(--cyan)"><h3 style="padding:24px 24px 0">Platform Cadence <span class="right">repurposed posts land here</span></h3><div class="table-wrap"><table>
+    <tr><th>Platform</th><th>Cadence</th><th>Focus</th></tr>
+    <tr><td><b>LinkedIn</b></td><td>3× / week</td><td>Case studies, before/afters, district wins</td></tr>
+    <tr><td><b>Instagram</b></td><td>4× / week</td><td>Photo-first transformations, reels of installs</td></tr>
+    <tr><td><b>Facebook</b></td><td>3× / week</td><td>Community &amp; church audiences, events</td></tr>
+    <tr><td><b>X</b></td><td>daily</td><td>Quick hits, progress shots, scheduling notes</td></tr>
+  </table></div></div>`;
+}
+function addItem(){
+  if(view==='content'){OS.openModal('New Content',`<label>Title</label><input id="f-title"><label>Type</label><select id="f-type"><option>blog</option><option>case-study</option><option>video</option><option>post</option></select><label>Body</label><textarea id="f-body" placeholder="Write or paste the source content — the Repurposing Agent turns it into platform posts."></textarea>`);
+    OS.onModalSave(async()=>{await OS.create('content',{title:OS.field('f-title')||'Untitled',type:OS.field('f-type'),body:OS.field('f-body'),status:'draft',channel:'website',date:OS.addDays(3)});OS.closeModal();OS.toast('Content drafted');render();});}
+  else if(view==='campaigns'){OS.openModal('New Campaign',`<label>Name</label><input id="f-name"><label>Channel</label><select id="f-ch"><option>email</option><option>social</option><option>sms</option></select><label>Budget ($)</label><input id="f-budget" type="number" min="0" value="500">`);
+    OS.onModalSave(async()=>{await OS.create('campaigns',{name:OS.field('f-name')||'Campaign',channel:OS.field('f-ch'),budget:+OS.field('f-budget')||0,status:'planned',start:OS.addDays(7),results:'—'});OS.closeModal();OS.toast('Campaign planned');render();});}
+}
+OS.boot('marketing','Marketing',async()=>{await Promise.all([OS.list('content'),OS.list('campaigns')]);renderTabs();await render();});
+</script>
+<script src="assets/pwa.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Portal Login — Lines &amp; Logos</title>
+<link rel="icon" type="image/png" href="icons/favicon-32.png?v=2">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;700;800&family=Archivo+Black&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#04060d;--navy:#0a1533;--navy-2:#132a63;--blue:#2d5bff;--blue-hi:#4d7dff;--cyan:#57c7ff;
+  --orange:#ff7a1a;--wood:#e8a24a;--lime:#c6e02c;--yellow:#ffc21c;--green:#3fae5a;--volley:#8fa8ff;
+  --chrome-1:#eef3fc;--line:rgba(120,145,205,.16);--text:#c6d0e6;--text-dim:#7e8cab;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--ink);color:var(--text);font-family:'Space Grotesk',system-ui,sans-serif;min-height:100vh;display:flex;flex-direction:column;overflow-x:hidden}
+.chrome{background:linear-gradient(180deg,#fff 0%,#dfe7f5 26%,#8ea2c8 50%,#f4f8ff 60%,#7688ad 86%,#ccd8ee 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.orb{position:fixed;border-radius:50%;filter:blur(90px);opacity:.4;pointer-events:none}
+.ob1{width:560px;height:560px;background:var(--blue);top:-20%;left:-10%}
+.ob2{width:380px;height:380px;background:var(--orange);bottom:-12%;right:-6%;opacity:.3}
+.ob3{width:300px;height:300px;background:var(--green);bottom:20%;left:8%;opacity:.22}
+main{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:28px 24px;position:relative}
+.card-logo{width:200px;display:block;margin:0 auto 24px;filter:drop-shadow(0 12px 34px rgba(45,91,255,.45))}
+.card{width:100%;max-width:440px;border:1px solid var(--line);border-radius:24px;padding:44px 40px;background:linear-gradient(180deg,rgba(16,31,77,.55),rgba(4,6,13,.85));backdrop-filter:blur(14px);box-shadow:0 40px 100px rgba(0,0,0,.6)}
+h1{font-family:'Archivo Black',sans-serif;font-size:26px;text-transform:uppercase;margin-bottom:6px;text-align:center}
+.sub{font-size:14px;color:var(--text-dim);margin-bottom:30px;text-align:center;line-height:1.6}
+.tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:28px}
+.tabs.tabs4{grid-template-columns:repeat(4,1fr)}
+.tab{font-family:'Archivo',sans-serif;font-weight:700;font-size:13px;padding:11px 6px;border-radius:10px;border:1px solid var(--line);background:transparent;color:var(--text-dim);cursor:pointer;transition:.2s;letter-spacing:.03em}
+.tab.active{background:linear-gradient(180deg,#4d7dff,#2d5bff);border-color:transparent;color:#fff;box-shadow:0 8px 24px rgba(45,91,255,.4)}
+label{display:block;font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--text-dim);margin:0 0 8px}
+input{width:100%;padding:14px 16px;border-radius:11px;border:1px solid var(--line);background:rgba(4,6,13,.6);color:#fff;font-family:inherit;font-size:15px;margin-bottom:18px;outline:none;transition:border-color .2s,box-shadow .2s}
+input:focus{border-color:var(--blue-hi);box-shadow:0 0 0 3px rgba(45,91,255,.2)}
+.btn{width:100%;font-family:'Archivo',sans-serif;font-weight:800;font-size:15.5px;color:#fff;border:none;cursor:pointer;padding:15px;border-radius:12px;background:linear-gradient(180deg,#4d7dff,#2d5bff 45%,#1c3fd6);box-shadow:0 0 0 1px rgba(120,160,255,.5) inset,0 10px 30px rgba(45,91,255,.35);transition:transform .15s,box-shadow .2s}
+.btn:hover{transform:translateY(-2px);box-shadow:0 0 0 1px rgba(140,175,255,.7) inset,0 16px 44px rgba(45,91,255,.5)}
+.err{display:none;background:rgba(255,60,60,.1);border:1px solid rgba(255,80,80,.4);color:#ff9d9d;font-size:13.5px;border-radius:10px;padding:12px 16px;margin-bottom:18px}
+.hint{margin-top:22px;font-size:12.5px;color:var(--text-dim);line-height:1.7;border-top:1px solid var(--line);padding-top:18px;text-align:center}
+.hint code{color:var(--cyan);background:rgba(45,91,255,.12);padding:2px 7px;border-radius:6px;font-size:12px}
+.back{display:inline-block;margin-top:20px;color:var(--text-dim);font-size:13px;text-decoration:none}
+.back:hover{color:#fff}
+@media(max-width:560px){
+  main{padding:18px 16px}
+  .card{padding:30px 22px;border-radius:18px}
+  .card-logo{width:168px}
+}
+/* PWA install toast — top banner, only shown on this login page */
+#installToast{position:fixed;top:0;left:0;right:0;z-index:9999;display:flex;align-items:center;gap:13px;padding:12px 18px;background:linear-gradient(180deg,#132a63,#0a1533);border-bottom:1px solid rgba(120,160,255,.45);box-shadow:0 14px 44px rgba(0,0,0,.55);transform:translateY(-115%);transition:transform .45s ease;font-size:13.5px}
+#installToast.show{transform:none}
+#installToast .dot{flex:none;width:10px;height:10px;border-radius:50%;background:var(--lime);box-shadow:0 0 12px var(--lime)}
+#installToast .txt{flex:1;min-width:0;color:var(--text);line-height:1.45}
+#installToast .txt b{color:#fff;font-family:'Archivo',sans-serif;letter-spacing:.02em}
+#installToast button{flex:none;cursor:pointer;font:800 12.5px Archivo,sans-serif;padding:9px 18px;border-radius:9px;border:none;color:#fff;background:linear-gradient(180deg,#4d7dff,#2d5bff 45%,#1c3fd6)}
+#installToast .x{flex:none;width:32px;height:32px;padding:0;background:transparent;border:1px solid rgba(120,145,205,.35);color:var(--text-dim);border-radius:9px;font-size:16px;line-height:1}
+#installToast .x:hover{color:#fff}
+@media(max-width:560px){
+  #installToast{flex-wrap:wrap;gap:10px}
+  #installToast .txt{flex-basis:100%;order:-1}
+}
+</style>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#04060d">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Lines & Logos">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="stylesheet" href="assets/theme.css">
+<script defer src="assets/theme.js?v=2"></script>
+</head>
+<body>
+<div class="orb ob1"></div><div class="orb ob2"></div><div class="orb ob3"></div>
+
+
+<main>
+  <div class="card">
+    <img class="card-logo" src="logo-hero.png" alt="Lines &amp; Logos">
+    <h1 class="chrome" id="title">Portal Login</h1>
+    <p class="sub" id="subtitle">Sign in to the Lines &amp; Logos portal.</p>
+    <p class="sub" id="roleHelp" style="margin:-16px 0 6px;font-size:12px">Admins and Crew sign in with email + password or a passkey. Clients and Partners use the token from your welcome email.</p>
+    <p class="sub" id="roleFieldHint" style="margin:0 0 22px;font-size:11.5px;color:var(--yellow)">Business OS access — owners and office staff.</p>
+
+    <div class="tabs tabs4" role="tablist" aria-label="Portal role">
+      <button class="tab active" role="tab" aria-selected="true" data-role="admin" data-hint="Business OS access for owners and office staff." onclick="switchRole('admin')">Admin</button>
+      <button class="tab" role="tab" aria-selected="false" data-role="contractor" data-hint="Field access — your crew lead issues these credentials." onclick="switchRole('contractor')">Crew</button>
+      <button class="tab" role="tab" aria-selected="false" data-role="client" data-hint="From your welcome email or contract-signing link." onclick="switchRole('client')">Client</button>
+      <button class="tab" role="tab" aria-selected="false" data-role="affiliate" data-hint="From your partner welcome email." onclick="switchRole('affiliate')">Partner</button>
+    </div>
+
+    <div class="err" id="err" role="alert" aria-live="assertive"></div>
+
+    <div id="form">
+      <label id="lblEmail">Work Email</label>
+      <input id="email" type="email" placeholder="Enter Email" autocomplete="username">
+      <label id="lblPass">Password</label>
+      <div style="position:relative">
+        <input id="password" type="password" placeholder="Enter your password" autocomplete="current-password" style="padding-right:64px">
+        <button type="button" onclick="togglePw()" aria-label="Show password" id="pwToggle" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:transparent;border:1px solid var(--line);color:var(--text-dim);border-radius:8px;font-size:11.5px;font-weight:700;padding:6px 10px;cursor:pointer">Show</button>
+      </div>
+    </div>
+    <div id="tokenBox" style="display:none">
+      <label>Portal Token</label>
+      <input id="token" type="text" placeholder="Paste your portal link token">
+    </div>
+
+    <button class="btn" id="signInBtn" onclick="login()">Sign In →</button>
+    <button class="btn btn-ghost" style="margin-top:10px;width:100%;display:inline-flex;align-items:center;justify-content:center;gap:9px" onclick="passkeyLogin()"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="8" cy="15" r="4"/><path d="M10.9 12.1 21 2M15 8l3 3M18 5l2 2"/></svg>Sign in with Passkey</button>
+    <div style="display:flex;justify-content:space-between;margin-top:16px">
+      <a class="back" style="margin-top:0" href="index.html">← Back to website</a>
+      <a class="back" style="margin-top:0" href="forgot.html">Forgot password?</a>
+    </div>
+
+    <div class="hint" id="demoHint" style="display:none">
+      <span style="font-weight:700;letter-spacing:.1em;font-size:11px;color:var(--yellow)">LOCAL DEMO ACCESS</span><br>
+      Credentials — <code>admin@linesandlogos.com</code> / <code>onepaint</code><br>
+      Tokens — crew <code>demo-crew-token</code> · client <code>demo-client-token</code> · partner <code>demo-partner-token</code><br>
+      Not a partner yet? <a href="partners.html" style="color:var(--cyan);text-decoration:none">Earn with us →</a>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <img src="logo-hero.png" alt="Lines &amp; Logos">
+        <address class="foot-address">2847 New Broadway St.<br>Memphis, TN 38109</address>
+      </div>
+      <div>
+        <h4>Partners</h4>
+        <a href="careers.html">Become a Contractor</a>
+        <a href="partners.html#apply">Become an Affiliate</a>
+        <a href="partners.html#how">Affiliate Guide</a>
+        <a href="partners.html#tiers">Earnings &amp; Payouts</a>
+      </div>
+      <div>
+        <h4>Support</h4>
+        <a href="index.html#faq">FAQ</a>
+        <a href="mailto:info@linesandlogos.team">Contact Support</a>
+        <a href="gallery.html">Photo Gallery</a>
+        <a href="legal.html#trust">Verification &amp; Trust</a>
+        <a href="legal.html#data-retention">Data Retention</a>
+      </div>
+      <div>
+        <h4>Legal</h4>
+        <a href="legal.html#terms">Terms of Service</a>
+        <a href="legal.html#privacy">Privacy Policy</a>
+        <a href="legal.html#acceptable-use">Acceptable Use Policy</a>
+        <a href="legal.html#provider-terms">Provider Terms</a>
+        <a href="legal.html#refunds">Refund Policy</a>
+        <a href="legal.html#cookies">Cookie Policy</a>
+        <a href="legal.html#legal-notice">Legal Notice</a>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>© 2026 Lines &amp; Logos. All rights reserved.</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+let role='admin';
+const API_BASE=(location.protocol==='file:')?'http://localhost:3001':'';
+const API=(p,o)=>fetch(API_BASE+p,o).then(r=>r.json());
+function switchRole(r){
+  role=r;
+  document.querySelectorAll('.tab').forEach(t=>{const on=t.dataset.role===r;t.classList.toggle('active',on);t.setAttribute('aria-selected',String(on));});
+  const tabEl=document.querySelector(`.tab[data-role="${r}"]`), hintEl=document.getElementById('roleFieldHint');
+  if(tabEl&&hintEl) hintEl.textContent=tabEl.dataset.hint||'';
+  const needsPw=r==='admin', needsTok=r==='contractor'||r==='client'||r==='affiliate';
+  document.getElementById('form').style.display=needsPw?'block':'none';
+  document.getElementById('tokenBox').style.display=needsTok?'block':'none';
+  if(r==='admin'){ document.getElementById('title').textContent='Admin Portal'; document.getElementById('subtitle').textContent='Business OS — sales, ops, finance, crew.'; }
+  if(r==='contractor'){ document.getElementById('title').textContent='Crew Portal'; document.getElementById('subtitle').textContent='Sign documents, view schedule, get dispatched.'; }
+  if(r==='client'){ document.getElementById('title').textContent='Client Portal'; document.getElementById('subtitle').textContent='Track quotes, jobs, and invoices for your facility.'; }
+  if(r==='affiliate'){ document.getElementById('title').textContent='Partner Login'; document.getElementById('subtitle').textContent='Referral links, leads CRM, and commission tracking.'; }
+  err('');
+}
+document.querySelectorAll('.tab').forEach((t,i,all)=>{
+  t.addEventListener('keydown',e=>{
+    let n=null;
+    if(e.key==='ArrowRight')n=(i+1)%all.length;
+    if(e.key==='ArrowLeft')n=(i-1+all.length)%all.length;
+    if(n!==null){e.preventDefault();all[n].focus();all[n].click();}
+  });
+});
+function err(m){const e=document.getElementById('err');e.style.display=m?'block':'none';e.textContent=m;}
+function togglePw(){
+  const p=document.getElementById('password'), t=document.getElementById('pwToggle');
+  const show=p.type==='password';
+  p.type=show?'text':'password';
+  t.textContent=show?'Hide':'Show';
+  t.setAttribute('aria-label', show?'Hide password':'Show password');
+}
+/* Demo credentials appear ONLY on local/staging — never on the production host */
+(function(){
+  const local=['localhost','127.0.0.1',''].includes(location.hostname)||location.hostname.endsWith('.local');
+  if(local||new URLSearchParams(location.search).has('demo')) document.getElementById('demoHint').style.display='block';
+})();
+async function passkeyLogin(){
+  err('');
+  const email=document.getElementById('email').value.trim();
+  const pk=JSON.parse(localStorage.getItem('ll_passkey')||'null');
+  if(!pk||pk.email!==email){ err('No passkey stored for this email on this device. Sign in with your password once, then enroll a passkey in Settings.'); return; }
+  try{
+    const r=await API('/api/passkey/login',{method:'POST',body:JSON.stringify({email,key:pk.key})});
+    if(r.error) return err('Passkey not recognized.');
+    localStorage.setItem('ll_token',r.token); localStorage.setItem('ll_user',JSON.stringify(r.user));
+    location.href='dashboard.html';
+  }catch{ err('Passkey sign-in needs the live server. Use the demo credentials below to explore this preview.'); }
+}
+async function login(){
+  err('');
+  const btn=document.getElementById('signInBtn');
+  btn.disabled=true; btn.textContent='Signing in…';
+  try{
+    if(role==='admin'){
+      const r=await API('/api/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:email.value,password:password.value})});
+      if(r.error) return err(r.error);
+      localStorage.setItem('ll_token',r.token); localStorage.setItem('ll_user',JSON.stringify(r.user));
+      location.href='dashboard.html';
+    } else if(role==='contractor'){
+      const tok=token.value.trim()||'demo-crew-token';
+      const r=await API('/api/portal/'+tok);
+      if(r.error) return err('Invalid portal token.');
+      localStorage.setItem('ll_portal',tok);
+      location.href='portal.html?token='+encodeURIComponent(tok)+'&name='+encodeURIComponent(r.name);
+    } else if(role==='client'){
+      const tok=token.value.trim()||'demo-client-token';
+      const r=await API('/api/client/'+tok);
+      if(r.error) return err('Invalid client portal token.');
+      sessionStorage.setItem('ll_client_token',tok);
+      location.href='customer.html';
+    } else {
+      // affiliate / partner portal
+      const tok=token.value.trim();
+      if(!tok) return err('Paste your partner dashboard token (from your welcome email).');
+      const r=await API('/api/affiliate/'+encodeURIComponent(tok));
+      if(r.error) return err('Invalid partner token. Apply at partners.html if you\'re new.');
+      localStorage.setItem('ll_affiliate',tok);
+      location.href='affiliate.html?token='+encodeURIComponent(tok);
+    }
+  }catch(e){ offlineDemo(); }
+  finally{ btn.disabled=false; btn.textContent='Sign In →'; }
+}
+/* The published preview is static hosting with no Node backend — when the API
+   is unreachable, validate the demo credentials locally so sign-in still works. */
+function offlineDemo(){
+  if(role==='admin'){
+    if(document.getElementById('email').value.trim().toLowerCase()==='admin@linesandlogos.com' && document.getElementById('password').value==='onepaint'){
+      localStorage.setItem('ll_token','demo-admin-token');
+      localStorage.setItem('ll_user',JSON.stringify({name:'Admin',role:'admin',email:'admin@linesandlogos.com'}));
+      location.href='dashboard.html';
+    } else {
+      err('This hosted preview has no live server — sign in with the demo credentials below to explore.');
+    }
+    return;
+  }
+  if(role==='contractor'){
+    const tok=document.getElementById('token').value.trim()||'demo-crew-token';
+    localStorage.setItem('ll_portal',tok);
+    location.href='portal.html?token='+encodeURIComponent(tok)+'&name='+encodeURIComponent('Demo Crew');
+    return;
+  }
+  if(role==='client'){
+    const tok=document.getElementById('token').value.trim()||'demo-client-token';
+    sessionStorage.setItem('ll_client_token',tok);
+    location.href='customer.html';
+    return;
+  }
+  const tok=document.getElementById('token').value.trim()||'demo-partner-token';
+  localStorage.setItem('ll_affiliate',tok);
+  location.href='affiliate.html?token='+encodeURIComponent(tok);
+}
+document.getElementById('password').addEventListener('keydown',e=>{if(e.key==='Enter')login()});
+
+/* PWA install banner removed per owner request — the app stays installable via the browser's own menu. */
+</script>
+<script>
+/* First-run setup: on a fresh deployment the first person to open this page creates the owner account (one-time, then locked). */
+(function(){
+  const BASE=(location.protocol==='file:')?'http://localhost:3001':'';
+  fetch(BASE+'/api/setup/status').then(r=>r.json()).then(s=>{
+    if(!s || !s.setupRequired) return;
+    document.getElementById('title').textContent='Create Owner Account';
+    document.getElementById('subtitle').innerHTML="You're the first person here — create the owner account to finish deploying your Business&nbsp;OS. This screen appears exactly once; everything after is normal sign-in.";
+    document.getElementById('roleHelp').style.display='none';
+    document.getElementById('roleFieldHint').style.display='none';
+    const tabs=document.querySelector('.tabs'); if(tabs) tabs.style.display='none';
+    document.getElementById('form').innerHTML=
+      '<label>Your Name</label><input id="su-name" type="text" placeholder="Trey Smith" autocomplete="name">'+
+      '<label>Email</label><input id="su-email" type="email" placeholder="you@yourcompany.com" autocomplete="email">'+
+      '<label>Password (12+ characters)</label><input id="su-pass" type="password" placeholder="Create a strong password" autocomplete="new-password">'+
+      '<label>Confirm Password</label><input id="su-pass2" type="password" placeholder="Repeat the password" autocomplete="new-password">';
+    document.getElementById('tokenBox').style.display='none';
+    const btn=document.getElementById('signInBtn');
+    btn.textContent='Create Account & Enter →';
+    btn.nextElementSibling.style.display='none'; /* hide passkey button */
+    const errEl=document.getElementById('err');
+    function fail(m){ errEl.textContent=m; errEl.style.display='block'; btn.disabled=false; }
+    btn.onclick=async ()=>{
+      errEl.style.display='none'; btn.disabled=true;
+      try{
+        const r=await fetch(BASE+'/api/setup/admin',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({
+          name:document.getElementById('su-name').value.trim(),
+          email:document.getElementById('su-email').value.trim(),
+          password:document.getElementById('su-pass').value,
+          confirm:document.getElementById('su-pass2').value })});
+        const d=await r.json();
+        if(!r.ok) return fail(d.error||'Setup failed — try again.');
+        localStorage.setItem('ll_token',d.token);
+        localStorage.setItem('ll_user',JSON.stringify(d.user));
+        location.href='dashboard.html';
+      }catch(e){ fail('Could not reach the server — check that it is running, then retry.'); }
+    };
+  }).catch(()=>{});
+})();
+</script>
+<script src="assets/pwa.js" defer></script>
+</body>
+</html>

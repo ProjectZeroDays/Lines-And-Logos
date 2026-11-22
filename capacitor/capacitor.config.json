@@ -1,0 +1,7 @@
+{
+  "appId": "com.linesandlogos.businessos",
+  "appName": "Lines & Logos",
+  "webDir": "www",
+  "android": { "allowMixedContent": true },
+  "ios": { "contentInset": "automatic" }
+}
